@@ -1,0 +1,7 @@
+certification-docs (0.1.0) UNRELEASED; urgency=low
+  
+  [Rod Smith]
+  * Initial release. Added documentation files from the maas-cert-server
+    project, plus fork of Self-Test Guide for 16.04.
+
+ -- Rod Smith <rod.smith@canonical.com>  Tue, 01 Sep 2015 13:17:30 -0400

@@ -1,0 +1,17 @@
+Source: certification-docs
+Section: admin
+Priority: optional
+Maintainer: Rod Smith <rod.smith@canonical.com>
+Build-Depends: debhelper (>= 9.0.0), rst2pdf, ttf-ubuntu-font-family, python-pil
+Standards-Version: 3.9.5
+Homepage: https://launchpad.net/certification-docs
+#Vcs-Bzr: lp:certification-docs
+#Vcs-Browser: https://code.launchpad.net/certification-docs
+
+Package: certification-docs
+Architecture: all
+Depends: ${misc:Depends}
+Description: Ubuntu certification documentation files
+ Documentation for the Ubuntu Server Certification program,
+ including MANIAC, MANIACS, the Self-Test Guide, the Program
+ Guide, the Test Cases Guide, and the Coverage Guide

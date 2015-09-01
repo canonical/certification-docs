@@ -1,0 +1,9 @@
+certification-docs for Debian
+-----------------------------
+
+This package contains documentation files in reStructuredText (.rst) format
+related to the Ubuntu Server Certification team's activities.
+
+
+ -- Rod Smith <rod.smith@canonical.com>  Tue, 01 Sep 2015 15:09:20 -0400
+
