@@ -126,6 +126,10 @@
       textColor: ff0050
       alignment: TA_CENTER
 
+    green-text:
+      parent: base
+      textColor: green
+
     title-reference:
       parent: normal
       fontName: stdItalic

@@ -23,11 +23,15 @@ maniacs: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.pdf
 
 stg: Self-Test_Guide-14.04.pdf Self-Test_Guide-16.04.pdf
 
+coverage: Coverage_Guide-14.04.pdf Coverage_Guide-16.04.pdf
+
 maniach: MAAS_Advanced_NUC_Installation_And_Configuration.html
 
 maniacsh: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.html
 
 stgh: Self-Test_Guide-14.04.html Self-Test_Guide-16.04.html
+
+coverageh: Coverage_Guide-14.04.html Coverage_Guide-16.04.html
 
 clean:
 	rm -f *.pdf *.html
