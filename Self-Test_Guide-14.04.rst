@@ -144,7 +144,8 @@ Network Test Environment
 ------------------------
 
 -  In addition to the SUT, the network must contain at least one other
-   machine, which will run MAAS and an ``iperf`` server. The MAAS Advanced
+   machine, which will run MAAS and an ``iperf`` server. (Both ``iperf2``
+   and ``iperf3`` are required.) The MAAS Advanced
    NUC Installation and Configuration (MANIAC) document (available from
    https://certification.canonical.com) describes how to configure a MAAS
    server. This server may be a standard part of the testing network or
@@ -692,12 +693,14 @@ To initiate a testing session in a server:
    simplify submission of results at the end of the test; however, this
    will work only if the SUT has full Internet access.
 
-#. Launch ``iperf`` on the server identified in the SUT's
-   ``/etc/xdg/canonical-certification.conf`` file by typing::
+#. Launch ``iperf`` (version 2) and ``iperf3`` on the server identified in
+   the SUT's ``/etc/xdg/canonical-certification.conf`` file by typing, one
+   command in each of two Terminals or logins::
 
     $ iperf -s
+    $ iperf3 -s
 
-#. If you're running the test via SSH, type screen on the SUT to ensure
+#. If you're running the test via SSH, type ``screen`` on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go
    down, as may happen when running the network tests. If you're
    disconnected, you can reconnect to your session by logging in and
@@ -1208,16 +1211,23 @@ tests. Specific suggestions for fixing these problems include:
    can improve matters.
 
 -  **Check the iperf server** -- Ensure that the server computer is up and
-   that the ``iperf`` server program is running on it. Also ensure that the
-   computer has no issues. For instance, some versions of ``iperf``, when
+   that the ``iperf`` server programs are both running on it. Also ensure that the
+   computer has no issues. For instance, some versions of ``iperf`` 2, when
    run in daemon mode, cause the load average to go up every time a client
    disconnects. This can bring even a powerful computer to its knees quite
    quickly!
 
+-  **Restart iperf on the server** -- Occasionally ``iperf`` (version
+   2) and ``iperf3`` interfere with one another when run simultaneously,
+   resulting in poor network performance in both tests. Restarting
+   ``iperf`` (version 2) on the server usually fixes this problem. If it
+   doesn't, try running just one server at a time and run the network tests
+   sequentially.
+
 -  **Ensure the iperf server is on the SUT's local network** -- The
    network tests temporarily remove the default route from the routing
-   table, so the ``iperf`` server must be on the same network segment as
-   the SUT.
+   table, so the ``iperf`` server computer must be on the same network
+   segment as the SUT.
 
 -  **Check the SUT's network configuration** -- A failure to configure the
    network ports in ``/etc/network/interfaces`` will cause a failure of the
