@@ -1,7 +1,13 @@
-certification-docs (0.1.0) UNRELEASED; urgency=low
+certification-docs (0.1.1-0ppa1) trusty; urgency=medium
+
+  * Add iperf3 information to 14.04 Self-Test Guide.
+
+ -- Rod Smith <rod.smith@canonical.com.com>  Mon, 05 Oct 2015 16:17:39 -0400
+
+certification-docs (0.1.0) trusty; urgency=low
   
   [Rod Smith]
   * Initial release. Added documentation files from the maas-cert-server
     project, plus fork of Self-Test Guide for 16.04.
 
- -- Rod Smith <rod.smith@canonical.com>  Tue, 01 Sep 2015 13:17:30 -0400
+ -- Rod Smith <rod.smith@canonical.com>  Mon, 05 Oct 2015 16:10:10 -0400
