@@ -1,3 +1,9 @@
+certification-docs (0.1.2-0ppa1) trusty; urgency=medium
+
+  * Add new Policy Guide RST file 
+
+ -- Jeff Lane <jeff@ubuntu.com>  Tue, 06 Oct 2015 16:15:07 -0400
+
 certification-docs (0.1.1-0ppa1) trusty; urgency=medium
 
   * Add iperf3 information to 14.04 Self-Test Guide.
