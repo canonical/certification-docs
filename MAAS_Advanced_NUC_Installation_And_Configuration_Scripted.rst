@@ -380,13 +380,18 @@ downloaded -- about 150 GB per release. For comparison, HD video consumes
 1-8GiB per hour -- usually on the low end of that range for video streaming
 services. As should be clear, the result will be significant network demand
 that will degrade a typical residential DSL or cable connection for hours,
-and possibly exceed your monthly bandwidth allocation::
+and possibly exceed your monthly bandwidth allocation. If you want to defer
+creating a mirror, you should respond ``N`` to the following prompt, then
+re-launch ``maniacs-setup`` with the ``\-\-mirror-archives`` (or ``-m``)
+option later. In any event, you make your selection at the following
+prompt::
 
     ***************************************************************************
     * Mirroring an archive site is necessary if you'll be doing testing while
     * disconnected from the Internet, and is desirable if your test site has
     * poor Internet connectivity. Performing the mirroring operation takes
     * time and disk space, though -- about 150 GiB per release mirrored.
+    * To defer this task, respond 'N' to the following question.
     *
     * Do you want to mirror an archive site for local use (y/N)? Y
 
@@ -405,8 +410,12 @@ mirror::
     * Do you want to mirror precise (Y/n)? n
     * Do you want to mirror trusty (Y/n)? y
     * Do you want to mirror vivid (Y/n)? n
+    * Do you want to mirror wily (Y/N)? n
 
-When it's done, you'll be asked if you want to configure the computer to
+The list of releases changes as new versions become available and as old
+ones drop out of supported status.
+When the mirror process is done, you'll be asked if you want to configure
+the computer to
 automatically update its mirror every day, by modifying the
 ``/etc/cron.d/apt-mirror`` file. If you do not opt for automatic daily
 updates, you can update your mirror at any time by typing ``sudo
@@ -432,7 +441,11 @@ The script then gives you the option to retrieve an image used for
 virtualization testing. If your site has good Internet connectivity, you
 may not need this image; but it's not a bad idea to have it on hand
 just in case. Note that the script skips this prompt if it detects an image
-already exists in ``/srv``.
+already exists in ``/srv``. Although downloading the cloud image isn't
+nearly as time-consuming as mirroring the archives, it can take long
+enough that you may want to defer this action. You can download the
+cloud image later by launching ``maniacs-setup`` with the
+``\-\-download-virtualization-image`` (or ``-d``) option.
 
 ::
 
@@ -440,6 +453,8 @@ already exists in ``/srv``.
     * An Ubuntu cloud image is required for virtualization tests. Having such an
     * image on your MAAS server can be convenient, but downloading it can take
     * a while (it's about 250MiB).
+    *
+    * To defer this task, respond 'N' to the following question.
     *
     * Do you want to copy a cloud image for the vitualization tests (Y/n)?
 
@@ -457,22 +472,54 @@ the default or enter a new value::
     *
     * Type your repository's URL, or press the Enter key:
 
-
-At this point, the script tells MAAS to begin importing its boot resources
--- images it uses to enlist, commission, and start nodes. This process can
-take several minutes to over an hour to complete. When it's done, the
-script also imports the point-release images used for certification;
-however, it first asks if you want to import the 12.04 images as well as
-the 14.04 images, which it always imports::
+At this point, the script gives you the option of telling MAAS to begin
+importing its boot resources -- images it uses to enlist, commission, and
+start nodes. This process can take several minutes to over an hour to
+complete, so the script gives you the option of deferring this process::
 
     ***************************************************************************
-    * Importing point-release images. By default, only 14.04 images will be
-    * imported.
+    * MAAS requires boot resource images to be useful; however, importing them
+    * can take a LONG time. You can perform this task now or defer it until
+    * later (or do it manually with the MAAS web UI).
     *
-    * Do you want to import the 12.04 point-release images, too (y/N)?
+    * Do you want to import boot resources now? (Y/n)
+
+If you choose to defer this process, MAAS may begin it automatically in the
+background. If this fails and you want to initiate it manually later, you
+can use the MAAS web UI or launch ``maniacs-setup`` with the
+``\-\-import-boot-resources`` (or ``-i``) option.
+
+When MAAS has finished importing boot resources, the
+script helps you import the point-release images used for certification;
+however, you are first asked which series you want to import::
+
+    ***************************************************************************
+    * Ubuntu hardware certification is done using point-release images. These
+    * can take a LONG time to download. You can do so now or defer this task.
+    *
+    * Do you want to import point-release images now (Y/n)? y
+    *
+    * Do you want to import 15.10 (1 image) (y/N)? n
+    * Do you want to import the 14.04 series (4 images) (Y/n)? y
+    * Do you want to import the 12.04 series (6 images) (y/N)? y
+
+Whenever you respond ``Y`` to a question about a particular version or
+series, the script proceeds to download and register the images. (The
+relevant output has been omitted from the preceding example.) If an image
+is already installed, ``maniacs-setup`` skips that image. Certification
+uses only LTS images; however, non-LTS images, such as 15.10, may be made
+available for testing and as a way to "preview" the features of
+future LTS series.
+
+If you're running MAAS 1.8.2 or later, ``maniacs-setup`` registers the most
+recent point-release image in any series you download as the default OS for
+deployments.
 
 Again, this process can take a while, especially if you opt to import the
-12.04 images (there are six of them).
+12.04 images. If you want to skip this step for now and return to it, you
+can; you should re-launch ``maniacs-setup`` with its
+``\-\-update-point-releases`` (or ``-u``) option when you're ready to
+download these images.
 
 Finally, the script announces it's finished its work::
 
@@ -660,22 +707,29 @@ custom images.
 
 The ``maniacs-setup`` script automatically downloads and installs all the
 available point-release images at the time you first run it. After a new
-point release is made, you can update the ``maas-cert-server`` package and
-re-run the script with the ``\-\-update-point-releases`` option to have the
-script install the new release::
+point release is made, you can re-run the script with the
+``\-\-update-point-releases`` (or ``-u``) option to have the script install
+the new release::
 
     $ sudo apt-get install maas-cert-server
     $ sudo maniacs-setup --update-point-releases
 
-The script will skip most of the setup steps and download and install only
-those point-release images that have not yet been installed. Note that
-updating the ``maas-cert-server`` package, or at least the
-``maniacs-setup`` script, is a critical part of this process, because the
-script has relevant filenames and descriptions hard-coded within it.
+The script will skip most of the setup steps and proceed to asking you
+which point-release images to download and install. When you select a
+series, only those point-release images that have not yet been installed
+from that series will be downloaded. Note that if you're running
+``maas-cert-server`` version 0.2.9 or earlier, you should update to the
+latest version before updating your point releases. Version 0.2.10
+introduced the ability to dynamically determine what Ubuntu point-release
+images are available for download; earlier versions used a hard-coded list,
+and so will miss updates beyond Ubuntu 14.04.3.
 
 If a particular point release is giving you problems, you can delete it
 using the MAAS web UI and then update your point-release images as just
 described; this will refresh the image to the latest available version.
+Similarly, if the Server Certification Team releases new images, you should
+first delete the old ones using the web UI and then update your point
+releases.
 
 Note that before you can install a custom image for any given architecture,
 you must have first imported at least one image for that architecture via

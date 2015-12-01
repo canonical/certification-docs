@@ -10,3 +10,6 @@ export NO_PNG_PKG_MANGLE=1
 
 override_dh_auto_install:
 	$$(pwd)/debian/debinstall $$(pwd)/debian/certification-docs
+
+override_dh_compress:
+	dh_compress -X.pdf

@@ -38,4 +38,4 @@ coverageh: Coverage_Guide-14.04.html Coverage_Guide-16.04.html
 programmeh: Programme_Guide-14.04.html Programme_Guide-16.04.html
 
 clean:
-	rm -f *.pdf *.html
+	rm -rf *.pdf *.html debian/files debian/certification-docs*

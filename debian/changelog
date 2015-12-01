@@ -1,8 +1,14 @@
+certification-docs (0.1.3-0ppa1) trusty; urgency=medium
+
+  * Override default compression of PDF files; leave them uncompressed.
+
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 12 Nov 2015 10:54:38 -0500
+
 certification-docs (0.1.2-0ppa1) trusty; urgency=medium
 
-  * Add new Policy Guide RST file 
+  * Updated MANIACS for changes in maas-cert-server 0.2.10
 
- -- Jeff Lane <jeff@ubuntu.com>  Tue, 06 Oct 2015 16:15:07 -0400
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 12 Nov 2015 10:26:10 -0500
 
 certification-docs (0.1.1-0ppa1) trusty; urgency=medium
 
