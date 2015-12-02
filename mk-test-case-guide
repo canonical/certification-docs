@@ -1,0 +1,265 @@
+#!/usr/bin/python3
+# encoding: utf-8
+#
+# Copyright (c) 2015, Canonical Ltd.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Author: Rod Smith <rod.smith@canonical.com>
+
+"""Create a rudimentary Test Case Guide .rst file."""
+
+from os import listdir
+from guacamole import Command
+
+
+class make_guide(Command):
+
+    """Create a rudimentary Test Case Guide."""
+
+    def register_arguments(self, parser):
+        """
+        Register arguments using guacamole.
+
+        :param parser:
+            Argument parser (from :mod:`argparse`) specific to this command.
+        """
+        tpfile = '/usr/share/plainbox-provider-certification-server/units/server-full-14.04.pxu'
+        jdir = '/usr/share/2013.com.canonical.certification:checkbox/jobs/'
+        parser.add_argument('--whitelist', '-w', help='the whitelist file',
+                            default=tpfile)
+        parser.add_argument('--jobs', '-j', help='the jobs directory',
+                            default=jdir)
+        parser.add_argument('--preamble', '-p',
+                            help='fixed preamble file for .rst file',
+                            default='testcase-preamble.rst')
+        parser.add_argument('--output', '-o', help='the output .rst file',
+                            default='testcase.rst')
+
+    def find_tests(whitelist_file):
+        """
+        Build a list of tests from the whitelist file.
+
+        :param whitelist_file:
+            Filename of file containing test names.
+        :returns:
+            List of dictionaries; each dictionary has 'category' and 'test'
+            entries.
+
+        This function reads and ignores lines from whitelist_file until a
+        line with nothing but "include:" is encountered. Thereafter, the
+        function discards lines that begin with "#", discards lines that
+        contain "*", records any line that starts with "__" as a category name
+        (discarding all "_" characters from the line), and stores every other
+        line as a test name. In all cases, excess spaces (as at the starts of
+        lines) are discarded.
+        """
+        search = False
+        category = 'uncategorized'
+        test_list = []
+        try:
+            with open(whitelist_file) as f:
+                for line in f:
+                    line = ''.join(line.split())
+                    if not line.startswith('#') and not line.startswith('__') \
+                            and not '*' in line and search is True:
+                        test_list.append(dict([('category', category),
+                                               ('test', line)]))
+                    if line.startswith('_') and search is True:
+                        category = line.replace('_', '')
+                    if line.rstrip() == 'include:':
+                        search = True
+        except FileNotFoundError:
+            print('Could not open whitelist file ({})!'.format(whitelist_file))
+            print('Aborting!')
+            exit(1)
+        return test_list
+
+    def add_one_description(test, contents):
+        """
+        Add the description for a single test.
+
+        :param test:
+            Dictionary containing test information; add description to it.
+        :param contents:
+            String containing contents of job file in which test is mentioned.
+
+        This function searches the string contents for the test name preceded
+        by "id: ". The next line beginning with "description:" or
+        "_description:" is then found. Its contents, and the contents of any
+        subsequent lines that are indented at least one space, are then
+        concatenated. The leading "description:" or "_description:" is then
+        removed and newline characters inserted at spaces close to the 75-
+        character mark. This final string is added to the test dictionary.
+        """
+        search = False
+        check_next_line = False
+        matchname = 'id: ' + test['test']
+        description = ''
+        for line in contents.splitlines():
+            s_line = line.lstrip()
+            if search is True and (s_line.startswith('description:') or
+                                   s_line.startswith('_description:') or
+                                   check_next_line is True):
+                if check_next_line is True and (line == '' or not line.
+                                                startswith(' ')):
+                    break
+                description = description + line
+                check_next_line = True
+            if matchname in line:
+                search = True
+        description = description.replace('_description: ', '')
+        description = description.replace('description: ', '')
+        if description == '':
+            description = 'No description available'
+        description = ' '.join(description.split())
+        last_breakpoint = 0
+        breakpoint = 75
+        while len(description) - last_breakpoint > 75:
+            while description[breakpoint] != ' ':
+                breakpoint = breakpoint - 1
+            if breakpoint < 0:
+                print('Warning: Extra-long word in description!')
+                break
+            description = description[:breakpoint] + '\n' + \
+                description[breakpoint:]
+            last_breakpoint = breakpoint
+            breakpoint = last_breakpoint + 75
+        test['description'] = description
+
+    def add_descriptions(test_list, jobs_directory):
+        """
+        Add descriptions for all the tests.
+
+        :test_list:
+            List of tests (each of which is a dictionary).
+        :jobs_directory:
+            Directory in which jobs files are located.
+
+        Loop through ALL the files in the jobs_directory to find matches for
+        the test names in test_list. (Checking for an individual test is
+        skipped if a description already exists.) When a match is found,
+        add_one_description() is called to add it to the test's dictionary.
+        """
+        try:
+            job_files = listdir(jobs_directory)
+        except FileNotFoundError:
+            print('Could not open jobs directory ({})!'.format(jobs_directory))
+            print('Aborting!')
+            exit(1)
+        for file in job_files:
+            fullpath = jobs_directory + "/" + file
+            try:
+                contents = open(fullpath).read()
+                for test in test_list:
+                    if 'description' not in test or test['description'] == '':
+                        matchname = 'id: ' + test['test']
+                        if matchname in contents:
+                            make_guide.add_one_description(test, contents)
+            except OSError:
+                print('Could not read jobs file {}!'.format(fullpath))
+                print('Skipping! Some descriptions may be missing!')
+
+    def create_rst_file(test_list, preamble_filename, output_filename):
+        """
+        Create the output .rst file.
+
+        :test_list:
+            List of test items (each of which is a dictionary).
+        :preamble_filename:
+            Filename of preamble file that's put at start of output file.
+        :output_filename:
+            Filename of output file.
+
+        Create a new file (output_filename) that begins with the contents of
+        preamble_filename and that then contains the names and descriptions
+        from test_list. The test_list is sorted by category name and test name
+        prior to writing its contents to the output file. This function keeps
+        track of the test categories, and whenever they change, a new rST
+        heading with the new category name is created.
+        """
+        try:
+            preamble = open(preamble_filename).read()
+        except OSError:
+            print('Unable to open the preamble file ({})!'.
+                  format(preamble_filename))
+            print('Aborting!')
+            exit(1)
+        try:
+            f = open(output_filename, 'w')
+        except OSError:
+            print('Unable to open the output file ({})!'.
+                  format(output_filename))
+            print('Aborting!')
+            exit(1)
+        f.write(preamble)
+        test_list = sorted(test_list, key=lambda test:
+                           (test['category'], test['test']))
+        category = ''
+        for test in test_list:
+            if test['category'] != category:
+                category = test['category']
+                f.write('{}\n'.format(category))
+                f.write('{}\n'.format('-'.ljust(len(category), '-')))
+                f.write('\n')
+            f.write('{}\n'.format(test['test']))
+            try:
+                f.write(' {}\n'.format(test['description']))
+            except KeyError:
+                f.write(' No description available\n')
+            f.write('\n')
+        f.close()
+
+    def invoked(self, ctx):
+        """
+        Guacamole-based method that adds tests and descriptions into rST file.
+
+        :param ctx:
+            The guacamole context object. Context provides access to all
+            features of guacamole. The argparse ingredient adds the ``args``
+            attribute to it. That attribute contains the result of parsing
+            command line arguments.
+        :returns:
+            The return code of the command. Guacamole translates ``None`` to a
+            successful exit status (return code zero).
+        """
+        print('')
+        print('Whitelist file: {}'.format(ctx.args.whitelist))
+        print('Jobs directory: {}'.format(ctx.args.jobs))
+        print('Preamble file: {}'.format(ctx.args.preamble))
+        print('Output file: {}'.format(ctx.args.output))
+        print('')
+        test_list = make_guide.find_tests(ctx.args.whitelist)
+        make_guide.add_descriptions(test_list, ctx.args.jobs)
+        make_guide.create_rst_file(test_list, ctx.args.preamble,
+                                   ctx.args.output)
+
+
+if __name__ == '__main__':
+    make_guide().main()

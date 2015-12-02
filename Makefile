@@ -27,6 +27,8 @@ coverage: Coverage_Guide-14.04.pdf Coverage_Guide-16.04.pdf
 
 programme: Programme_Guide-14.04.pdf Programme_Guide-16.04.pdf
 
+testcase: Test_Case_Guide_16.04.pdf
+
 maniach: MAAS_Advanced_NUC_Installation_And_Configuration.html
 
 maniacsh: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.html
