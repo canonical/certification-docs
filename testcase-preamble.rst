@@ -30,7 +30,8 @@ Introduction
 ============
 
 This guide describes the tests performed in Ubuntu server certification
-testing.
+testing. Tests are grouped by category, such as "cpu," "ethernet," and
+"memory." A brief description follows each test.
 
 Tests
 =====
