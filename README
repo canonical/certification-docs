@@ -51,7 +51,7 @@ Execute the script like this (ex. 16.04 Test Case Guide):
 
 To build the Test Case Guide alone, once you've created the RST file, simply:
 
- # make testcase
+    make testcase
 
 Creating HTML and PDF Files
 ===========================
