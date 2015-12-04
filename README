@@ -44,13 +44,14 @@ Guacamole libs:
 To use the script, you will also need the source for checkbox (for the job
 files) and the whitelist you wish to use to build the guide from.
 
-Execute the script like this:
+Execute the script like this (ex. 16.04 Test Case Guide):
 
  $ mk-test-case-guide -w path/to/whitelist -j path/to/jobs dir --preamble
- testcase-preample.rst --output filename.rst
+ testcase-preample.rst --output Test_Case_Guide_16.04.rst
 
-This will create the RST base for the test case guide.  You will then need to
-use the rst2pdf tool to convert the RST file to a consumable PDF.
+To build the Test Case Guide alone, once you've created the RST file, simply:
+
+ # make testcase
 
 Creating HTML and PDF Files
 ===========================
