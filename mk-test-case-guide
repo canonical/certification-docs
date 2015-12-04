@@ -185,6 +185,9 @@ class make_guide(Command):
             except OSError:
                 print('Could not read jobs file {}!'.format(fullpath))
                 print('Skipping! Some descriptions may be missing!')
+            except UnicodeDecodeError:
+                print('Could not decode something in {}!'.format(fullpath))
+                print('Skipping! Some descriptions may be missing!')
 
     def create_rst_file(test_list, preamble_filename, output_filename):
         """

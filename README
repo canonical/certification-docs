@@ -28,6 +28,30 @@ Converting from .rst to .pdf form requires the ``rst2pdf`` package::
 
   sudo apt-get install rst2pdf
 
+Test Case Guide
+===============
+
+The Test Case Guide is a special case that requires some extra manual effort.
+
+Test Case Guide creation uses the mk-test-case-guide script found in the source
+for certification-docs.
+
+Before using mk-test-case-guide, you will need to install the Python 3
+Guacamole libs:
+
+ sudo apt-get install python3-guacamole
+
+To use the script, you will also need the source for checkbox (for the job
+files) and the whitelist you wish to use to build the guide from.
+
+Execute the script like this:
+
+ $ mk-test-case-guide -w path/to/whitelist -j path/to/jobs dir --preamble
+ testcase-preample.rst --output filename.rst
+
+This will create the RST base for the test case guide.  You will then need to
+use the rst2pdf tool to convert the RST file to a consumable PDF.
+
 Creating HTML and PDF Files
 ===========================
 
