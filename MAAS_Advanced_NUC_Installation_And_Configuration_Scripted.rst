@@ -310,6 +310,22 @@ The more specific procedure for using MAAS in certification testing is:
    - Note that there must *not* be spaces surrounding the equal signs
      (``=``) in the assignments!
 
+#. Optionally create an ``/etc/maas-cert-server/iperf.conf`` file to
+   identify your ``iperf`` server(s). This file should consist of a single
+   line that contains a comma-delimited list of IP addresses, each
+   identifying a different ``iperf`` (or ``iperf3``) server. If this file
+   is absent, SUTs will configure themselves to use their network
+   gateways (normally the MAAS server) as the ``iperf`` target. If
+   ``/etc/maas-cert-server/iperf.conf`` is present, though, MAAS will tell
+   SUTs to use the specified system(s) instead. You might use this feature
+   if your ``iperf`` server is not the SUTs' network gateway or if you have
+   multiple ``iperf`` servers -- for instance, one for ``iperf`` (version
+   2) and another for ``iperf3``; or one on a 1 Gbps network and another on
+   a separate 10 Gbps network. The SUTs will attempt to use each ``iperf``
+   target in series until the network test passes or until the list is
+   exhausted. This setting can be overridden on SUTs by editing the
+   ``/etc/xdg/canonical-certification.conf`` file on the SUT.
+
 Running the Setup Script
 ------------------------
 

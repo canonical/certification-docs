@@ -174,7 +174,10 @@ Network Test Environment
    Ethernet, the other network components should be capable of 1Gbps or
    faster speeds. If the local network used for testing is less capable
    than the best network interfaces on the SUT, those interfaces must be
-   tested later on a more-capable network.
+   tested later on a more-capable network. If the test environment uses
+   separate networks with different speeds, with the SUT cabled to multiple
+   networks via different ports, you can specify multiple ``iperf``
+   servers, as described later.
 
 -  If desired, the MAAS server may be run inside a virtual machine;
    however, it is advisable to run the ``iperf`` server on "real" hardware
@@ -387,7 +390,7 @@ up the SUT and test environment:
    setup, but you may need to refer to additional documentation to complete
    the task if you're not already familiar with MAAS.
 
--  The test LAN must have one system available to act as a Target for
+-  The test LAN must have at least one system available to act as a Target for
    network testing with ``iperf``. Note that accessing an ``iperf`` server
    that's reachable only via a router may not work, because routing tables
    are temporarily lost during network testing. The ``iperf`` server is
@@ -671,30 +674,35 @@ To initiate a testing session in a server:
        KVM_IMAGE: /home/ubuntu/trusty-server-cloudimg-i386-disk1.img
 
 #. If necessary, edit the ``/etc/xdg/canonical-certification.conf`` file on
-   the SUT so as to specify your ``iperf`` server. For example::
+   the SUT so as to specify your ``iperf`` server(s). For example::
 
     TEST_TARGET_FTP = your-ftp-server.example.com
     TEST_USER = anonymous
     TEST_PASS =
-    TEST_TARGET_IPERF =  192.168.0.2
+    TEST_TARGET_IPERF =  192.168.0.2,172.24.124.7
 
    If you configured your MAAS server as described in the MANIAC document,
-   the ``TEST_TARGET_IPERF`` line should point to your SUT's gateway address,
-   which is normally also your MAAS server; but if your network
-   configuration deviates from the one described in MANIAC, you may need to
-   adjust this value. The Server Test Suite does not currently use FTP, but
-   these lines must be uncommented. They may be left at their default
-   values.
+   the ``TEST_TARGET_IPERF`` line should already be set appropriately. If
+   your environment includes multiple ``iperf`` servers, you can identify
+   them all, separated by commas. The test suite will attempt to use each
+   server in sequence until one results in a passed test or until they are
+   all exhausted. You can use this feature if your environment includes
+   separate networks with different speeds, to run ``iperf`` and ``iperf3``
+   on separate servers, or for other reasons. The Server Test Suite does
+   not currently use FTP, but these lines must be uncommented. They may be
+   left at their default values.
 
 #. While editing ``/etc/xdg/canonical-certification.conf``, you may
    optionally enter the SUT's Secure ID in the ``[sru]`` section. This can
    simplify submission of results at the end of the test; however, this
    will work only if the SUT has full Internet access.
 
-#. Launch ``iperf`` on the server identified in the SUT's
-   ``/etc/xdg/canonical-certification.conf`` file by typing::
+#. Launch ``iperf`` (version 2) and ``iperf3`` on the server identified in
+   the SUT's ``/etc/xdg/canonical-certification.conf`` file by typing, one
+   command in each of two Terminals or logins::
 
     $ iperf -s
+    $ iperf3 -s
 
 #. If you're running the test via SSH, type screen on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go

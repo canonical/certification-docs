@@ -970,26 +970,42 @@ MAAS can automatically install the certification packages every time you
    leave this file as-is, the SUT will attempt to access the Internet,
    and so will require Internet access to fully provision itself.
 
-7. Using the MAAS web user interface, enlist and commission a new node.
+#. Optionally create an ``/etc/maas-cert-server/iperf.conf`` file to
+   identify your ``iperf`` server(s). This file should consist of a single
+   line that contains a comma-delimited list of IP addresses, each
+   identifying a different ``iperf`` (or ``iperf3``) server. If this file
+   is absent, SUTs will configure themselves to use their network
+   gateways (normally the MAAS server) as the ``iperf`` target. If
+   ``/etc/maas-cert-server/iperf.conf`` is present, though, MAAS will tell
+   SUTs to use the specified system(s) instead. You might use this feature
+   if your ``iperf`` server is not the SUTs' network gateway or if you have
+   multiple ``iperf`` servers -- for instance, one for ``iperf`` (version
+   2) and another for ``iperf3``; or one on a 1 Gbps network and another on
+   a separate 10 Gbps network. The SUTs will attempt to use each ``iperf``
+   target in series until the network test passes or until the list is
+   exhausted. This setting can be overridden on SUTs by editing the
+   ``/etc/xdg/canonical-certification.conf`` file on the SUT.
+
+#. Using the MAAS web user interface, enlist and commission a new node.
    Alternatively, you can click "Release Node" on the node you tested
    earlier, then wait a few seconds and refresh the page.
 
-8. Go back to the Node View and deploy a node, as described earlier. Your
+#. Go back to the Node View and deploy a node, as described earlier. Your
    SUT should turn on, do an installation, and then install the
    certification tools.
 
-9. You can observe the installation process by connecting a monitor to the
+#. You can observe the installation process by connecting a monitor to the
    node and viewing the messages in real-time as they're being produced.
 
-10. Once the machine finishes installation and reboots, you can SSH into
-    its ``ubuntu`` account from the MAAS server and you should be able to
-    run the command::
+#. Once the machine finishes installation and reboots, you can SSH into
+   its ``ubuntu`` account from the MAAS server and you should be able to
+   run the command::
 
-       $ canonical-certification-server
+      $ canonical-certification-server
 
-    Note, however, that this works only on 14.04 (GA and point release)
-    versions. If you are certifying a 12.04 release, you must manually
-    install the certification suite.
+   Note, however, that this works only on 14.04 (GA and point release)
+   versions. If you are certifying a 12.04 release, you must manually
+   install the certification suite.
 
 For more on the  certification process itself, see the Ubuntu Server
 Hardware Self-Testing Guide, which is available from
