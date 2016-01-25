@@ -153,8 +153,8 @@ Network Test Environment
    small portable computer such as an Intel NUC is sufficient. MAAS version
    1.7 or later is strongly preferred for certification work; the older
    MAAS 1.5 lacks certain features that are becoming increasingly
-   important. This document describes use of MAAS 1.8. If you use MAAS 1.7,
-   some procedures will differ slightly.
+   important. This document describes use of MAAS 1.9. If you use MAAS 1.7
+   or 1.8, some procedures will differ slightly.
 
 -  The MAAS server computer should run Ubuntu 14.04 (Trusty Tahr), and
    should be configured to deliver Ubuntu 14.04 images to its clients.
@@ -346,6 +346,11 @@ up the SUT and test environment:
       Canonical Certification Team before changing firmware settings to
       overcome such a problem.
 
+   -  Disks must be configured for "flat" storage -- that is, filesystems
+      in plain partitions, rather than using LVM or bcache configurations.
+      "Flat" storage was the only option with MAAS 1.8 and earlier, but
+      MAAS 1.9 introduced LVM and bcache options.
+
 -  If possible, as many processors as the SUT will support should be
    installed.
 
@@ -412,8 +417,8 @@ that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced NUC Installation and Configuration (MANIAC) document describes how
 to set up a MAAS server for certification testing purposes. This document
-describes use of MAAS 1.8. Using MAAS 1.7 is also acceptable, but some user
-interface details differ.
+describes use of MAAS 1.9. Using MAAS 1.7 or 1.8 is also acceptable, but
+some user interface details differ, particularly for MAAS 1.7.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:

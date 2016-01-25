@@ -1,9 +1,10 @@
-certification-docs (0.1.6-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.7-0ppa1) UNRELEASED; urgency=medium
 
   * Added preliminary Test Case Guide for 16.04 (built using
     mk-test-case-guide).
+  * Modified documents for MAAS 1.9.
 
- -- Rod Smith <rod.smith@canonical.com>  Fri, 18 Dec 2015 15:21:04 -0500
+ -- Rod Smith <rod.smith@canonical.com>  Mon, 25 Jan 2016 14:44:49 -0500
 
 certification-docs (0.1.5-0ppa1) trusty; urgency=medium
 

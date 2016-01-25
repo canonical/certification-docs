@@ -260,9 +260,9 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo apt-add-repository ppa:maas/stable
 
-   Currently (July, 2015), Ubuntu 14.04 installs MAAS 1.5 by default. This
-   PPA holds version 1.8 of MAAS, which is the recommended version for
-   certification testing. (MAAS 1.7 is also acceptable.) Version 1.8 will
+   Currently (January, 2016), Ubuntu 14.04 installs MAAS 1.7 by default. This
+   PPA holds version 1.9 of MAAS, which is the recommended version for
+   certification testing. (MAAS 1.7 and 1.8 are also acceptable.) Version 1.9 will
    eventually become standard for Ubuntu 14.04, at which point this step
    will become unnecessary.
 
@@ -275,7 +275,7 @@ The more specific procedure for using MAAS in certification testing is:
       $ sudo apt-get update
       $ sudo apt-get install maas-cert-server
 
-   As of version 0.1.2, the ``maas-cert-server`` package includes a
+   The ``maas-cert-server`` package includes a
    dependency on MAAS, so installing ``maas-cert-server`` will also install
    MAAS, as well as all of MAAS's dependencies.
 
@@ -284,8 +284,8 @@ The more specific procedure for using MAAS in certification testing is:
    appear outside of that directory tree. (Subsequent steps describe how to
    use these files.)
 
-#. Verify that you've installed MAAS 1.8 from the PPA, rather than MAAS
-   1.5 or some other version::
+#. Verify that you've installed MAAS 1.9 from the PPA, rather than
+   some other version::
 
       $ dpkg -p maas | grep Version
 
@@ -562,6 +562,10 @@ adjusts some other details of which you should be aware:
   Suite whenever they're deployed. This detail increases deployment time
   compared to a generic MAAS installation.
 
+- When using MAAS 1.9, the default storage layout setting is changed from
+  "LVM" to "flat." Some certification tests assume a flat layout, which is
+  the default (and only) option in MAAS 1.8 and earlier.
+
 Checking the MAAS Configuration
 -------------------------------
 
@@ -592,7 +596,7 @@ to modify a few settings. To do so, follow these steps:
      of your image downloads. A successful image import will show Synced
      under Images.
 
-   - If you need to support architectures other than AMD64, you must check
+   - If you need to support an architecture other than AMD64, you must check
      that architecture and click Apply Changes. This process will probably
      take several minutes to complete.
 
@@ -718,7 +722,7 @@ From time to time, Canonical updates the LTS versions of Ubuntu with new
 point releases, such as 14.04.1, 14.04.2, and so on. Because you must run
 the certification tests on the latest point release, updating your MAAS
 server with the latest point releases will become necessary, sooner or
-later. This task can be accomplished with MAAS 1.7 or 1.8 by installing
+later. This task can be accomplished with MAAS 1.7 or later by installing
 custom images.
 
 The ``maniacs-setup`` script automatically downloads and installs all the

@@ -242,10 +242,10 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo add-apt-repository ppa:maas/stable
 
-   Currently (late June, 2015), Ubuntu 14.04 installs MAAS 1.7 by default.
-   This PPA holds version 1.8 of MAAS, which is the recommended version for
-   certification testing, although MAAS 1.7 is also acceptable. This
-   document describes MAAS 1.8, so if you skip this step, some details will
+   Currently (January, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
+   This PPA holds version 1.9 of MAAS, which is the recommended version for
+   certification testing, although MAAS 1.7 and 1.8 are also acceptable. This
+   document describes MAAS 1.9, so if you skip this step, some details will
    differ.
 
 #. Several scripts and configuration files, some of which are quite
@@ -257,7 +257,7 @@ The more specific procedure for using MAAS in certification testing is:
       $ sudo apt-get update
       $ sudo apt-get install maas-cert-server
 
-   As of version 0.1.2, the ``maas-cert-server`` package includes a
+   The ``maas-cert-server`` package includes a
    dependency on MAAS, so installing ``maas-cert-server`` will also install
    MAAS, as well as all of MAAS's dependencies.
 
@@ -266,8 +266,8 @@ The more specific procedure for using MAAS in certification testing is:
    appear outside of that directory tree. (Subsequent steps describe how to
    use these files.)
 
-#. Verify that you've installed MAAS 1.8 from the PPA, rather than MAAS
-   1.5 or some other version::
+#. Verify that you've installed MAAS 1.9 from the PPA, rather than
+   some other version::
 
       $ dpkg -p maas | grep Version
 
@@ -709,6 +709,11 @@ To do so, follow these steps:
 
    -  Under *Third Party Drivers Configuration*, ensure that *Enable the
       installation of proprietary drivers (i.e. HPVSA)* is checked.
+
+   -  If you use MAAS 1.9, change *Default storage layout* in the *Storage*
+      section from *LVM layout* to *Flat layout.*  Some certification tests
+      assume a flat layout, which is the default (and only) option in MAAS
+      1.8 and earlier.
 
 Testing the MAAS Server
 =======================
