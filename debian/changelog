@@ -1,4 +1,4 @@
-certification-docs (0.1.7-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.7-0ppa1) trusty; urgency=medium
 
   * Added preliminary Test Case Guide for 16.04 (built using
     mk-test-case-guide).
