@@ -145,7 +145,11 @@ up its most basic network settings:
       install the desktop on top of that as it simplifies MAAS access.
 
    -  This guide assumes the use of Ubuntu 14.04. Although another version
-      may work, some details will differ.
+      may work, some details will differ. Note that Ubuntu 14.04 is the
+      preferred version of Ubuntu on the MAAS server even for pre-release
+      (zero-day) and early post-release testing of Ubuntu 16.04. This
+      preference exists so as to avoid the rapid changes that are likely in
+      the days leading up to 16.04's release.
 
 2. Boot the portable computer and log in.
 
@@ -242,11 +246,12 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo add-apt-repository ppa:maas/stable
 
-   Currently (January, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
+   Currently (February, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
    This PPA holds version 1.9 of MAAS, which is the recommended version for
-   certification testing, although MAAS 1.7 and 1.8 are also acceptable. This
-   document describes MAAS 1.9, so if you skip this step, some details will
-   differ.
+   certification testing. (MAAS 1.7 and 1.8 are also acceptable.) In the
+   long term, MAAS 1.10 and later will be used with Ubuntu 16.04, but as
+   noted earlier, Ubuntu 14.04 is the preferred version leading up to, and
+   slightly past, the release of Ubuntu 16.04.
 
 #. Several scripts and configuration files, some of which are quite
    lengthy, are available in the ``maas-cert-server`` package in the
@@ -269,7 +274,7 @@ The more specific procedure for using MAAS in certification testing is:
 #. Verify that you've installed MAAS 1.9 from the PPA, rather than
    some other version::
 
-      $ dpkg -p maas | grep Version
+      $ dpkg -s maas | grep Version
 
    If the wrong version is installed, fixing the problem (presumably a
    misconfigured PPA) and upgrading may work. If you upgrade from an
@@ -411,7 +416,7 @@ mirror for these purposes, follow these steps:
      for both 12.04 (Precise) and 14.04 (Trusty). The total disk space
      (and network bandwidth consumed) is on the order of 300GiB.
 
-   - For comparison, HD video consumes 1-8GiB per hour -- usually on the
+   - For comparison, HD video consumes 1-8 GiB per hour -- usually on the
      low end of that range for video streaming services. As should be
      clear, the result will be significant network demand that will
      *degrade a typical residential DSL or cable connection for hours,*

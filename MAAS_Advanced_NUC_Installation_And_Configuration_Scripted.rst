@@ -47,12 +47,13 @@ settings relax security in the interest of ease of use, so you should
 limit use of the portable computer on the Internet at large.
 
 This document begins with information on the required hardware and then
-moves on to details about Ubuntu's network configuration and then the
-procedures for installing MAAS. (This document assumes that you know how
-to install Ubuntu.) Because the purpose of this document is to help you
-bring up a MAAS server for certification purposes, it then describes how
-to install additional software and configure MAAS to automatically
-install the certification packages on the system under test (SUT).
+moves on to a general description of Ubuntu installation, details on how to
+install and configure MAAS, and how to test your MAAS installation.
+Appendixes cover more esoteric or specialized topics, including how to
+update the fixed-point-release images, how to add support for i386 (32-bit)
+images, how to partially restore MAAS in case of a broken configuration,
+and how to mirror repositories not configured for mirroring by the main
+setup procedure.
 
 Figure 1 illustrates the overall configuration that this document will
 help you create. This document describes configuration of the Portable
@@ -100,6 +101,7 @@ hardware:
    - Digital Loggers, Inc. PDU
    - HP Moonshot - iLO Chassis Manager
    - HP Moonshot - iLO (IPMI)
+   - IBM Hardware Management Console (HMC)
    - IPMI
    - Intel AMT
    - Microsoft OCS - Chassis Manager
@@ -150,7 +152,11 @@ up its most basic network settings:
       install the desktop on top of that as it simplifies MAAS access.
 
    -  This guide assumes the use of Ubuntu 14.04. Although another version
-      may work, some details will differ.
+      may work, some details will differ. Note that Ubuntu 14.04 is the
+      preferred version of Ubuntu on the MAAS server even for pre-release
+      (zero-day) and early post-release testing of Ubuntu 16.04. This
+      preference exists so as to avoid the rapid changes that are likely in
+      the days leading up to 16.04's release.
 
 #. Boot the portable computer and log in.
 
@@ -167,7 +173,7 @@ up its most basic network settings:
       use DHCP, which is appropriate. You can adjust it if necessary,
       though.
 
-   -  In theory, you can configure the external network either via
+   -  You can configure the external network either via
       ``/etc/network/interfaces`` or by using the Desktop's Network Manager
       tool.
 
@@ -260,11 +266,12 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo apt-add-repository ppa:maas/stable
 
-   Currently (January, 2016), Ubuntu 14.04 installs MAAS 1.7 by default. This
-   PPA holds version 1.9 of MAAS, which is the recommended version for
-   certification testing. (MAAS 1.7 and 1.8 are also acceptable.) Version 1.9 will
-   eventually become standard for Ubuntu 14.04, at which point this step
-   will become unnecessary.
+   Currently (February, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
+   This PPA holds version 1.9 of MAAS, which is the recommended version for
+   certification testing. (MAAS 1.7 and 1.8 are also acceptable.) In the
+   long term, MAAS 1.10 and later will be used with Ubuntu 16.04, but as
+   noted earlier, Ubuntu 14.04 is the preferred version leading up to, and
+   slightly past, the release of Ubuntu 16.04.
 
 #. Several scripts and configuration files, some of which are quite
    lengthy, are available in the ``maas-cert-server`` package in the
@@ -287,7 +294,7 @@ The more specific procedure for using MAAS in certification testing is:
 #. Verify that you've installed MAAS 1.9 from the PPA, rather than
    some other version::
 
-      $ dpkg -p maas | grep Version
+      $ dpkg -s maas | grep Version
 
    If the wrong version is installed, fixing the problem (presumably a
    misconfigured PPA) and upgrading may work. If you upgrade from an
@@ -393,7 +400,7 @@ connections, you must create a local mirror of the Ubuntu archives on your
 MAAS server. These archives will be stored in the ``/srv`` directory, but
 creating them takes a long time because of the amount of data to be
 downloaded -- about 150 GB per release. For comparison, HD video consumes
-1-8GiB per hour -- usually on the low end of that range for video streaming
+1-8 GiB per hour -- usually on the low end of that range for video streaming
 services. As should be clear, the result will be significant network demand
 that will degrade a typical residential DSL or cable connection for hours,
 and possibly exceed your monthly bandwidth allocation. If you want to defer
@@ -425,7 +432,6 @@ mirror::
 
     * Do you want to mirror precise (Y/n)? n
     * Do you want to mirror trusty (Y/n)? y
-    * Do you want to mirror vivid (Y/n)? n
     * Do you want to mirror wily (Y/N)? n
 
 The list of releases changes as new versions become available and as old
@@ -446,7 +452,8 @@ apt-mirror``.
 Note that ``maniacs-setup`` configures the system to mirror AMD64, i386,
 and source repositories because all three are required by the default APT
 configuration. If you want to tweak the mirror configuration, you can do so
-by editing the ``/etc/apt/mirror.list`` file -- but do so *after* finishing
+by editing the ``/etc/apt/mirror.list`` file, as described in `Appendix D:
+Mirroring Additional Repositories`_ -- but do so *after* finishing
 with the ``maniacs-setup`` script, and then type ``sudo apt-mirror`` to
 pull in any new directories you've specified. You can also configure the
 computer to use its own local mirror, if you like::
@@ -505,6 +512,11 @@ background. If this fails and you want to initiate it manually later, you
 can use the MAAS web UI or launch ``maniacs-setup`` with the
 ``\-\-import-boot-resources`` (or ``-i``) option.
 
+Sometimes this process hangs. Typically, the boot images end up available
+in MAAS, but the script doesn't move on. If this happens, you can kill the
+script and, if desired, re-launch it with the ``\-\-update-point-releases``
+(or ``-u``) option to finish the installation.
+
 When MAAS has finished importing boot resources, the
 script helps you import the point-release images used for certification;
 however, you are first asked which series you want to import::
@@ -516,7 +528,7 @@ however, you are first asked which series you want to import::
     * Do you want to import point-release images now (Y/n)? y
     *
     * Do you want to import 15.10 (1 image) (y/N)? n
-    * Do you want to import the 14.04 series (4 images) (Y/n)? y
+    * Do you want to import the 14.04 series (5 images) (Y/n)? y
     * Do you want to import the 12.04 series (6 images) (y/N)? y
 
 Whenever you respond ``Y`` to a question about a particular version or
@@ -549,8 +561,8 @@ adjusts some other details of which you should be aware:
   server. These keys enable you to log in to nodes that MAAS deploys from
   your regular account on the MAAS server.
 
-- Any keys in your ``~/.ssh/authorized_keys`` file on the portable are also
-  added to the MAAS setup. Again, this simplifies login.
+- Any keys in your ``~/.ssh/authorized_keys`` file on the portable computer
+  are also added to the MAAS setup. Again, this simplifies login.
 
 - The portable computer's SSH server configuration is relaxed so that
   changed host keys do not block outgoing connections. This change is
@@ -589,7 +601,10 @@ to modify a few settings. To do so, follow these steps:
 #. Log in to the Dashboard using your regular username and the password you
    gave to the setup script.
 
-#. Click Images near the top of the MAAS web page. This page will show the Ubuntu images that are available on the server. The setup script imports a 14.04 image for AMD64, as well as custom images for every 14.04 point release. You may need to take additional actions in some cases:
+#. Click Images near the top of the MAAS web page. This page will show the
+   Ubuntu images that are available on the server. The setup script imports
+   a 14.04 image for AMD64, as well as whatever custom point-release images
+   you specified. You may need to take additional actions in some cases:
 
    - If you see a blue circle next to an image, it did not import
      correctly. You can also check the Clusters page to verify the status
@@ -843,7 +858,92 @@ This procedure should restore your ability to PXE-boot your SUTs.
 
    PageBreak
 
-Appendix D: Glossary
+Appendix D: Mirroring Additional Repositories
+=============================================
+
+You can mirror repositories or Ubuntu versions beyond those configured by
+``maniacs\-setup`` by editing the ``/etc/apt/mirror.list`` file. This
+feature may be helpful to mirror a PPA you need locally or to mirror a
+pre-release version of Ubuntu. In most cases, the easiest way to do this is
+to cut-and-paste a similar block of configuration lines and modify them to
+suit your needs. The source may be lines in the original
+``/etc/apt/mirror.list`` file or an example in the documentation for
+whatever site you want to mirror.
+
+As an example, consider setting up a mirror of a pre-release version of
+Ubuntu. At the time of writing, Ubuntu 16.04 (Xenial Xerus) has not yet
+been released, so if you want to mirror it, you must copy and then modify
+the configuration for a working version, such as 14.04 (Trusty Tahr). The
+``/etc/apt/mirror.list`` file created by ``maniacs-setup`` includes three
+blocks for Trusty Tahr, each of which looks something like this::
+
+  ## trusty on amd64 archives
+  
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty main restricted universe \
+            multiverse
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty-security main restricted \
+            universe multiverse
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty-backports main restricted \
+            universe multiverse
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty-updates main restricted \
+            universe multiverse
+  
+  deb-amd64 http://ppa.launchpad.net/hardware-certification/public/ubuntu trusty \
+            main
+  deb-amd64 http://ppa.launchpad.net/firmware-testing-team/ppa-fwts-stable/ubuntu \
+            trusty main
+
+Two other blocks have lines beginning with ``deb-i386`` and ``deb-src``,
+respectively, but are otherwise similar. Your file may refer to an archive
+site other than ``archive.ubuntu.com``, as well. Also, this example wraps
+long lines to fit on the page, but you should not wrap long lines in this
+way.
+
+Once you've found these blocks, duplicate *all three of them* and then
+modify them to suit your needs -- in this example, you should change
+``trusty`` on each line to ``xenial``. If you're mirroring from something
+other than an official Ubuntu repository (``archive.ubuntu.com`` or a
+regional ``*.archive.ubuntu.com`` site), you may need to change to an
+official Canonical repository to mirror pre-release software. If in doubt,
+check your preferred source with a web browser to see if the pre-release
+version is available on it. The result, for the block shown earlier, looks
+something like this::
+
+  ## trusty on amd64 archives
+  
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial main restricted universe \
+            multiverse
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial-security main restricted \
+            universe multiverse
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial-backports main restricted \
+            universe multiverse
+  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial-updates main restricted \
+            universe multiverse
+  
+  deb-amd64 http://ppa.launchpad.net/hardware-certification/public/ubuntu xenial \
+            main
+  deb-amd64 http://ppa.launchpad.net/firmware-testing-team/ppa-fwts-stable/ubuntu \
+            xenial main
+
+If you're mirroring something other than an Ubuntu release, you may be able
+to get by with mirroring just one architecture -- or perhaps you want to
+mirror an architecture other than those described in this guide. Feel free
+to experiment, but remember that some archives are quite large, so you may
+end up consuming considerable network bandwidth and disk space creating
+your mirror.
+
+Another key point to remember when modifying the ``/etc/apt/mirror.list``
+file created by ``maniacs-setup`` is that re-running that script may
+overwrite your changes. Thus, you should back up your customized
+``/etc/apt/mirror.list`` file so that you can cut-and-paste any changes you
+make back into the file that ``maniacs-setup`` regenerates, should the need
+arise.
+
+.. raw:: pdf
+
+   PageBreak
+
+Appendix E: Glossary
 ====================
 
 The following definitions apply to terms used in this document.
