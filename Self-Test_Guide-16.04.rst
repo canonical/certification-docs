@@ -25,9 +25,10 @@
 Introduction
 ============
 
-The aim of this document is to provide the information needed to certify
+The aim of this document is to provide the information needed to test
 a server on-site using the Canonical Server Test Suite without requiring
-an Internet connection.
+an Internet connection and then submit the results of that testing to
+Canonical to meet the requirements for Server Hardwar Certification.
 
 Glossary
 ========
@@ -898,10 +899,13 @@ problems, you can request a certificate:
    -  Level indicates the type of certification:
 
       -  Certified is for for hardware that's ready to be deployed with
-         Ubuntu.
+         Ubuntu. This is the option to choose for server hardware as that
+         typically does not ship with a pre-installed operating system.
 
-      -  Certified Pre-installed is for hardware that ships with a (possibly
-         customized) version of Ubuntu.
+      -  Certified Pre-installed is for hardware that  ships with a (possibly
+         customized) version of Ubuntu. This option is used almost exclusively
+         for Client hardware such as desktops, laptops and tablets that 
+         typically ship with a pre-installed operating system.
 
    -  Is Private should be checked if the certification should be kept
       private. Note that this check box affects the certificate only, not
