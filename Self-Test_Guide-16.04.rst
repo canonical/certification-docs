@@ -462,8 +462,9 @@ install Ubuntu on the SUT as follows:
    -  If desired, change the node name for the SUT.
 
    -  Check the SUT's power type and ensure it's set correctly (IPMI, AMT,
-      etc.). If the SUT has no BMC, you can leave this section blank or
-      enter "dummy" data.
+      etc.). If the SUT has no BMC, you can leave this section blank or set
+      it to Wake-On-LAN (although the latter is finicky and so may require
+      manual power control).
 
    -  Note that manual power control is acceptable only on low-end servers
       that lack BMCs. If MAAS fails to detect a BMC that is present or if
