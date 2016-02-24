@@ -4,6 +4,7 @@ certification-docs (0.1.8-0ppa1) trusty; urgency=medium
     mirrored semi-automatically by maniacs-setup script.
   * Incremental changes to MANIAC, MANIACS, and 16.04 Self-Test Guide
     in preparation for Ubuntu 16.04 release.
+  * Added new process flowcharts to Self-Test guide for 16.04
 
  -- Rod Smith <rod.smith@canonical.com>  Wed, 18 Feb 2016 13:46:23 -0500
 

@@ -126,6 +126,11 @@ certification tests and before uploading the results. The following
 sub-sections briefly describe these requirements. Detailed descriptions
 appear later in this document.
 
+.. image:: images/certification-process-flowchart.png
+           :alt: This flowchart outlines the certification process from
+                 hardware creation through certificate issuing.
+           :width: 100%
+
 Hardware Requirements
 ---------------------
 
@@ -590,6 +595,10 @@ deploy the Server Test Suite automatically. If MAAS doesn't deploy the
 Server Test Suite properly, you can do so manually, as described in
 `Appendix A - Installing the Server Test Suite Manually`_.
 
+.. raw:: pdf
+
+   PageBreak oneColumn
+
 Creating a Hardware Entry on C3
 ===============================
 
@@ -602,6 +611,12 @@ don't plan to submit the results, you should not create a C3 entry for the
 machine. To create an entry you can go directly to:
 
 https://certification.canonical.com/hardware/create-system
+
+.. image:: images/hardware-creation-flowchart.png
+           :alt: This flowchart outlines the steps necessary to create
+                 hardware entries on C3.
+           :width: 100%
+
 
 If you have problems accessing this site, contact your account manager.
 
