@@ -126,7 +126,7 @@ certification tests and before uploading the results. The following
 sub-sections briefly describe these requirements. Detailed descriptions
 appear later in this document.
 
-.. image:: images/certification-process-flowchart.png
+.. image:: images/certification-process-flowchart-portrait.png
            :alt: This flowchart outlines the certification process from
                  hardware creation through certificate issuing.
            :width: 100%
@@ -612,7 +612,7 @@ machine. To create an entry you can go directly to:
 
 https://certification.canonical.com/hardware/create-system
 
-.. image:: images/hardware-creation-flowchart.png
+.. image:: images/hardware-creation-flowchart-landscape.png
            :alt: This flowchart outlines the steps necessary to create
                  hardware entries on C3.
            :width: 100%
