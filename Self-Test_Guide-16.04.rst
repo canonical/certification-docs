@@ -28,7 +28,7 @@ Introduction
 The aim of this document is to provide the information needed to test
 a server on-site using the Canonical Server Test Suite without requiring
 an Internet connection and then submit the results of that testing to
-Canonical to meet the requirements for Server Hardwar Certification.
+Canonical to meet the requirements for Server Hardware Certification.
 
 Glossary
 ========
