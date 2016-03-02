@@ -294,6 +294,23 @@ and must be agreed upon by both Canonical and the Partner.  Please discuss this
 with your Account Manager if you need to certify Ubuntu as a guest on your
 hypervisor.
 
+Virtual Machine Requirements
+============================
+Guests or VMs created for the purpose of certifying Ubuntu as Guest on a 
+non-Ubuntu host OS should have a minimum of 4GB RAM and at least 100GB of disk
+space to ensure the tests run successfully.
+
+Guests should also have at least on virtual NIC that can successfully ping the
+MAAS server / iPerf Target.
+
+Certifications of this type will use the "virtual-machine-full" whitelist which
+is a subset of the full server suite.  This is a subset of the "server-full"
+whitelist.
+
+KVM testing is not required for certification of Ubuntu as Guest scenarios as
+nested virtualization (e.g. running KVM inside a VM) is considered an 
+advanced/non-standard configuration.
+
 System on Chip Certification
 ----------------------------
 The Server Hardware Certification Team also provides System on Chip
