@@ -1,6 +1,6 @@
-=================================================================
- Ubuntu Server Certified Hardware Self-Testing Guide (16.04 LTS)
-=================================================================
+===================================================================================
+ Ubuntu Server Certified Hardware Self-Testing Guide (16.04 LTS) PRE-RELEASE DRAFT
+===================================================================================
 
 .. header:: |ubuntu_logo|
 
@@ -35,12 +35,12 @@ Glossary
 
 The following definitions apply to terms used in this document.
 
-1Gbps
-  1 Gigabit per second -- Network speed for Gigabit Ethernet (1000Mbps).
+1 Gbps
+  1 Gigabit per second -- Network speed for Gigabit Ethernet (1000 Mbps).
 
-10Gbps
+10 Gbps
   10 Gigabits per second -- Network speed for 10 Gigabit Ethernet
-  (10,000Mbps).
+  (10,000 Mbps).
 
 BMC
   Baseboard Management Controller -- A device in many server models
@@ -63,7 +63,7 @@ KVM
   Ubuntu Server.
 
 IPMI
-  Intelligent Platform Management Interface -- A technology for
+  Intelligent Platform Management Interface -- A BMC technology for
   remotely connecting to a computer to perform management functions.
 
 JBOD
@@ -125,20 +125,33 @@ be aware of hardware requirements and the needs of the network test
 environment. There are steps you should perform before running the
 certification tests and before uploading the results. The following
 sub-sections briefly describe these requirements. Detailed descriptions
-appear later in this document.
+appear later in this document. The following flowchart shows a "birds-eye
+view" of the certification process.
 
 .. image:: images/certification-process-flowchart-portrait.png
            :alt: This flowchart outlines the certification process from
                  hardware creation through certificate issuing.
            :width: 100%
 
+.. raw:: pdf
+
+   PageBreak
+
 Hardware Requirements
 ---------------------
 
--  SUTs must contain at least 4GiB of RAM and one hard disk, but using
+-  SUTs must contain at least 4 GiB of RAM and one hard disk, but using
    the maximum amount of RAM and the maximum number of disks is
    preferable. Likewise, if configurable, using the maximum number of
    CPUs is desirable.
+
+-  If SUT model is available with differing disk sizes, testing with the
+   largest disk, or at least with a disk (or RAID array) over 2 TiB, is
+   recommended.
+
+-  If the SUT has multiple disk controllers (such as a motherboard-based
+   disk controller and a separate RAID controller), we strongly recommend
+   that disk devices be connected to both controllers during testing.
 
 -  CPUs should support virtualization (VMX/SVM), when supported by CPU
    architecture.
@@ -174,14 +187,21 @@ Network Test Environment
 -  Ideally, the network should have few or no other computers;
    extraneous network traffic can negatively impact the network tests.
 
+-  When testing multiple SUTs simultaneously, you will need multiple
+   ``iperf3`` targets, one for each SUT. Alternatively, you can run network
+   tests against a single ``iperf3`` target sequentially; however, this
+   approach complicates submission of results. Note that poor network
+   infrastructure may make multiple simultaneous ``iperf3`` runs
+   unreliable.
+
 -  Ideally, the MAAS server system should handle DNS and DHCP for the
    network. If other computers manage these tasks, be sure that they're
    configured to work with the MAAS server so that the SUT obtains its
    PXE-boot images from the MAAS server.
 
 -  Network cabling, switches, and the ``iperf3`` server should be capable of
-   at least the SUT's best speed. For instance, if the SUT has 1Gbps
-   Ethernet, the other network components should be capable of 1Gbps or
+   at least the SUT's best speed. For instance, if the SUT has 1 Gbps
+   Ethernet, the other network components should be capable of 1 Gbps or
    faster speeds. If the local network used for testing is less capable
    than the best network interfaces on the SUT, those interfaces must be
    tested later on a more-capable network. If the test environment uses
@@ -211,9 +231,8 @@ Before Running Test Cases
 -  Be sure to have all the items described in the `Equipment to
    Bring`_ section below.
 
--  Some manual configuration will be necessary to perform
-   network testing. See the `Installing Ubuntu on the
-   System`_ section below.
+-  Some manual network and disk configuration may be necessary. See the
+   `Running the Certification Tests`_ section below.
 
 Before Uploading Test Case Results
 ----------------------------------
@@ -268,7 +287,7 @@ Equipment to Bring
 The requirements for running the tests for a server are minimal. Ensure
 that you have:
 
--  Writable USB sticks with enough free space (> 256MB). Each stick must
+-  Writable USB sticks with enough free space (> 256 MB). Each stick must
    contain a *single partition* with a *writable FAT* filesystem on it. 
    Note that a USB stick with multiple partitions may cause problems, so if
    necessary you should repartitition your device to have a single
@@ -306,7 +325,7 @@ up the SUT and test environment:
 
 -  Minimum loadout
 
-   -  Minimum of 4GiB RAM
+   -  Minimum of 4 GiB RAM
 
    -  1 HDD (2 with minimal RAID)
 
@@ -317,6 +336,9 @@ up the SUT and test environment:
    -  Maximum supported number of HDDs or SSDs, especially if you can
       configure multiple RAID levels (e.g. 2 for RAID 0, 3 for RAID 5, and
       6 for RAID 50)
+
+   -  The largest disk capacity available from the OEM -- ideally, over
+      2 TiB on a single disk or RAID array.
 
    -  Maximum amount of supported RAM
 
@@ -346,21 +368,21 @@ up the SUT and test environment:
 
    -  The SUT must be configured to PXE-boot by default.
 
-   -  If the SUT's firmware is UEFI, it must be configured to boot in
-      native UEFI mode, not using the CSM/legacy boot support. (Note,
-      however, that some computers support UEFI-mode booting, but not when
-      PXE-booting.)
+   -  If the SUT's firmware supports PXE-booting in UEFI mode, it must be
+      configured to boot in UEFI mode, rather than in BIOS/CSM/legacy mode.
 
    -  If the UEFI supports it, the SUT must be configured to boot with
       Secure Boot active.
 
+.. raw:: pdf
+
+   PageBreak
+
 -  Storage should be properly configured.
 
-   -  If the SUT supports hardware RAID, the system will have to be
-      installed and tested twice, once with RAID enabled and once in a JBOD
-      configuration. One run must be a complete test, but the other can
-      test the disk devices alone. The order in which these modes are
-      tested is unimportant.
+   -  If the SUT provides multiple disk controller devices (such as an
+      on-board JBOD controller and a separate RAID controller), we strongly
+      recommend that disks be plugged into all the controllers.
 
    -  Software RAID, including firmware-supported software RAID (aka "fake
       RAID") should *not* be used. If hardware RAID is not available,
@@ -371,8 +393,9 @@ up the SUT and test environment:
       preferably, be a single partition that spans the entire disk.
 
    -  Some BIOS-only computers may have problems booting from disks over
-      2TiB in size. If the SUT fails for this reason, it may pass with
-      smaller disks (or a smaller RAID array).
+      2 TiB in size. If the SUT fails for this reason, it may pass with
+      smaller disks (or a smaller RAID array), but this issue should be
+      noted with the results submission.
 
    -  Disks must be configured for "flat" storage -- that is, filesystems
       in plain partitions, rather than using LVM or bcache configurations.
@@ -389,10 +412,10 @@ up the SUT and test environment:
    segregated LAN.
 
    -  If possible, the test LAN's speed should match or exceed the network
-      speed of the SUT. For instance, a SUT with 1Gbps onboard Ethernet
-      should be connected to a LAN capable of at least 1Gbps and a system
-      with 10Gbps Ethernet should be connected to a LAN capable of at least
-      10Gbps. Connecting a SUT to a network with greater network speed is
+      speed of the SUT. For instance, a SUT with 1 Gbps onboard Ethernet
+      should be connected to a LAN capable of at least 1 Gbps and a system
+      with 10 Gbps Ethernet should be connected to a LAN capable of at least
+      10 Gbps. Connecting a SUT to a network with greater network speed is
       acceptable.
 
    -  If the primary test network cannot meet these requirements,
@@ -509,8 +532,8 @@ install Ubuntu on the SUT as follows:
       process can take several minutes.
 
    -  If the SUT does not have a BMC, you should power it on manually after
-      clicking Acquire and Start Node. The SUT should then boot and install
-      Ubuntu. This process can take several minutes.
+      clicking Go. The SUT should then boot and install Ubuntu. This
+      process can take several minutes.
 
 If MAAS has problems in any of the preceding steps, the SUT might not pass
 certification. For instance, certification requires that MAAS be able to
@@ -560,22 +583,6 @@ You should keep some details in mind as you continue to access the SUT:
    certification software yourself, as described in `Appendix A -
    Installing the Server Test Suite Manually`_.
 
-Ensure all network devices are configured in the file
-``/etc/network/interfaces``:
-
-.. figure:: images/interfaces.png
-   :alt: The /etc/network/interfaces file must be properly configured
-         for your system's interfaces.
-   :width: 100%
-
-Be sure to start networking on all the interfaces. (The network tests will
-*not* bring up a network interface, even if it's defined in
-``/etc/network/interfaces``.) In most cases, typing ``sudo ifup eth1``, and
-so on for additional entries, will do the job. (The ``eth0`` interface is
-normally enabled by default on the first boot and so need not be explicitly
-brought up, but this isn't always the case.) Once you've done this, typing
-``ifconfig`` should show that all the interfaces have IP addresses.
-
 Installing the Server Test Suite Packages
 -----------------------------------------
 
@@ -596,10 +603,6 @@ deploy the Server Test Suite automatically. If MAAS doesn't deploy the
 Server Test Suite properly, you can do so manually, as described in
 `Appendix A - Installing the Server Test Suite Manually`_.
 
-.. raw:: pdf
-
-   PageBreak oneColumn
-
 Creating a Hardware Entry on C3
 ===============================
 
@@ -613,14 +616,14 @@ machine. To create an entry you can go directly to:
 
 https://certification.canonical.com/hardware/create-system
 
+If you have problems accessing this site, contact your account manager.
+
 .. image:: images/hardware-creation-flowchart-landscape.png
            :alt: This flowchart outlines the steps necessary to create
                  hardware entries on C3.
            :width: 100%
 
-
-If you have problems accessing this site, contact your account manager.
-
+The process of creating an entry is outlined in the preceding flowchart.
 When creating an entry, you must enter assorted pieces of information:
 
 #. Fill in the details:
@@ -680,9 +683,13 @@ When creating an entry, you must enter assorted pieces of information:
 Running the Certification Tests
 ===============================
 
-To initiate a testing session in a server:
+You can initiate a testing session in a server as follows:
 
-#. Connect to the server via SSH or log in at the console. A standard MAAS
+#. Launch ``iperf3`` on the Target server(s) you plan to use by typing::
+
+    $ iperf3 -s
+
+#. Connect to the SUT via SSH or log in at the console. A standard MAAS
    installation creates a user called ``ubuntu``, as noted earlier. You can
    test using either a direct console login or SSH, but an SSH login may be
    disconnected by the network tests or for other reasons.
@@ -734,17 +741,42 @@ To initiate a testing session in a server:
    simplify submission of results at the end of the test; however, this
    will work only if the SUT has full Internet access.
 
-#. Launch ``iperf3`` on the server identified in
-   the SUT's ``/etc/xdg/canonical-certification.conf`` file by typing::
-
-    $ iperf3 -s
-
 #. If you're running the test via SSH, type screen on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go
    down, as may happen when running the network tests. If you're
    disconnected, you can reconnect to your session by logging in and
    typing ``screen -r``. This step is not important if you're running the
    Server Test Suite at the console.
+
+#. Verify that all your disks are mounted. Type ``df -h`` to view the
+   mounted disks, and compare the output to the disk devices available to
+   you, as shown by ``ls /dev/sd*``. (Some exotic disk devices may appear
+   under other device names, such as ``/dev/nvme*``.) If ``ls /dev/sd*``
+   shows a disk with no mounted partitions, you should partition the disk
+   (one big disk-spanning partition is best), create a filesystem on it,
+   and mount it (subdirectories of ``/mnt`` work well). Repeat this process
+   for each unmounted disk.
+
+#. Prior to running the certification tests, you should double-check that
+   the server's configuration is correct by running the ``cert-precheck``
+   script, which tests the critical configuration details that may be set
+   incorrectly. Information on most of these details is displayed, followed
+   by a summary, such as the following:
+
+   .. figure:: images/cert-pretest.png
+      :alt: The certification pre-test script helps you identify
+            simple problems that might make you go d'oh!
+      :width: 100%
+
+   Summary results are color-coded, with gray for information, green for
+   passed results, yellow for warnings, and red for problems that should be
+   corrected. In the preceding output, the Installed RAM value was
+   displayed in yellow because the system's RAM is a bit shy of 4 GiB; and
+   the ``iperf`` line is in red because the script detected no ``iperf3``
+   server. If your terminal supports the feature, you can scroll up to see
+   details of any warnings or failures.
+
+#. Correct any problems identified by the ``cert-precheck`` script.
 
 #. Run::
 
@@ -756,14 +788,15 @@ To initiate a testing session in a server:
 #. Press the Enter key. The system will display a Suite Selection
    screen:
 
-   .. figure:: images/some_tests.png
+   .. figure:: images/suite-selection-xenial.png
       :alt: The suite selection screen enables you to pick which
             tests to run
       :width: 100%
 
-#. Select the *Server-full-16.04* item and deselect the other items.
-   (These other suites exist to enable easy re-running of subsets of
-   tests that often fail in some environments.)
+#. Select the *16.04 server certification full* item and deselect the other
+   items. (These other suites exist to enable easy re-running of subsets of
+   tests that often fail in some environments or to run tests on Ubuntu
+   14.04.)
 
 #. Use the arrow keys to highlight the *<OK>* option and then press
    Enter.
@@ -797,6 +830,14 @@ To initiate a testing session in a server:
    up you should run the ``canonical-certification-server`` command again
    and respond `y` when asked if you want to resume the previous session.
 
+#. If any tests fail or do not run, the test selection screen will
+   reappear, but it will show only those tests that failed or did not run.
+   You can use this opportunity to re-run a test if you believe it failed
+   for a transient reason, such as if your ``iperf3`` server crashed or was
+   unavailable. Note that the presence of a test in this list does not
+   necessarily mean that the test failed; tests that were skipped for
+   harmless reasons can also appear in this list.
+
 #. When the test run is complete, you should see a summary of tests run, a
    note about where the ``submission.xml``, ``submission.html``,
    ``submission.xlsx``, and ``submission.json`` files have been stored,
@@ -812,16 +853,13 @@ To initiate a testing session in a server:
    having the results available as a backup can be useful because it
    enables you to review the results off-line or in case of submission
    problems that aren't immediately obvious. The results are stored in
-   the ``~/.local/share/plainbox`` directory.
+   the ``~/.local/share/plainbox`` directory. The upcoming section,
+   `Manually Uploading Test Results to the Certification Site`_, describes
+   how to perform this task.
 
-#. Copy the whole directory to an external medium and bring it with you
-   after certifying the system. It contains a file called
-   ``submission.xml`` which is the results of the testing as well as a file
-   called ``submission.html`` that, if loaded in a web browser, will show you
-   the results.
-
-If you review your results by loading ``submission.html`` in a web browser,
-you can quickly spot failed tests because they're highlighted in red with a
+You can review your results locally by loading ``submission.html`` in a web
+browser. This enables you to
+quickly spot failed tests because they're highlighted in red with a
 "FAILED" notation in the Result column, whereas passed tests acquire a
 green color, with the word "PASSED." Note, however, that *a failed test
 does not necessarily denote a failed certification*. Reasons a test might
@@ -841,35 +879,6 @@ fail but still enable a certification to pass include the following:
 
 Consult your account manager if you have questions about specific test
 results.
-
-Repeating the Disk Tests
-========================
-
-If the server provides a hardware RAID card, you must submit test runs with
-the card configured both for JBOD and for RAID. (You can use whatever RAID
-level is convenient.) Thus, after you complete a test run as just
-described, you should:
-
- #. Ensure that the results have been submitted, or at least copied off
-    of the SUT.
-
- #. Reconfigure the RAID settings -- if the system had been configured
-    for JBOD, reconfigure it for RAID; and if it had been configured for
-    RAID, reconfigure it for JBOD.
-
- #. Using MAAS, re-commission and re-deploy the server. (Re-commissioning
-    is necessary for MAAS to detect the server's modified disk
-    configuration.)
-
- #. If necessary, install the Certification Suite again.
-
- #. Run through the steps described earlier, in `Running the Certification
-    Tests`_; however, instead of selecting the "Server-full-14.04" test
-    suite, select the "Storage only" test suite.
-
-Be sure to submit *both* the original run and the secondary run to C3. When
-requesting the certificate, you'll do so using the full run, but include a
-note pointing to the results of the secondary run.
 
 Manually Uploading Test Results to the Certification Site
 =========================================================
@@ -991,12 +1000,6 @@ problems, you can request a certificate:
          *miscellanea/get-maas-version* test fails, be sure to specify the
          version of MAAS used to deploy the SUT.
 
-      -  A note titled "RAID Results" or "JBOD Results" should point to
-         the URL on C3 where the results from the RAID or JBOD test results
-         (whichever was *not* used for the current run) are available. If
-         the server does not support hardware RAID in its tested
-         configuration, this note should specify that fact.
-
       In most cases, the "Private" check box should be checked for your
       notes.
 
@@ -1007,21 +1010,20 @@ problems, you can request a certificate:
 Appendix A - Installing the Server Test Suite Manually
 ======================================================
 
-Ordinarily, MAAS will install the Server Test Suite onto the SUT as part
-of the provisioning process, as described in the main body of this
-document. If the MAAS server is not configured to do this, though, you
-have two additional options for installing the Server Test Suite: You
+Ordinarily, MAAS will install the Server Test Suite onto the SUT as part of
+the provisioning process. If the MAAS server is not configured to do this,
+you have two additional options for installing the Server Test Suite: You
 may use APT if the SUT has full Internet access (or at least access to a
-local APT repository); or you may install
-the Server Test Suite from a tarball that you bring with you.
+local APT repository); or you may install the Server Test Suite from a
+tarball that you bring with you.
 
 Installing the Server Test Suite via APT
 ----------------------------------------
 
-If your lab setup has Internet access or a local APT repository with both
-the main Ubuntu archives and the relevant PPAs, getting the testing tools is a
-pretty straightforward process, because you can install the necessary
-tools from the Ubuntu Hardware Certification PPA.
+If your lab has Internet access or a local APT repository with both the
+main Ubuntu archives and the relevant PPAs, getting the testing tools is a
+straightforward process, because you can install the necessary tools using
+``apt-get``.
 
 Log in to the server locally or via SSH or KVM and run the following
 commands::
@@ -1034,8 +1036,8 @@ commands::
 .. The ppa:hardware-certification/public should be stable. For
    the development PPA, instead use ppa:checkbox-dev/ppa.
 
-If for some reason you want to  run the test suite from an Ubuntu live
-medium, you must also enable the universe repository::
+If you want to  run the test suite from an Ubuntu live medium, you must
+also enable the universe repository::
 
   $ sudo apt-add-repository universe
 
@@ -1046,8 +1048,7 @@ situations or when debugging problems that necessitate booting in this way.
 During the installation, you may be prompted for a password for ``mysql``.
 This can be set to anything you wish; it will not be used during testing.
 
-At this point, you should have the test suite and dependencies installed
-and be ready to begin testing.
+At this point, the test suite and dependencies should be installed.
 
 Bringing the Server Test Suite Packages With You
 ------------------------------------------------
@@ -1079,7 +1080,7 @@ perform the following steps on the SUT:
 #. Insert the USB drive on which you placed the tarball.
 
 #. Extract the contents of the ``.tar.gz`` file from the USB stick to a
-   temporary directory (such as ``/tmp/``)::
+   temporary directory::
 
     $ tar -C /tmp -xzf ubuntu-16.04-server-amd64.tar.gz
     $ cd /tmp
@@ -1088,7 +1089,7 @@ perform the following steps on the SUT:
    it (note this is just an example, your exact directory name may be
    different)::
 
-    $ cd apt-repo-ubuntu-16.04.1-server-amd64.iso-20140901-canonical-certification-ser
+    $ cd apt-repo-ubuntu-16.04.1-server-amd64.iso-20160401-canonical-certification-ser
 
 4. Use a provided helper script to add a local package repository::
 
@@ -1188,7 +1189,7 @@ The test selection screen looks like this:
          you want to run.
    :width: 100%
 
-Every test suite name is preceded by a brackets that contain either an
+Every test suite name is preceded by brackets that contain either an
 *X* character or nothing to identify whether the test suite has been
 selected or not.
 
@@ -1279,7 +1280,7 @@ tests. Specific suggestions for fixing these problems include:
 
 -  **Check cables and other hardware** -- Yes, this is very basic; but bad
    cables can cause problems. For instance, one bad cable at Canonical
-   resulted in connections at 100Mbps rather than 1Gbps, and therefore
+   resulted in connections at 100 Mbps rather than 1 Gbps, and therefore
    failures. Some of these failures were identified in the output as the
    lack of a route to the host. Similarly, if a switch connecting the SUT
    to the ``iperf3`` server is deficient, it will affect the network test

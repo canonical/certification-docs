@@ -30,21 +30,21 @@
 Purpose
 =======
 
-This document describes how to install MAAS on a portable computer (such as
-an Intel NUC or laptop) so that you can deploy systems in a test
-environment as well as install the certification tools and perform
-certification testing. Consult the Ubuntu Certified Hardware Self-Testing
-Guide (available from https://certification.canonical.com) for detailed
-information on running the certification tests themselves.
+This document describes how to install MAAS on a computer so that you can
+deploy systems in a test environment as well as install the certification
+tools and perform certification testing. Consult the Ubuntu Certified
+Hardware Self-Testing Guide (available from
+https://certification.canonical.com) for detailed information on running
+the certification tests themselves.
 
-Note that this document is based on using the Ubuntu Desktop image for
-ease of use, and thus some bits, the Network Manager bits especially,
-may not apply if you're using Server without a desktop.
+In this document, the MAAS server is referred to generically as a "portable
+computer" because the intent is that the MAAS server (such as an Intel NUC
+or laptop) be portable for field technicians; however, you can deploy a
+desktop computer or server in exactly the same way.
 
-A device (referred to generically as a "portable computer") configured
-as described here is not intended for general Internet use. Some
-settings relax security in the interest of ease of use, so you should
-limit use of the portable computer on the Internet at large.
+A computer configured as described here is not intended for general
+Internet use. Some settings relax security in the interest of ease of use,
+so you should limit use of the portable computer on the Internet at large.
 
 This document begins with information on the required hardware and then
 moves on to a general description of Ubuntu installation, details on how to
@@ -83,8 +83,7 @@ hardware:
 
    -  Ensure that the portable computer has two network interfaces. A
       laptop with both Ethernet and wi-fi should suffice; or you can use a
-      USB network dongle to provide a second interface, particularly for a
-      NUC.
+      USB network dongle to provide a second interface.
 
    -  Because testing sessions can last for hours, ensure that you have a
       power brick; you should *not* run on battery power!
@@ -126,7 +125,7 @@ hardware:
 *  Video cable for NUC (HDMI, Mini DisplayPort, or a converter like a
    MiniDP to VGA)
 
-*  At least 1TB of disk space with which to mirror the Ubuntu archives,
+*  At least 1 TB of disk space with which to mirror the Ubuntu archives,
    if desired (an external USB3 hard disk may be used for this, if
    necessary)
 
@@ -149,7 +148,8 @@ up its most basic network settings:
       system.
 
    -  If you choose to use the Server version, you will probably want to
-      install the desktop on top of that as it simplifies MAAS access.
+      install the X server and a desktop environment on top of that as it
+      simplifies MAAS access.
 
    -  This guide assumes the use of Ubuntu 14.04. Although another version
       may work, some details will differ. Note that Ubuntu 14.04 is the
@@ -200,6 +200,9 @@ up its most basic network settings:
       *external* addresses when deciding on its *internal* address and
       netmask.
 
+   -  Avoid the 10.0.3.0/24 address range, because Ubuntu 16.04 server uses
+      this address range for its LXC container tool.
+
    -  Do not specify a gateway for the private internal LAN; doing so will
       create confusion when trying to access the Internet via the external
       port.
@@ -232,7 +235,7 @@ up its most basic network settings:
 
 #. If you plan to mirror the Ubuntu archives locally, ensure you have
    enough space in the ``/srv`` directory to hold your mirrors. As a
-   general rule of thumb, you should set aside about 150GB per release. If
+   general rule of thumb, you should set aside about 150 GB per release. If
    necessary, mount an extra disk at ``/srv`` to hold your repository
    mirror.
 
@@ -266,9 +269,9 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo apt-add-repository ppa:maas/stable
 
-   Currently (February, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
+   Currently (March, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
    This PPA holds version 1.9 of MAAS, which is the recommended version for
-   certification testing. (MAAS 1.7 and 1.8 are also acceptable.) In the
+   certification testing. (MAAS 1.8 is also acceptable.) In the
    long term, MAAS 1.10 and later will be used with Ubuntu 16.04, but as
    noted earlier, Ubuntu 14.04 is the preferred version leading up to, and
    slightly past, the release of Ubuntu 16.04.
@@ -321,14 +324,15 @@ The more specific procedure for using MAAS in certification testing is:
    identify your ``iperf`` server(s). This file should consist of a single
    line that contains a comma-delimited list of IP addresses, each
    identifying a different ``iperf`` (or ``iperf3``) server. If this file
-   is absent, SUTs will configure themselves to use their network
-   gateways (normally the MAAS server) as the ``iperf`` target. If
+   is absent, SUTs will configure themselves to use their network gateways
+   (normally the MAAS server) as the ``iperf`` target. If
    ``/etc/maas-cert-server/iperf.conf`` is present, though, MAAS will tell
    SUTs to use the specified system(s) instead. You might use this feature
    if your ``iperf`` server is not the SUTs' network gateway or if you have
    multiple ``iperf`` servers -- for instance, one for ``iperf`` (version
-   2) and another for ``iperf3``; or one on a 1 Gbps network and another on
-   a separate 10 Gbps network. The SUTs will attempt to use each ``iperf``
+   2; used for testing Ubuntu 14.04 and earlier) and another for ``iperf3``
+   (used for Ubuntu 16.04); or one on a 1 Gbps network and another on a
+   separate 10 Gbps network. The SUTs will attempt to use each ``iperf``
    target in series until the network test passes or until the list is
    exhausted. This setting can be overridden on SUTs by editing the
    ``/etc/xdg/canonical-certification.conf`` file on the SUT.
@@ -543,8 +547,8 @@ If you're running MAAS 1.8.2 or later, ``maniacs-setup`` registers the most
 recent point-release image in any series you download as the default OS for
 deployments.
 
-Again, this process can take a while, especially if you opt to import the
-12.04 images. If you want to skip this step for now and return to it, you
+Again, this process can take a while. If you want to skip this step for
+now and return to it, you
 can; you should re-launch ``maniacs-setup`` with its
 ``\-\-update-point-releases`` (or ``-u``) option when you're ready to
 download these images.
@@ -591,7 +595,7 @@ to modify a few settings. To do so, follow these steps:
       internal port).
 
    -  You should also be able to access this by default on the
-      external port, too.
+      external port.
 
    -  If you provide the computer with a hostname in DNS or ``/etc/hosts``,
       you should be able to access it via that name, as well.
@@ -666,11 +670,10 @@ To test it, follow these steps:
    - This first boot should be to the enlistment image, which provides
      some very basic information to the MAAS server. Once the node powers
      itself off you should see it listed in the MAAS nodes list
-     (\http://localhost/MAAS/#/nodes/ or, on MAAS 1.7,
-     \http://localhost/MAAS/nodes/) with a Status field of "New."
+     (\http://localhost/MAAS/#/nodes/) with a Status field of "New."
 
-   - Note that you will have to refresh the nodes list as it does not
-     refresh itself to list new data.
+   - Once the test computer powers off, it should appear in the MAAS
+     server's nodes list, but if it doesn't, try refreshing the page.
 
 #. Click on the node's hostname to view the node's summary page.
 
@@ -724,7 +727,7 @@ misconfigured something in the MAAS setup. You may want to review the
 preceding sections to verify that you configured everything correctly.
 To help in debugging problems, the node status page includes a section
 entitled Latest Node Events with a summary of the last few events
-related to the node. (You must refresh the page to see new events.)
+related to the node. (You may have to refresh the page to see new events.)
 
 .. raw:: pdf
 
@@ -909,7 +912,7 @@ check your preferred source with a web browser to see if the pre-release
 version is available on it. The result, for the block shown earlier, looks
 something like this::
 
-  ## trusty on amd64 archives
+  ## xenial on amd64 archives
   
   deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial main restricted universe \
             multiverse
@@ -948,11 +951,11 @@ Appendix E: Glossary
 
 The following definitions apply to terms used in this document.
 
-1Gbps
-  1 Gigabit - Network speed for Gigabit Ethernet (1000Mbps).
+1 Gbps
+  1 Gigabit - Network speed for Gigabit Ethernet (1000 Mbps).
 
-10Gbps
-  10 Gigabit - Network speed for 10 Gigabit Ethernet (10,000Mbps).
+10 Gbps
+  10 Gigabit - Network speed for 10 Gigabit Ethernet (10,000 Mbps).
 
 BMC
   Baseboard Management Controller -- A device in many server models
