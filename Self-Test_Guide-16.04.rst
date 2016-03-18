@@ -311,12 +311,6 @@ that you have:
    Test Suite on the SUT, which will not be the case for a "generic" MAAS
    server.)
 
--  A USB flash drive that holds the Server Test Suite software. (This is a
-   precautionary measure in case MAAS can't install the Server Test Suite
-   packages and your LAN lacks Internet access.) The `Bringing the Server
-   Test Suite Packages With You`_ section of Appendix A describes how to
-   obtain the software.
-
 Hardware Setup
 --------------
 
@@ -373,10 +367,6 @@ up the SUT and test environment:
 
    -  If the UEFI supports it, the SUT must be configured to boot with
       Secure Boot active.
-
-.. raw:: pdf
-
-   PageBreak
 
 -  Storage should be properly configured.
 
@@ -583,19 +573,20 @@ You should keep some details in mind as you continue to access the SUT:
    certification software yourself, as described in `Appendix A -
    Installing the Server Test Suite Manually`_.
 
+.. raw:: pdf
+
+   PageBreak
+
 Installing the Server Test Suite Packages
 -----------------------------------------
 
-Three methods of installing the Server Test Suite exist:
+Two methods of installing the Server Test Suite are supported:
 
 -  Automatically by the MAAS server
 
 -  Using APT to retrieve the Server Test Suite packages on a SUT with
    full Internet access or with access to a local APT repository on
    a local computer such as the MAAS server
-
--  By loading the Server Test Suite Debian packages from a USB flash
-   drive or other medium you bring with you to the test site
 
 If MAAS is fully configured as described in the `MAAS Advanced NUC
 Installation and Configuration -- Scripted (MANIACS)` document, it should
@@ -768,7 +759,7 @@ You can initiate a testing session in a server as follows:
             simple problems that might make you go d'oh!
       :width: 100%
 
-   Summary results are color-coded, with gray for information, green for
+   Summary results are color-coded, with white for information, green for
    passed results, yellow for warnings, and red for problems that should be
    corrected. In the preceding output, the Installed RAM value was
    displayed in yellow because the system's RAM is a bit shy of 4 GiB; and
@@ -810,7 +801,7 @@ You can initiate a testing session in a server as follows:
    this screen is fairly straightforward, but `Appendix C - Using the Test
    Selection Screen`_ covers the details.
 
-   .. figure:: images/ccs_tests.png
+   .. figure:: images/test-selection-xenial.png
       :alt: The suite selection screen enables you to pick which
             tests to run
       :width: 100%
@@ -839,8 +830,7 @@ You can initiate a testing session in a server as follows:
    harmless reasons can also appear in this list.
 
 #. When the test run is complete, you should see a summary of tests run, a
-   note about where the ``submission.xml``, ``submission.html``,
-   ``submission.xlsx``, and ``submission.json`` files have been stored,
+   note about where the ``submission*`` files have been stored,
    and a prompt to submit the
    results to ``certification.canonical.com``. If you're connected to the
    Internet, typing ``y`` at this query should cause the results to be
@@ -853,11 +843,12 @@ You can initiate a testing session in a server as follows:
    having the results available as a backup can be useful because it
    enables you to review the results off-line or in case of submission
    problems that aren't immediately obvious. The results are stored in
-   the ``~/.local/share/plainbox`` directory. The upcoming section,
+   the ``~/.local/share/checkbox-ng`` directory. The upcoming section,
    `Manually Uploading Test Results to the Certification Site`_, describes
    how to perform this task.
 
-You can review your results locally by loading ``submission.html`` in a web
+You can review your results locally by loading
+``submission_<DATECODE>.html`` in a web
 browser. This enables you to
 quickly spot failed tests because they're highlighted in red with a
 "FAILED" notation in the Result column, whereas passed tests acquire a
@@ -907,7 +898,7 @@ instructions:
 #. Run the following command::
 
     $ canonical-certification-submit --secure_id <SUT_SECURE_ID> \
-      <PATH_TO>/submission.xml
+      <PATH_TO>/submission_<DATECODE>.xml
 
    where:
 
@@ -920,26 +911,24 @@ instructions:
          :align: left
          :width: 50%
 
-   -  ``<PATH_TO>`` refers to the location of the ``submission.xml file``
+   -  ``<PATH_TO>`` refers to the location of the
+      ``submission_{datecode}.xml`` file
       (which should be contained in the ``~/.local/share/plainbox``
       directory you copied to the USB key).
 
-   -  Older versions of this tool used ``\-\-hwid`` rather than
-      ``\-\-secure_id``.
+   -  ``<DATECODE>`` is a date code. Note that if you re-run the
+      certification suite, you're likely to see multiple
+      ``submission_<DATECODE>.xml`` files, each with a different date code,
+      one for each run. Ordinarily, you should submit the most recent file.
 
 You should see output similar to the following for a successful
 submission::
 
-  $ canonical-certification-submit --hwid a00D000000LU9Ji \
+  $ canonical-certification-submit --secure_id a00D000000dpNfPIAU \
      ~/.local/share/plainbox/submission.xml
-   2012-03-28 11:05:30,575 INFO     Preparing to submit results using Hardware
-                                    ID: a00D000000LU9Ji
-   2012-03-28 11:05:30,576 INFO     Getting messages
-   2012-03-28 11:05:56,726 INFO     Exchanged 8 of 8 messages
-   2012-03-28 11:05:56,726 INFO     Results have been successfully submitted.
-                                    To review your test results now, please
-                                    go to the following URL:
-               https://certification.canonical.com/submission/eFXnst3rVbBvdu2
+  Successfully sent, submission status at
+  https://certification.canonical.com/submissions/status/20283
+
   
 Once results submission is complete, use the provided link in the output
 to review the results and confirm that they are correct.
@@ -1012,18 +1001,10 @@ Appendix A - Installing the Server Test Suite Manually
 
 Ordinarily, MAAS will install the Server Test Suite onto the SUT as part of
 the provisioning process. If the MAAS server is not configured to do this,
-you have two additional options for installing the Server Test Suite: You
-may use APT if the SUT has full Internet access (or at least access to a
-local APT repository); or you may install the Server Test Suite from a
-tarball that you bring with you.
-
-Installing the Server Test Suite via APT
-----------------------------------------
-
-If your lab has Internet access or a local APT repository with both the
-main Ubuntu archives and the relevant PPAs, getting the testing tools is a
-straightforward process, because you can install the necessary tools using
-``apt-get``.
+you may use APT to do the job after deploying the SUT. In order to do this,
+your lab must have Internet access or a local APT repository with both the
+main Ubuntu archives and the relevant PPAs. You can install the necessary
+tools using ``apt-get``.
 
 Log in to the server locally or via SSH or KVM and run the following
 commands::
@@ -1049,60 +1030,6 @@ During the installation, you may be prompted for a password for ``mysql``.
 This can be set to anything you wish; it will not be used during testing.
 
 At this point, the test suite and dependencies should be installed.
-
-Bringing the Server Test Suite Packages With You
-------------------------------------------------
-
-If you do not have Internet access from your LAN, you can find the
-pre-built tarball including the Server Test Suite packages under:
-
-https://certification.canonical.com/offline
-
-Note that you will be asked for your account credentials when you access
-that URL.
-
-Copy the appropriate ``.tar.gz`` file to a USB stick and bring this with
-you when testing the system. You will also need to obtain and bring a copy
-of a bootable Ubuntu Cloud Image for the virtualization portion of the
-certification test.  You can obtain that here:
-
-http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-i386-disk1.img
-
-You can use another release of Ubuntu if this is convenient. An i386
-image is used even when you're testing 64-bit hardware. The point is to
-test that virtualization features work, not that a specific Ubuntu
-version or architecture is supported. Because the i386 image is more
-general, it's the one that we use in testing.
-
-To install the server certification packages from the copied tarball,
-perform the following steps on the SUT:
-
-#. Insert the USB drive on which you placed the tarball.
-
-#. Extract the contents of the ``.tar.gz`` file from the USB stick to a
-   temporary directory::
-
-    $ tar -C /tmp -xzf ubuntu-16.04-server-amd64.tar.gz
-    $ cd /tmp
-
-#. Look for a directory whose name begins with ``apt-repo`` and switch to
-   it (note this is just an example, your exact directory name may be
-   different)::
-
-    $ cd apt-repo-ubuntu-16.04.1-server-amd64.iso-20160401-canonical-certification-ser
-
-4. Use a provided helper script to add a local package repository::
-
-    $ sudo ./add_offline_repository -u
-
-5. Install the Server Test Suite::
-
-    $ sudo apt-get install canonical-certification-server
-
-During the installation, you may be prompted for a password for ``mysql``.
-This can be set to anything you wish; it will not be used during testing.
-If you're asked about mail server configuration, respond that the mail
-server should not be configured.
 
 .. raw:: pdf
 
@@ -1184,26 +1111,27 @@ do it when so instructed.
 
 The test selection screen looks like this:
 
-.. figure:: images/ccs_tests2.png
+.. figure:: images/test-selection2-xenial.png
    :alt: The test selection screen enables you to select the tests
          you want to run.
    :width: 100%
 
-Every test suite name is preceded by brackets that contain either an
-*X* character or nothing to identify whether the test suite has been
-selected or not.
+Initially a list of test categories appears. Highlighting one of these
+categories and then pressing the Enter key expands the category to show the
+individual tests it contains. (The preceding figure shows the *Ethernet
+Device tests* category so expanded.)
 
-Tests are arranged hierarchically. When a top-level test is highlighted,
-you can hide or reveal the details by pressing the Enter key; or you can
-select or deselect all the tests in that category by pressing the
-Spacebar. For instance, with *Benchmark tests* highlighted, as in the
-figure, pressing Enter will hide the lines up to *CPU tests*; and pressing
-the Spacebar will deactivate (or re-activate) all of the benchmark
-tests. You can select or de-select an individual test, such as the
-*hdparm-read_sda* test, by highlighting it and pressing the Spacebar.
+Every category and test suite name is preceded by brackets that contain
+either an *X* character or nothing to identify whether the test suite has
+been selected or not. You can select or deselect either an individual test
+or all the tests in a category by pressing the Spacebar. For instance, with
+*Ethernet Device tests* highlighted, pressing the Spacebar will deactivate
+(or re-activate) all of the Ethernet tests. You can select or de-select an
+individual test, such as the *Multi-NIC Iperf3 testing for NIC eth1* test,
+by highlighting it and pressing the Spacebar.
 
-Once you've selected all the tests, press the *T* key to begin the testing
-process.
+Once you've chosen the tests you want to run, press the *T* key to begin
+the testing process.
 
 .. raw:: pdf
 
