@@ -47,3 +47,33 @@ testcaseh: Test_Case_Guide-16.04.html
 
 clean:
 	rm -rf *.pdf *.html debian/files debian/certification-docs*
+
+# dependencies
+
+*.pdf: styles/cert-doc.style
+MAAS_Advanced_NUC_Installation_And_Configuration.*: images/logo-ubuntu_su-white_orange-hex.png
+MAAS_Advanced_NUC_Installation_And_Configuration.*: images/logo-canonical_no-tm-white-hex.png
+MAAS_Advanced_NUC_Installation_And_Configuration.*: images/maniac-network.png
+MAAS_Advanced_NUC_Installation_And_Configuration.*: images/maas-dropdown.png
+MAAS_Advanced_NUC_Installation_And_Configuration.*: images/clusters-page.png
+MAAS_Advanced_NUC_Installation_And_Configuration.*: images/custom-image-selection.png
+MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/logo-ubuntu_su-white_orange-hex.png
+MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/logo-canonical_no-tm-white-hex.png
+MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/maniac-network.png
+MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/clusters-page.png
+Self-Test_Guide-14.04.*: images/logo-ubuntu_su-white_orange-hex.png
+Self-Test_Guide-14.04.*: images/logo-canonical_no-tm-white-hex.png
+Self-Test_Guide-14.04.*: images/secure_id.png
+Self-Test_Guide-14.04.*: images/interfaces.png
+Self-Test_Guide-14.04.*: images/some_tests.png
+Self-Test_Guide-14.04.*: images/ccs_tests.png
+Self-Test_Guide-14.04.*: images/ccs_tests2.png
+Self-Test_Guide-16.04.*: images/logo-ubuntu_su-white_orange-hex.png
+Self-Test_Guide-16.04.*: images/logo-canonical_no-tm-white-hex.png
+Self-Test_Guide-16.04.*: images/certification-process-flowchart-portrait.png
+Self-Test_Guide-16.04.*: images/secure_id.png
+Self-Test_Guide-16.04.*: images/hardware-creation-flowchart-landscape.png
+Self-Test_Guide-16.04.*: images/cert-pretest.png
+Self-Test_Guide-16.04.*: images/suite-selection-xenial.png
+Self-Test_Guide-16.04.*: images/test-selection-xenial.png
+Self-Test_Guide-16.04.*: images/test-selection2-xenial.png

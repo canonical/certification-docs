@@ -1,6 +1,6 @@
-===================================================================================
- Ubuntu Server Certified Hardware Self-Testing Guide (16.04 LTS) PRE-RELEASE DRAFT
-===================================================================================
+=================================================================
+ Ubuntu Server Certified Hardware Self-Testing Guide (16.04 LTS) 
+=================================================================
 
 .. header:: |ubuntu_logo|
 
@@ -151,7 +151,7 @@ Hardware Requirements
 
 -  If the SUT has multiple disk controllers (such as a motherboard-based
    disk controller and a separate RAID controller), we strongly recommend
-   that disk devices be connected to both controllers during testing.
+   that disk devices be connected to all controllers during testing.
 
 -  CPUs should support virtualization (VMX/SVM), when supported by CPU
    architecture.
@@ -167,17 +167,29 @@ Network Test Environment
 ------------------------
 
 -  In addition to the SUT, the network must contain at least one other
-   machine, which will run MAAS and an ``iperf3`` server. The MAAS Advanced
-   NUC Installation and Configuration -- Scripted (MANIACS) document
-   (available from
-   https://certification.canonical.com) describes how to configure a MAAS
-   server. This server may be a standard part of the testing network or
-   something you bring with you for testing purposes alone. A laptop or a
-   small portable computer such as an Intel NUC is sufficient. MAAS version
-   1.7 or later is required for certification work; the older
-   MAAS 1.5 lacks certain features that are becoming increasingly
-   important. This document describes use of MAAS 1.9. If you use MAAS 1.7
-   or 1.8, some procedures will differ slightly.
+   machine, which will run MAAS and an ``iperf3`` server; however, you may
+   want to separate these two functions.
+
+   - The MAAS Advanced NUC Installation and Configuration -- Scripted
+     (MANIACS) document (available from
+     https://certification.canonical.com) describes how to configure a MAAS
+     server. This server may be a standard part of the testing network or
+     something you bring with you for testing purposes alone. A laptop or a
+     small portable computer such as an Intel NUC is sufficient. MAAS
+     version 1.7 or later is required for certification work; the older
+     MAAS 1.5 lacks certain features that are becoming increasingly
+     important. This document describes use of MAAS 1.9. If you use MAAS
+     1.7 or 1.8, some procedures will differ slightly.
+
+  -  When testing multiple SUTs simultaneously, you will need multiple
+     ``iperf3`` targets, one for each SUT. If your ``iperf3`` Target has a
+     sufficiently fast NIC or multiple NICs, you can assign the computer
+     multiple IP addresses and treat each one as a distinct Target. This
+     topic is covered in more detail in Appendix E of the MANIACS document.
+     Alternatively, you can run network tests against a single ``iperf3``
+     Target sequentially; however, this approach complicates submission of
+     results. Note that poor network infrastructure may make multiple
+     simultaneous ``iperf3`` runs unreliable.
 
 -  The MAAS server computer should run Ubuntu 14.04 (Trusty Tahr) or later,
    and should be configured to deliver Ubuntu 16.04 images to its clients.
@@ -186,13 +198,6 @@ Network Test Environment
 
 -  Ideally, the network should have few or no other computers;
    extraneous network traffic can negatively impact the network tests.
-
--  When testing multiple SUTs simultaneously, you will need multiple
-   ``iperf3`` targets, one for each SUT. Alternatively, you can run network
-   tests against a single ``iperf3`` target sequentially; however, this
-   approach complicates submission of results. Note that poor network
-   infrastructure may make multiple simultaneous ``iperf3`` runs
-   unreliable.
 
 -  Ideally, the MAAS server system should handle DNS and DHCP for the
    network. If other computers manage these tasks, be sure that they're
@@ -262,7 +267,7 @@ handle some preliminary tasks:
       .. image:: images/secure_id.png
          :alt: The Secure ID can be obtained from the Ceritification web site.
          :align: left
-         :width: 50%
+         :width: 70%
 
    -  For more information on creating the hardware entry, please see
       `Creating a Hardware Entry on C3` below.
@@ -321,7 +326,7 @@ up the SUT and test environment:
 
    -  Minimum of 4 GiB RAM
 
-   -  1 HDD (2 with minimal RAID)
+   -  1 HDD or SSD (2 with minimal RAID)
 
    -  1 CPU of a supported type
 
@@ -342,7 +347,7 @@ up the SUT and test environment:
    installed.
 
    -  Note that systems that ship with processors from different families
-      (e.g Sandy Bridge vs. Haswell) will require extra testing.
+      (e.g Broadwell vs. Skylake) will require extra testing.
 
    -  CPU speed bumps and die shrinks do not require extra testing.
 
@@ -573,10 +578,6 @@ You should keep some details in mind as you continue to access the SUT:
    certification software yourself, as described in `Appendix A -
    Installing the Server Test Suite Manually`_.
 
-.. raw:: pdf
-
-   PageBreak
-
 Installing the Server Test Suite Packages
 -----------------------------------------
 
@@ -585,7 +586,7 @@ Two methods of installing the Server Test Suite are supported:
 -  Automatically by the MAAS server
 
 -  Using APT to retrieve the Server Test Suite packages on a SUT with
-   full Internet access or with access to a local APT repository on
+   full Internet access or with access to a mirrored APT repository on
    a local computer such as the MAAS server
 
 If MAAS is fully configured as described in the `MAAS Advanced NUC
@@ -637,16 +638,17 @@ When creating an entry, you must enter assorted pieces of information:
      point to the same system, but appear as three separate entries on the
      public web site).
 
-   * **Codenames** -- This is for your internal reference and use and is
-     for the internal code name associated with the SUT. This data is
+   * **Codenames** -- This is for your internal reference and identifies
+     the internal code name associated with the SUT. This data is
      *never* published and is visible only to you and to Canonical.
 
-   * **Web site** -- Optional, link to the system info on the
+   * **Web site** -- This optional field links to the system information on the
      manufacturer's web site. This field is published publicly and is a way
      for potential customers to directly access information about your
      hardware on your own web site.
 
-   * **Comment** -- Optional, any comment you want to make about the
+   * **Comment** -- This optional field holds any comment you want to make
+     about the
      hardware, including things like tester name, test location, etc. 
      These comments are never made public, they are for internal use only.
 
@@ -698,7 +700,7 @@ You can initiate a testing session in a server as follows:
    inserted *throughout the test run*, because the media tests will be
    kicked off partway through the run.
 
-#. If the system doesn't have Internet access:
+#. If the system doesn't have Internet access, or if that access is slow:
 
    * Copy the image you downloaded from
      http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-i386-disk1.img (as
@@ -728,7 +730,8 @@ You can initiate a testing session in a server as follows:
    let the test suite try them all until it finds a free one.)
 
 #. While editing ``/etc/xdg/canonical-certification.conf``, you may
-   optionally enter the SUT's Secure ID in the ``[sru]`` section. This can
+   optionally enter the SUT's Secure ID in the ``[transport:c3]`` section.
+   This can
    simplify submission of results at the end of the test; however, this
    will work only if the SUT has full Internet access.
 
@@ -749,7 +752,8 @@ You can initiate a testing session in a server as follows:
    for each unmounted disk.
 
 #. Prior to running the certification tests, you should double-check that
-   the server's configuration is correct by running the ``cert-precheck``
+   the server's configuration is correct by running the
+   ``canonical-certification-precheck``
    script, which tests the critical configuration details that may be set
    incorrectly. Information on most of these details is displayed, followed
    by a summary, such as the following:
@@ -767,7 +771,8 @@ You can initiate a testing session in a server as follows:
    server. If your terminal supports the feature, you can scroll up to see
    details of any warnings or failures.
 
-#. Correct any problems identified by the ``cert-precheck`` script.
+#. Correct any problems identified by the
+   ``canonical-certification-precheck`` script.
 
 #. Run::
 
@@ -785,7 +790,7 @@ You can initiate a testing session in a server as follows:
       :width: 100%
 
 #. Select the *16.04 server certification full* item and deselect the other
-   items. (These other suites exist to enable easy re-running of subsets of
+   items. (These other test plans exist to enable easy re-running of subsets of
    tests that often fail in some environments or to run tests on Ubuntu
    14.04.)
 
@@ -909,11 +914,11 @@ instructions:
       .. image:: images/secure_id.png
          :alt: The Secure ID can be obtained from the Ceritification web site.
          :align: left
-         :width: 50%
+         :width: 70%
 
    -  ``<PATH_TO>`` refers to the location of the
       ``submission_{datecode}.xml`` file
-      (which should be contained in the ``~/.local/share/plainbox``
+      (which should be contained in the ``~/.local/share/checkbox-ng``
       directory you copied to the USB key).
 
    -  ``<DATECODE>`` is a date code. Note that if you re-run the
@@ -924,10 +929,10 @@ instructions:
 You should see output similar to the following for a successful
 submission::
 
-  $ canonical-certification-submit --secure_id a00D000000dpNfPIAU \
-     ~/.local/share/plainbox/submission.xml
+  $ canonical-certification-submit --secure_id a00D000000XndQJIAZ \
+    ~/.local/share/checkbox_ng/submission_2016-03-23T19\:06\:18.244727.xml 
   Successfully sent, submission status at
-  https://certification.canonical.com/submissions/status/20283
+  https://certification.canonical.com/submissions/status/20409
 
   
 Once results submission is complete, use the provided link in the output
@@ -1039,9 +1044,8 @@ Appendix B - Re-Testing and Installing Updated Tests
 ====================================================
 
 Occasionally, a test will fail, necessitating re-testing a feature. For
-instance, if you forget to insert a USB flash drive, the relevant USB
-tests will fail. The same thing will happen if a USB flash drive is
-defective or improperly prepared. Another common source of problems is
+instance, if a USB flash drive is defective or improperly prepared, the
+relevant USB tests will fail. Another common source of problems is
 network tests, which can fail because of busy LANs, flaky switches, bad
 cables, and so on. When this happens, you must re-run the relevant
 test(s).
@@ -1163,7 +1167,7 @@ report should be filed and note made of the problem in the certificate
 request. Please notify your TPM about such problems to facilitate their
 resolution.
 
-Because Ubuntu 16.04.1 uses the same 4.40 kernel series as 16.04 GA,
+Because Ubuntu 16.04.1 uses the same 4.4.0 kernel series as 16.04 GA,
 testing 16.04.1 is required only if 16.04 GA fails. (Although 16.04 GA
 and 16.04.1 use the same kernel series, 16.04.1 ships with a later
 kernel within that series, so it might fix a bug that blocks 16.04 GA
@@ -1185,7 +1189,7 @@ Submitting Results
 
 If submitting results from the Server Test Suite itself fails, you can use
 the ``canonical-certification-submit`` program, as described earlier, in
-`Manually Uploading Test Results to the Certification Site`. You can try
+`Manually Uploading Test Results to the Certification Site`_. You can try
 this on the SUT, but if network problems prevented a successful submission,
 you may need to bring the files out on a USB flash drive or other removable
 medium and submit them from a computer with better Internet connectivity.
@@ -1229,7 +1233,10 @@ tests. Specific suggestions for fixing these problems include:
    program refuses connections if it's already talking to another client.
    Thus, a SUT may fail its network test if the ``iperf3`` server is
    already in use. You may need to re-run the network tests on one or more
-   SUTs if this is the case.
+   SUTs if this is the case. Note that a faster ``iperf3`` server (say, one
+   with a 10 Gbps NIC used to test 1 Gbps SUTs) requires special
+   configuration to handle multiple simultaneous connections, as described
+   in the MANIACS guide.
 
 -  **Ensure the iperf3 server is on the SUT's local network** -- The
    network tests temporarily remove the default route from the routing
@@ -1259,7 +1266,7 @@ Issues During Testing
 
 The testing process should be straightforward and complete without issue.
 Should you encounter problems during testing, please contact your account
-manager. Be sure to save the ``~/.local/share/plainbox`` and
+manager. Be sure to save the ``~/.local/share/checkbox-ng`` and
 ``~/.cache/plainbox`` directory trees as they will contain logs and other
 data that will help the Server Certification Team determine if the issue is
 a testing issue or a hardware issue that will affect the certification

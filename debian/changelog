@@ -1,11 +1,11 @@
-certification-docs (0.1.9-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.9-0ppa1) trusty; urgency=medium
 
   * Incremental changes to MANIAC, MANIACS, and 16.04 Self-Test Guide
     in preparation for Ubuntu 16.04 release.
   * Clarifications to VM certification policies in 16.04 Policy Guide.
   * Removed information on bringing Checkbox in via a USB flash drive.
 
- -- Rod Smith <rod.smith@canonical.com>  Mon, 07 Mar 2016 09:45:40 -0500
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 23 Mar 2016 16:59:31 -0400
 
 certification-docs (0.1.8-0ppa1) trusty; urgency=medium
 

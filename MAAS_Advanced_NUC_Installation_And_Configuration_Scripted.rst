@@ -272,7 +272,7 @@ The more specific procedure for using MAAS in certification testing is:
    Currently (March, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
    This PPA holds version 1.9 of MAAS, which is the recommended version for
    certification testing. (MAAS 1.8 is also acceptable.) In the
-   long term, MAAS 1.10 and later will be used with Ubuntu 16.04, but as
+   long term, MAAS 2.0 and later will be used with Ubuntu 16.04, but as
    noted earlier, Ubuntu 14.04 is the preferred version leading up to, and
    slightly past, the release of Ubuntu 16.04.
 
@@ -329,18 +329,18 @@ The more specific procedure for using MAAS in certification testing is:
    ``/etc/maas-cert-server/iperf.conf`` is present, though, MAAS will tell
    SUTs to use the specified system(s) instead. You might use this feature
    if your ``iperf`` server is not the SUTs' network gateway or if you have
-   multiple ``iperf`` servers -- for instance, one for ``iperf`` (version
-   2; used for testing Ubuntu 14.04 and earlier) and another for ``iperf3``
-   (used for Ubuntu 16.04); or one on a 1 Gbps network and another on a
-   separate 10 Gbps network. The SUTs will attempt to use each ``iperf``
+   multiple ``iperf`` servers. The SUTs will attempt to use each ``iperf``
    target in series until the network test passes or until the list is
    exhausted. This setting can be overridden on SUTs by editing the
-   ``/etc/xdg/canonical-certification.conf`` file on the SUT.
+   ``/etc/xdg/canonical-certification.conf`` file on the SUT. See
+   `Appendix E: Network Testing Options`_ for more on advanced network
+   testing configurations.
 
 Running the Setup Script
 ------------------------
 
-The certification script is called ``maniacs-setup``, and was installed as part
+The MAAS configuration script is called ``maniacs-setup``, and was installed
+as part
 of the ``maas-cert-server`` package. Running this script will set up the MAAS
 server with reasonable defaults for certification work; however, the script
 will also ask you a few questions along the way::
@@ -531,6 +531,7 @@ however, you are first asked which series you want to import::
     *
     * Do you want to import point-release images now (Y/n)? y
     *
+    * Do you want to import 16.04beta2 (1 image) (y/N)? n
     * Do you want to import 15.10 (1 image) (y/N)? n
     * Do you want to import the 14.04 series (5 images) (Y/n)? y
     * Do you want to import the 12.04 series (6 images) (y/N)? y
@@ -542,6 +543,12 @@ is already installed, ``maniacs-setup`` skips that image. Certification
 uses only LTS images; however, non-LTS images, such as 15.10, may be made
 available for testing and as a way to "preview" the features of
 future LTS series.
+
+For 16.04 zero-day testing, you should use the 16.04 beta2 image or, once
+it's available (after April 14), the RC release. After the 16.04 GA release
+on April 21, you should delete all beta and RC releases from your MAAS
+server and instead use the GA release. You can install the latest version
+as described shortly.
 
 If you're running MAAS 1.8.2 or later, ``maniacs-setup`` registers the most
 recent point-release image in any series you download as the default OS for
@@ -946,7 +953,106 @@ arise.
 
    PageBreak
 
-Appendix E: Glossary
+Appendix E: Network Testing Options
+===================================
+
+A key part of certification is testing your SUT's network cards. This
+document is written with the assumption of a fairly basic configuration;
+however, some labs may have more advanced needs. Differences also exist
+between Ubuntu 14.04 and 16.04 testing. Important variables include:
+
+* **Network test software** -- The certification suite for Ubuntu 14.04
+  relies on ``iperf`` (version 2), but this has changed to ``iperf3`` for
+  Ubuntu 16.04. Thus, you may need to be prepared to run both programs.
+
+* **Multiple simultaneous network tests** -- A single server takes about 60
+  minutes per network port to run its network tests -- long enough that
+  testing multiple SUTs simultaneously is likely to result in contention
+  for access to the ``iperf`` (2) or ``iperf3`` server. This is especially
+  true if SUTs have multiple network ports -- a server with four ports will
+  tie up an ``iperf`` server for four hours. An ``iperf`` 2 server will
+  permit multiple connections, which will result in failed tests if the
+  server's network hardware is not fast enough to handle the connections.
+  An ``iperf3`` server will refuse multiple connections, which should at
+  least enable one SUT's network tests to pass; but if the ``iperf3``
+  server has a sufficiently fast NIC, it will then be under-utilized.
+
+* **Advanced network interfaces** -- A portable computer configured as
+  described here will likely have a 1 Gbps link to the internal LAN. If
+  you're testing systems with faster interfaces, you will need a separate
+  computer to function as an ``iperf`` or ``iperf3`` server.
+
+If you have a fast (10 Gbps or faster) NIC and want to test multiple slower
+(say, 1 Gbps) SUTs, you can configure the fast NIC with multiple IP
+addresses. An ``/etc/network/interfaces`` entry to do this might look like
+this::
+
+  # The 10Gbps network interface
+  auto eth2
+  iface eth2 inet static
+	address 172.16.0.2
+	netmask 255.255.252.0
+	broadcast 172.16.3.255
+  auto eth2:1
+  iface eth2:1 inet static
+	address 172.16.0.3
+	netmask 255.255.252.0
+	broadcast 172.16.3.255
+  auto eth2:2
+  iface eth2:2 inet static
+	address 172.16.0.4
+	netmask 255.255.252.0
+	broadcast 172.16.3.255
+
+This example configures the ``iperf3`` server with three addresses. You can
+enter them all in ``/etc/maas-cert-server/iperf.conf``::
+
+  172.16.0.2,172.16.0.3,172.16.0.4
+
+You would then launch ``iperf3`` separately on each IP address::
+
+  iperf3 -sD -B 172.16.0.2
+  iperf3 -sD -B 172.16.0.3
+  iperf3 -sD -B 172.16.0.4
+
+The result should be that each of your SUTs will detect an open port on the
+``iperf3`` server and use it without conflict, up to the number of ports
+you've configured. Past a certain point, though, you may over-stress your
+CPU or NIC, which will result in failed network tests. You may need to
+discover the limit experimentally.
+
+Furthermore, if you want to test a SUT with a NIC that meets the speed of
+the ``iperf3`` server's NIC, you'll have to ensure that only the high-speed
+SUT is tested.
+
+If your network has a single ``iperf3`` server with multiple physical
+interfaces, you can use a similar configuration to that just described.
+You'll be able to test as many SUTs as you have NICs on the ``iperf3``
+server, provided the ``iperf3`` server's CPU can keep up and provided the
+network's switch is up to the task. Note that, because the SUT tests its
+NICs serially, an ``iperf3`` server with four NICs can handle four SUTs,
+each of which also has four (or any other number of) NICs.
+
+If your lab uses separate LANs for different network speeds, you can list
+IP address on separate LANs in ``/etc/maas-cert-server/iperf.conf`` or on
+SUTs in ``/etc/xdg/canonical-certification.conf``. The SUT will try each IP
+address in turn until a test passes or until all the addresses are
+exhausted.
+
+If you want to test multiple SUTs but your network lacks a high-speed NIC
+or a system with multiple NICs, you can do so by splitting your SUTs into
+two equal-sized groups. On Group A, launch ``iperf3`` as a server, then run
+the certification suite on Group B. When that run is done, reverse their
+roles -- run ``iperf3`` as a server on Group B and run the certification
+suite on Group A. You'll need to adjust the
+``/etc/xdg/canonical-certification.conf`` file on each SUT to point it to
+its own matched server.
+
+.. raw:: pdf
+
+   PageBreak
+
+Appendix F: Glossary
 ====================
 
 The following definitions apply to terms used in this document.
