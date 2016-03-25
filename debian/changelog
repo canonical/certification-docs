@@ -1,3 +1,9 @@
+certification-docs (0.1.10-0ppa1) trusty; urgency=medium
+
+  * Initial 16.04 PPA Release 
+
+ -- Jeff Lane <jeff@ubuntu.com>  Fri, 25 Mar 2016 11:12:25 -0400
+
 certification-docs (0.1.9-0ppa1) trusty; urgency=medium
 
   * Incremental changes to MANIAC, MANIACS, and 16.04 Self-Test Guide
