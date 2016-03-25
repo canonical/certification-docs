@@ -17,4 +17,6 @@ cp -a "MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.pdf" "$BUILD_RO
 cp -a "MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.html" "$BUILD_ROOT/usr/share/doc/certification-docs/"
 cp -a "Self-Test_Guide-14.04.pdf" "$BUILD_ROOT/usr/share/doc/certification-docs/"
 cp -a "Self-Test_Guide-14.04.html" "$BUILD_ROOT/usr/share/doc/certification-docs/"
+cp -a "Self-Test_Guide-16.04.pdf" "$BUILD_ROOT/usr/share/doc/certification-docs/"
+cp -a "Self-Test_Guide-16.04.html" "$BUILD_ROOT/usr/share/doc/certification-docs/"
 cp -a "images" "$BUILD_ROOT/usr/share/doc/certification-docs/"
