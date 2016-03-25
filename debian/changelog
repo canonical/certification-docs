@@ -1,6 +1,7 @@
 certification-docs (0.1.11-0ppa1) trusty; urgency=medium
 
   * Fix failure to include 16.04 Self-Test Guide
+  * Fix MakeFile so Policy Guide is built during 'make all'
 
  -- Rod Smith <rod.smith@canonical.com>  Fri, 25 Mar 2016 13:53:37 -0400
 
