@@ -1,3 +1,10 @@
+certification-docs (0.1.12-0ppa1) UNRELEASED; urgency=medium
+
+  * Added warning to MANIAC and MANIACS against direct connection of
+    MAAS server to the Internet.
+
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 31 Mar 2016 16:09:05 -0400
+
 certification-docs (0.1.11-0ppa1) trusty; urgency=medium
 
   * Fix failure to include 16.04 Self-Test Guide
