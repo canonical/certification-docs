@@ -73,6 +73,13 @@ LAN at each site.
 
    Figure 1: Network structure in which the portable computer will reside
 
+**WARNING:** The configuration described in this document leaves several
+server programs running on the portable computer, including a proxy server,
+a web server (that can control MAAS), and an SSH server. Thus, it is unwise
+to expose the portable computer directly to the Internet. You should either
+secure it with strict local firewall rules or place it behind a strong
+firewall running on a router between it and the Internet.
+
 Hardware Required
 =================
 
