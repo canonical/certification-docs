@@ -41,25 +41,30 @@ Canonical's Technical Partner Managers, Field Engineers and the Server
 Certification Team work closely with manufacturers to resolve test issues 
 and assure that the testing is representative of in-field use.
 
-As of Ubuntu Server 14.04 LTS, MAAS has been used as part of the testing
-process for testing scale out deployment capabilities, which are a
+Since Ubuntu Server 14.04 LTS, MAAS has been used as part of the testing
+process for testing scale out deployment capabilities, which is a
 requirement for a system to be listed as Ubuntu Server Certified Hardware. 
 This means that a given server must be able to be automatically provisioned
-by Canonical's Metal as a Service (MAAS) tool, with no unnecessary manual
+by Canonical's `Metal as a Service (MAAS)`_ tool, with no unnecessary manual
 intervention.
 
+.. _`Metal as a Service (MAAS)`:
+  http://maas.io
+
 To meet this goal, the test environment requires a provisioning server
-running MAAS, which is used to deploy and test the hardware. This general
-overview covers x86- and x86-64-based servers only; please contact your
-Canonical account team for support of other architectures.
+running MAAS, which is used to deploy and test the hardware. MAAS currently
+supports the x86, amd64, arm64, and ppc64le architectures. Installation and 
+configuration of the MAAS environment for certification and the Server Test 
+Suite can be found in other guides available on the Certification Portal
+(http://certification.canonical.com).
 
 Certification Goals
 ===================
 
-* Testing that hardware works correctly with a specific LTS and future
+* Verifying that hardware works correctly with a specific LTS and future
   point releases of Ubuntu Server.
 
-* Testing that a system can be provisioned and deployed using MAAS.
+* Ensuring that a system can be provisioned and deployed using MAAS.
 
 * Identifying technical issues and potential certification blockers.
 
@@ -74,33 +79,46 @@ Scope of the Ubuntu Server Hardware Certification
 =================================================
 
 Certification is open to members of the Technical Partners Program
-(http://www.ubuntu.com/partners/find-a-partner/hardware). Servers to be
-certified are initially tested at the customer's premises or, in special
-circumstances, at Canonical's certification laboratories, to ensure that
-hardware is fully compatible with Ubuntu Server and Ubuntu deployment
-tools.
+(http://partners.ubuntu.com/programmes/hardware). Systems to be certified are 
+initially tested at the customer's premises or at Canonical's certification 
+labs, to ensure that hardware is fully compatible with Ubuntu Server and 
+Ubuntu deployment tools.
 
-Once systems have passed testing  and are to be listed as certified, a
-representative sample of hardware is sent to Canonical's labs. This
-hardware is an agreed-upon subset of the partner's product line that
+Certification testing at the Partner's premesis can be conducted by the
+Partner's engineers or by Canonical Engineers.
+
+Once systems have passed testing and are to be listed as certified, a
+representative sample of hardware must be kept and made available to Canonical
+for support needs. This hardware may be maintained at the Parter's premesis or
+sent to Canonical's labs. 
+
+This hardware is an agreed-upon subset of the partner's product line that
 encompasses all the various components (storage controllers, network
-controllers, processor families, etc) that make up the product line. The
+controllers, processor families, etc) that make up the product line.  The
 representative hardware may be used to replicate support cases, SRU and
-point release testing,  as well as ongoing extensive testing as part of our
-Openstack Interoperability Lab
-(http://www.ubuntu.com/cloud/ecosystem/ubuntu-oil).
+point release testing.
+
+Partners may also optionally request that this representative hardare be placed
+in the OpenStack Interoperability Lab for ongoing extensive testing with
+various OpenStack versions and configurations.  Participation in OIL is not a
+requirement for Certification but any server included in OIL is required to be
+Ubuntu Server Certified. More information about OIL can be found here:
+
+        http://partners.ubuntu.com/programmes/openstack
 
 Additionally, in some situations it is possible for Canonical engineers to
 remotely perform certification testing on hardware located on a
 customer's premises.
 
-Servers are tested using all point releases for the latest supported LTS
-release of Ubuntu Server. LTS Point Releases (e.g. Ubuntu Server 14.04.4
-LTS) and interim releases are tested every three months on actual or
-representative hardware to find regressions. Although interim releases are
-tested, Ubuntu Server Certification does NOT include certification against
-non-LTS releases. Interim release testing is part of the process and
-eventual testing and certification of the corresponding LTS point release.
+Servers are tested using the initial GA release of an LTS and the latest LTS
+Point release (if necessary due to hardware support issues).  Hardware sent to
+Canonical is also tested with the latest LTS Point Releases (e.g. Ubuntu 
+Server 14.04.4 LTS) and interim releases are tested every three months on 
+actual or representative hardware to find regressions. Although interim 
+releases are tested, Ubuntu Server Certification does NOT include certification
+against non-LTS releases. Interim release testing is part of the regression 
+testing process as each Interim release forms the basis for the next LTS Point
+release.
 
 .. figure:: images/release_cadence_1604.png
    :alt: Ubuntu LTS releases are supported for five years, whereas
@@ -164,9 +182,8 @@ For each certified server, the certificate will show information about:
 * Hardware configuration of the certified server (a list of the components
   that are part of the certified server)
 
-  * In the case of multiple configurations of a single model being tested
-    for certification the public site will display an aggregated list of
-    components tested across all configurations in a single entry.
+Actual test results are **never** publicly revealed, nor are they accessible
+to anyone other than the Partner and Canonical.
 
 Partner Resources
 =================
@@ -190,13 +207,13 @@ Programme Access
 ================
 
 System manufacturers and builders who want to have their servers designated
-as Ubuntu Server Certified Hardware can apply online for the Technical
-Partner Programme. Registration is a simple process and offers partners
+as Ubuntu Server Certified Hardware shoud contact Canonical via the Partners
+contact form.  Once the TPP agreement has been accpeted, partners will have
 access to a Technical Partner Manager, access to the Partner Portal and the
 private Certification Portal.
 
 To apply for Canonical's Technical Partner Programme, use the online
-Partner Registration form:
+Partner Registration form
 
      http://www.canonical.com/partners/contact-us
 
@@ -207,5 +224,5 @@ Once registered, partners can access the certification program online at:
 
        https://certification.canonical.com/
 
-If you would like to reach the Technical Partner Program managers directly
-you can also e-mail tpp@canonical.com.
+If you have questions about the Server Certification Programme, please contact
+us directly at server-certification@canonical.com.

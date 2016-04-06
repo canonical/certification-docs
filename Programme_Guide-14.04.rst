@@ -45,8 +45,11 @@ As of Ubuntu Server 14.04 LTS, MAAS will be used as part of the testing
 process for testing scale out deployment capabilities which will be a
 requirement for a system to be listed as Ubuntu Server Certified Hardware. 
 This means that a given server must be able to be automatically provisioned
-by Canonical's Metal as a Service tool (MAAS) with no unnecessary manual
+by Canonical's `Metal as a Service tool (MAAS)`_ tool, with no unnecessary manual
 intervention.
+
+.. _`Metal as a Service (MAAS)`:
+  http://maas.io
 
 To meet this goal the test environment will require a provisioning server
 running MAAS which will be used to deploy and test the hardware.  This is a
@@ -75,7 +78,7 @@ Scope of the Ubuntu Server Hardware Certification
 =================================================
 
 Certification is open to members of the Technical Partners Program
-(http://www.ubuntu.com/partners/find-a-partner/hardware).   Servers to be
+(http://partners.ubuntu.com/programmes/hardware).  Servers to be
 certified are initially tested at customer's premises or in special
 circumstances at Canonical's certification laboratories to ensure that
 hardware is fully compatible with Ubuntu Server and Ubuntu deployment
@@ -89,7 +92,7 @@ controllers, processor families, etc) that make up the product line.  The
 representative hardware may be used to replicate support cases, SRU and
 point release testing,  as well as ongoing extensive testing as part of our
 Openstack Interoperability Lab
-(http://www.ubuntu.com/cloud/ecosystem/ubuntu-oil).
+(http://partners.ubuntu.com/programmes/openstack).
 
 Additionally, in some situations it is possible for Canonical engineers to
 remotely perform certification testing on hardware located on a
@@ -204,5 +207,5 @@ Once registered, partners can access the certification program online at:
 
        https://certification.canonical.com/
 
-If you would like to reach the Technical Partner Program managers directly
-you can also e-mail tpp@canonical.com.
+If you have questions about the Server Certification Programme, please contact
+us directly at server-certification@canonical.com.
