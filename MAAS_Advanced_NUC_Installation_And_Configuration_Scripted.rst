@@ -1029,16 +1029,35 @@ CPU or NIC, which will result in failed network tests. You may need to
 discover the limit experimentally.
 
 Furthermore, if you want to test a SUT with a NIC that meets the speed of
-the ``iperf3`` server's NIC, you'll have to ensure that only the high-speed
-SUT is tested.
+the ``iperf3`` server's NIC, you'll have to ensure that the high-speed
+SUT is tested alone -- additional simultaneous tests will degrade the
+performance of all the tests, causing them all to fail.
+
+If the ``iperf3`` server has multiple interfaces of differing speeds, you
+may find that performance will match the *lowest-speed* interface. This is
+because the Linux kernel provides no means to control which of multiple
+network targets is used for outgoing traffic, so the kernel may use a
+low-speed NIC in preference to a high-speed NIC. Two solutions to this
+problem exist:
+
+* You can disable the lower-speed NIC(s) (permanently or temporarily) and
+  rely exclusively on the high-speed NIC(s), at least when performing
+  high-speed tests.
+
+* You can configure the high-speed and low-speed NICs to use different
+  address ranges -- for instance, 172.16.0.0/22 for the low-speed NICs and
+  172.16.4.0/22 for the high-speed NICs. This approach will require
+  additional MAAS configuration not described here. To minimize DHCP
+  hassles, it's best to keep the networks on separate physical switches or
+  VLANs, too.
 
 If your network has a single ``iperf3`` server with multiple physical
-interfaces, you can use a similar configuration to that just described.
-You'll be able to test as many SUTs as you have NICs on the ``iperf3``
-server, provided the ``iperf3`` server's CPU can keep up and provided the
-network's switch is up to the task. Note that, because the SUT tests its
-NICs serially, an ``iperf3`` server with four NICs can handle four SUTs,
-each of which also has four (or any other number of) NICs.
+interfaces, you can launch ``iperf3`` separately on each NIC, as just
+described; however, you may run into a variant of the problem with NICs of
+differing speed -- the Linux kernel may try to communicate over just one
+NIC, causing a bottleneck and degraded performance for all tests. Using
+multiple network segments may work around this problem, at the cost of
+increased configuration complexity.
 
 If your lab uses separate LANs for different network speeds, you can list
 IP address on separate LANs in ``/etc/maas-cert-server/iperf.conf`` or on

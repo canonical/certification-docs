@@ -1,5 +1,9 @@
 certification-docs (0.1.12-0ppa1) UNRELEASED; urgency=medium
 
+  * MANIACS: Described possible complication of placing two NICs,
+    especially of varying speed, from one iperf3 server on a single
+    network.
+
   * Added warning to MANIAC and MANIACS against direct connection of
     MAAS server to the Internet.
 
