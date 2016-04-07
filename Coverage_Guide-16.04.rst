@@ -97,11 +97,12 @@ Whitelist
     functionality.
 
     * By default, 64-bit Ubuntu is used. 32-bit Ubuntu is used only on
-      processors that are 32-bit.
+      processors that are 32-bit. 32-bit Ubuntu is *not* tested on 64-bit
+      processors.
 
   * A general stress test is performed to verify that the system can handle
     a sustained high load for a period of time. This utilizes the test tool
-    "stress" available in the Universe repositories.
+    "stress-ng" available in the Universe repositories.
 
 * Memory:
 
@@ -111,7 +112,7 @@ Whitelist
 
   * A general stress test is performed to verify that the system can handle
     a sustained high load for a period of time. This utilizes the test tool
-    "stress" available in the Universe repository.
+    "stress-ng" available in the Universe repository.
 
 * Internal hard drives (RAID AND Non-RAID) [1]_:
 
@@ -124,38 +125,51 @@ Whitelist
 
   * Basic RAID levels (0,1 or 5)
 
+* Mezzanine or Daughter Cards
+
+  * Any mezzanine or daughter card that enables ports on the motherboard must
+    pass. (e.g. a mezz card that enables 10Gb on onboard SFP+ ports)
+
 * Optical drives (CD/DVD):
 
   * Read
 
 * Networking:
 
-  * 1Gb and 10Gb Ethernet
+  * Ethernet devices are tested at their full speed and must show a minimum of
+    80% of advertised maximum speed.
 
-* System management [2]_:
+  * Testing is conducted for 1 hour per port.
+
+* System management [2]_ [3]_:
 
   .. [2] Applicable to systems that ship with a BMC or similar management
          device.
+  
+  .. [3] Limited to Power Management and User/Password management for MAAS
+         control.
 
-  * In-Band Management (DCMI, IPMI, etc)
+  * In-Band Management (IPMI)
 
-  * Out-of-Band Management (DCMI, IPMI, etc)
+  * Out-of-Band Management (IPMI, AMT, etc)
+
+  * Chassis Management (Blade / Cartridge type systems)
+
+  * Virtual Machine Management (for LPAR or VM systems like Power or z13)
 
   * MAAS Compatibility
 
 * USB controllers. USB ports are tested to ensure operability.
 
-  * USB 2.0/3.0
-
-* Input devices:
-
-  * External keyboard (basic functionality)
+  * USB 2.0/3.x
 
 * Boot/Reboot
 
   * Includes PXE Booting
 
 * Virtualization extensions
+
+* Running an Ubuntu image on KVM
 
 Greylist
 --------
@@ -179,8 +193,6 @@ Greylist
   * Storage management tools should be fully functional on Ubuntu
     (executable from Ubuntu)
 
-* Running an Ubuntu image on KVM
-
 * Advanced RAID levels (10, 15, 50, etc)
 
 * Infiniband
@@ -191,7 +203,9 @@ Greylist
 
   * FC, FCoE
 
-* Non-x86 architectures may be tested as part of this or other programmes
+* Input devices:
+
+  * External keyboard (basic functionality)
 
 Blacklist
 ---------
@@ -224,10 +238,8 @@ Does changing the speed of processors require a new certificate?
   new certificate.
 
 What about non-x86 processors?
-  At this time only x86 based systems fall under the standard Ubuntu Server
-  Certification Guides.  If you have questions about testing, certifying, or
-  supporting other architectures please work with your Canonical account
-  team.
+  Any architecture supported by Ubuntu may be certified.  At this time, this
+  includes ia32, x86_64, ARM, ARM64, PPC64LE and s390x.
 
 
 Complete Test Plan
