@@ -1,5 +1,6 @@
-certification-docs (0.1.12-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.12-0ppa1) trusty; urgency=medium
 
+  [ Rod Smith ]
   * MANIACS: Described possible complication of placing two NICs,
     especially of varying speed, from one iperf3 server on a single
     network.
@@ -7,7 +8,14 @@ certification-docs (0.1.12-0ppa1) UNRELEASED; urgency=medium
   * Added warning to MANIAC and MANIACS against direct connection of
     MAAS server to the Internet.
 
- -- Rod Smith <rod.smith@canonical.com>  Thu, 31 Mar 2016 16:09:05 -0400
+  [ Jeff Lane ]
+  * Updates to Programme, Policy, and Coverage guides.
+
+  * Modified mk-test-case-guide to work with new whitelist format.
+
+  * Created new Test_Case_Guide-16.04.rst based on current 16.04 whitelist.
+
+ -- Jeff Lane <jeff@ubuntu.com>  Thu, 07 Apr 2016 17:57:49 -0400
 
 certification-docs (0.1.11-0ppa1) trusty; urgency=medium
 

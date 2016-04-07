@@ -29,9 +29,32 @@
 Introduction
 ============
 
-This guide describes the tests performed in Ubuntu server certification
-testing. Tests are grouped by category, such as "cpu," "ethernet," and
-"memory." A brief description follows each test.
+This guide describes the jobs performed in Ubuntu server certification
+testing. A job can be anything executed by Checkbox, typically these are either
+information gathering jobs or test cases.
+
+Test cases follow the format Category/TestName such as `ethernet/detect`. Some
+job names may simply be a TestName without the category designator. These are
+typically jobs that gather and/or attach hardware info for the submission file.
+
+Jobs are grouped into three categories:
+
+mandatory_include
+    Items that Checkbox *will* run every time. These jobs can not be skipped.
+
+include
+    Items that Checkbox *may* run. These jobs can be skipped depending on the
+    presence or absence of certain components, or software.
+
+bootstrap_include
+    Items that Checkbox will run before the final test list is created. These
+    jobs accomplish tasks such as gathering initial system information that is
+    used to determine which test cases are applicable to the SUT.
+
+This guide is based on the `server-full-16.04.pxu` list used for full Server
+Certification. Other lists in the `canonical-certification-server` UI are
+either subsets of this list, or not applicable to 16.04 certification, such as
+the 14.04 lists.
 
 Tests
 =====
