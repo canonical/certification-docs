@@ -139,9 +139,7 @@ Test Tool Maintenance and Bug Fixing
 ''''''''''''''''''''''''''''''''''''
 We will investigate and resolve reported bugs in the Suite.
 We will maintain the Suite code to ensure it runs reliably on all current
-Ubuntu LTS versions. (Note that Precise is only Semi-Supported as the official test
-suite for 12.04 LTS is considered EOL and in bug-fix only mode for the
-remaining lifetime of 12.04 LTS.)
+Ubuntu LTS versions.
 
 Website Maintenance and Bug Fixes
 '''''''''''''''''''''''''''''''''
@@ -183,13 +181,16 @@ Some items distributed to the list include (but are not limited to):
 To join the list please visit
 https://lists.canonical.com/mailman/listinfo/hwcert-announce
 
+Questions about the Certification Programme may be sent directly to the
+Certification Team (server-certification@canonical.com)
+
 General Policies
 ================
 
 OS Versions
 -----------
-Certifications are available for any current LTS version of Ubuntu Server.  At
-this time, this includes 12.04 LTS, 14.04 LTS and 16.04 LTS.
+Certifications are available for the two most recent LTS versions of Ubuntu
+Server.  At this time, this includes 14.04 LTS and 16.04 LTS
 
 Certification is never granted for Interim releases of Ubuntu Server (non-LTS
 versions such as 15.04, 15.10 or 16.10).
@@ -199,11 +200,6 @@ Certification Testing is performed on the following LTS releases:
 * LTS GA - ex. 14.04 LTS GA as released in April 2014
 
 * Current LTS Point Release - ex 14.04.3 as released in August 2015
-
-Note that while we do accept certifications based on the oldest active LTS
-(12.04 at the time of this writing), once the oldest is two releases behind
-(e.g. 12.04 LTS once 16.04 LTS is released) certifications are only accepted on
-a case-by-case basis.
 
 Package Versions
 ----------------
@@ -215,7 +211,8 @@ Deployed OSs for Certification should *not* be updated with current package
 versions unless explicitly instructed to by the Server Certification Team.
 
 Certification should always be performed using the most recent version of the
-Certification Suite.
+Certification Suite. This is installed separately after the OS Vesrion has been
+installed on the SUT.
 
 Certification Lifetime
 ----------------------
@@ -255,6 +252,9 @@ For example, the network testing may move from iperf2 to iperf3, which will not
 affect testing or certification.  Conversely, the addition of an Apachebench
 based Network test would constitute a suite change and would *not* gate current
 LTS certifications, but MAY become a blocker for future LTS releases.
+
+Likewise, tests specifically for new technologies will not be blockers on the
+current LTS, but could become blockers on the next LTS.
 
 Test Requirements Changes
 '''''''''''''''''''''''''
@@ -329,12 +329,14 @@ Guests should also have at least one virtual NIC that can successfully ping the
 MAAS server / ``iperf`` Target.
 
 Certifications of this type will use the "virtual-machine-full" whitelist,
-which is a subset of the full server suite. This is a subset of the
-"server-full" whitelist.
+which is a subset of the full server suite defined by the "server-full
+whitelist.
 
-KVM testing is not required for certification of Ubuntu as Guest scenarios as
-nested virtualization (e.g. running KVM inside a VM) is considered an 
-advanced/non-standard configuration.
+KVM testing is generally not required for certification of Ubuntu as Guest
+scenarios as nested virtualization (e.g. running KVM inside a VM) is considered
+an advanced/non-standard configuration.) This exception may not apply to
+certain special situations that are business goal dependent.  That
+determination will be made by the Certification Team.
 
 System on Chip Certification
 ----------------------------
@@ -344,9 +346,9 @@ server systems built by OEM/ODMs down the road.
 
 Application
 '''''''''''
-SoC Certification applies *only* to Systems on Chip and potentially reference
-boards that are used to access those SoCs.  It does not apply to production
-server systems based on SoCs.
+SoC Certification applies *only* to Systems on Chip and reference boards that
+showcase those SoCs.  It does not apply to production server systems based on
+SoCs.
 
 Additionally there is no inheritance upstream.  So though an SoC may be
 certified by an SoC vendor like APM or Texas Instruments, OEM/ODMs who build
@@ -391,8 +393,10 @@ Ubuntu installed.
 Public Web Site
 ---------------
 All published Certificates are accessible via our public certification website
-found at: http://www.ubuntu.com/certification/server and
-http://www.ubuntu.com/certification/soc
+found at
+
+        http://www.ubuntu.com/certification/server
+        http://www.ubuntu.com/certification/soc
 
 Public certificates will include Make/Model, release and pertinent hardware
 information including the exact configuration that was used for Certification.
@@ -402,7 +406,10 @@ system data or other details that are not meant to be publicly accessible.
 
 Private Web Site
 ----------------
-The private web portal can be found at https://certification.canonical.com and
+The private web portal can be found at
+
+        https://certification.canonical.com
+
 this site is often referred to as C3.
 
 Access to C3 is available only to Canonical employees and designated employees
@@ -412,12 +419,29 @@ The private site will provide the Partner with a history of all certified and
 registered models and a history of all submitted test results and all
 certificates.
 
+People with access must have an account on Launchpad (https://launchpad.net)
+and their account must be added to the appropriate access group by the
+Partner's TPM or a member of the Certification team.
+
+Documentation
+-------------
+All documentation can be accessed by several methods:
+
+* C3 has links to all document files
+
+* The `certification-docs` package available from the Hardware Certification
+  Public PPA contains copies of all documents in both PDF and HTML versions.
+
+* The `certification-docs` package is also installed on every SUT as a
+  suggested package for `canonical-certification-server`
+
+* MAAS servers installed following our MANIAC guide provide the docs via html
+  locally (http://maas.server.ip/doc)
+
 Certification Process
 =====================
-Most of the Certification process is defined in the Self-Testing Guide
-available from the private Certification portal
-(https://certification.canonical.com) or on request from the Certification
-Team.
+Most of the Certification process is defined in the Self-Testing Guide. (See
+the `Documentation` section above)
 
 Timeframe
 ---------
@@ -505,8 +529,11 @@ Custom Kernels and Drivers
 --------------------------
 Custom kernels are not allowed for Certification.  Certified hardware must work
 with the standard Ubuntu kernel for the SUT's architecture.  No unaccepted
-kernel patches will be allowed.  The exception to this involves kernel modules
-as outlined below.
+kernel patches will be allowed.
+
+The standard Ubuntu Kernel includes the GA kernel or any released HWE kernel.
+
+The exception to this involves kernel modules as outlined below.
 
 Third Party / Proprietary Drivers
 '''''''''''''''''''''''''''''''''
@@ -528,8 +555,10 @@ Storage Options
 ---------------
 Certification testing should be performed for each storage mode supported.
 Thus if a system supports JBOD and onboard RAID plus an optional PCIe add-in
-RAID card (that controls onboard disks), the storage tests would need to be run
+RAID card (that controls onboard disks), the storage tests should be run
 against all three configurations.
+
+The Server Test Suite provides a ``storage-only`` whitelist for this purpose.
 
 USB Testing
 -----------
@@ -631,9 +660,9 @@ Certification, the following applies:
   the RC or last Beta of the LTS release.
 
 * SUTs must subsequently be *re-tested* for official certification using
-  the GA/Release version of the new LTS within 3 weeks of Release.  Thus,
-  if Server A is certified Zero-Day, it must also be re-tested for official
-  certification within the 3 weeks following the LTS Release Day.
+  the GA/Release version of the new LTS within 60 days of Release.  Thus, if
+  Server A is certified Zero-Day, it must also be re-tested for official
+  certification within 60 days following the LTS Release Day (GA +60).
 
 * SUTs that are *not* re-tested within the Cert Window will lose their
   certified status until such time as they are tested on the GA version of
@@ -653,6 +682,20 @@ original certification results.  A private "Note" should be added to any
 existing certificate request that provides a link to the new retest results.
 
 Do *not* request further certificates each time retest results are submitted to C3.
+
+Regression Testing
+------------------
+The Certification Team performs regression testing on a pool of certified
+hardware at each Point Release and Interim Release.  Partners should likewise
+include a regression testing component in their own testing programs.
+
+The Certification Team runs regression testing on hardware contained in the
+Certification Lab and in the OIL programme.
+
+The pool of hardware tested by the Certification Team for each release rotates
+so not every model is tested on every release.
+
+Regressions do not affect existing certifications.
 
 Re-Certification
 ----------------
@@ -709,7 +752,7 @@ Canonical offers Partners the option of participating in our OpenStack
 Interoperability Lab (http://partners.ubuntu.com/programmes/openstack).  
 
 Participation in OIL does not automatically grant certified status; however,
-any server that is placed into OIL should be certified before it can be
+any server that is placed into OIL must be certified before it can be
 placed in OIL.
 
 The typical workflow looks like this:
