@@ -167,9 +167,13 @@ Whitelist
 
   * Includes PXE Booting
 
-* Virtualization extensions
+* Virtualization [4]_:
 
-* Running an Ubuntu image on KVM
+  .. [4] Only applies to Bare Metal and Ubuntu as Guest on a KVM Hypervisor.
+
+  * Virtualization extensions
+
+  * Running an Ubuntu image on KVM
 
 Greylist
 --------
