@@ -35,6 +35,7 @@
 
 """Create a rudimentary Test Case Guide .rst file."""
 
+import re
 from os import listdir
 from guacamole import Command
 
@@ -86,15 +87,21 @@ class make_guide(Command):
         try:
             with open(whitelist_file) as f:
                 for line in f:
-                    line = ''.join(line.split())
-                    if not line.startswith('#') and not line.startswith('__') \
-                            and not '*' in line and search is True:
-                        test_list.append(dict([('category', category),
-                                               ('test', line)]))
-                    if line.startswith('_') and search is True:
-                        category = line.replace('_', '')
-                    if line.rstrip() == 'include:':
+                    if not 'certification-status' in line:
+                        line = ''.join(line.split())
+                    if line.endswith('include:'):
                         search = True
+                        category = line.replace('_', ' ')
+                    if not line.startswith('#') and \
+                       not line.startswith('__') and \
+                       not line.endswith('include:') and \
+                       search is True:
+                        testname = line.split()[0]
+                        if testname.endswith(('.*', '.*.txt')):
+                            testname = re.sub('\.\S+','',testname)
+                            print('NAMECHANGE %s' % testname)
+                        test_list.append(dict([('category', category),
+                                               ('test', testname)]))
         except FileNotFoundError:
             print('Could not open whitelist file ({})!'.format(whitelist_file))
             print('Aborting!')
@@ -133,6 +140,8 @@ class make_guide(Command):
                 description = description + line
                 check_next_line = True
             if matchname in line:
+                new_test_name = line.split()[1]
+                test['test'] = new_test_name
                 search = True
         description = description.replace('_description: ', '')
         description = description.replace('description: ', '')

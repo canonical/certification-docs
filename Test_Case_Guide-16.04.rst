@@ -1,6 +1,6 @@
-==================================================================
+=================================================================
  Ubuntu Server Hardware Certification Test Case Guide (16.04 LTS)
-==================================================================
+=================================================================
 
 .. include:: <isonum.txt>
 
@@ -29,24 +29,53 @@
 Introduction
 ============
 
-This guide describes the tests performed in Ubuntu server certification
-testing. Tests are grouped by category, such as "cpu," "ethernet," and
-"memory." A brief description follows each test.
+This guide describes the jobs performed in Ubuntu server certification
+testing. A job can be anything executed by Checkbox, typically these are either
+information gathering jobs or test cases.
+
+Test cases follow the format Category/TestName such as `ethernet/detect`. Some
+job names may simply be a TestName without the category designator. These are
+typically jobs that gather and/or attach hardware info for the submission file.
+
+Jobs are grouped into three categories:
+
+mandatory_include
+    Items that Checkbox *will* run every time. These jobs can not be skipped.
+
+include
+    Items that Checkbox *may* run. These jobs can be skipped depending on the
+    presence or absence of certain components, or software.
+
+bootstrap_include
+    Items that Checkbox will run before the final test list is created. These
+    jobs accomplish tasks such as gathering initial system information that is
+    used to determine which test cases are applicable to the SUT.
+
+This guide is based on the `server-full-16.04.pxu` list used for full Server
+Certification. Other lists in the `canonical-certification-server` UI are
+either subsets of this list, or not applicable to 16.04 certification, such as
+the 14.04 lists.
 
 Tests
 =====
 
-benchmarks
-----------
+bootstrap include:
+------------------
 
-benchmarks/disk/hdparm-cache-read
- Cached read timing benchmark of each disk using hdparm.
+device
+ No description available
 
-benchmarks/disk/hdparm-read
- Raw read timing benchmark of each disk using hdparm.
+fwts
+ No description available
 
-cpu
----
+include:
+--------
+
+benchmarks/disk/hdparm-cache-read_{name}
+ This test runs hdparm timing of cache reads as a benchmark for {name}
+
+benchmarks/disk/hdparm-read_{name}
+ This test runs hdparm timing of device reads as a benchmark for {name}
 
 cpu/clocktest
  Tests the CPU for clock jitter.
@@ -70,32 +99,31 @@ cpu/scaling_test-log-attach
 cpu/topology
  This test checks cpu topology for accuracy between proc and sysfs.
 
-disk
-----
-
 disk/detect
  Displays information about each disk detected on the system under test.
 
-disk/read_performance
- Verify system storage performs at or above a baseline speed.
+disk/read_performance_{name}
+ Disk performance test for {product}
 
-disk/smart
- This tests the SMART capabilities of disks detected on the system.
+disk/smart_{name}
+ This tests the SMART capabilities for {product} (Note that this test may
+ not work against hardware RAID)
 
-disk/stats
- This test generates some disk activity and checks the stats to ensure drive
- activity is being recorded properly.
+disk/stats_{name}
+ This test checks {name} disk stats, generates some activity and rechecks
+ stats to verify they've changed. It also verifies that disks appear in
+ the various files they're supposed to.
 
-disk/storage_devices
- Verify that storage devices, such as Fibre Channel and RAID, perform under
- stress without data loss or corruption.
-
-ethernet
---------
+disk/storage_device_{name}
+ Disk I/O stress test for {product}
 
 ethernet/detect
  Test to detect and return information about available network controllers
  on the system under test.
+
+ethernet/ethertool_check_device{__index__}_{interface}
+ This test executes ethtool requests against ethernet device {__index__}
+ ({interface}).
 
 ethernet/ethtool_info
  No description available
@@ -104,157 +132,52 @@ ethernet/info_automated
  Gathers some info on the current state of your network devices. If no
  devices are found, the test will exit with an error.
 
-ethernet/multi_iperf3_nic
+ethernet/multi_iperf3_nic_device{__index__}_{interface}
  This test uses iperf3 to ensure network devices pass data at an acceptable
  minimum percentage of advertized speed.
 
-ethernet/multi_nic
- This test uses iperf to ensure network devices pass data at an acceptable
- minimum percentage of advertized speed.
+info/hdparm_{name}.txt
+ Attaches the bootchart png file for bootchart runs
 
-info
-----
-
-cpuinfo_attachment
- Attaches a report of CPU information
-
-dmesg_attachment
- Attaches a copy of /var/log/dmesg to the test results
-
-dmi_attachment
- Attaches info on DMI
-
-dmidecode_attachment
- Attaches dmidecode output
-
-efi_attachment
- Attaches the firmware version
-
-info/disk_partitions
- Attaches information about disk partitions
-
-info/hdparm
- Attaches SATA/IDE device information reported by hdparm.
-
-lshw_attachment
- Attaches lshw output
-
-lsmod_attachment
- Attaches a list of the currently running kernel modules.
-
-lspci_attachment
- Attaches very verbose lspci output.
-
-lsusb_attachment
- Attaches a list of detected USB devices.
-
-meminfo_attachment
- Attaches info on system memory as seen in /proc/meminfo.
-
-modprobe_attachment
- Attaches the contents of the various modprobe conf files.
-
-modules_attachment
- Attaches the contents of the /etc/modules file.
-
-sysctl_attachment
- Attaches the contents of various sysctl config files.
-
-sysfs_attachment
- Attaches a report of sysfs attributes.
-
-udev_attachment
- Attaches a dump of the udev database showing system hardware information.
-
-memory
-------
-
-memory/check
- Test to perform some basic stress and exercise of system memory. This test
- also includes an over-commit function to force swapping to disk, thus
- SUTs should have suitably large swap files for the amount of RAM they
- have installed.
+info/kvm_output
+ Attaches the debug log from the virtualization/kvm_check_vm test to the
+ results submission.
 
 memory/info
  This test checks the amount of memory which is reporting in meminfo against
  the size of the memory modules detected by DMI.
 
-miscellanea
------------
+memory/memory_stress_ng
+ Test to perform some basic stress and exercise of system memory via the
+ stress_ng tool. This test also includes an over-commit function to force
+ swapping to disk, thus SUTs should have suitably large swap files for the
+ amount of RAM they have installed.
 
 miscellanea/bmc_info
  This will gather some info about the BMC itself for diagnostic purposes.
  This will not works on non-IPMI systems like AMT and blade/sled type
  systems.
 
-miscellanea/boot_mode
- Test to verify that the system booted in EFI mode rather than Legacy/BIOS
- mode.
-
-miscellanea/cpus_are_not_samples
- Sanity check of CPU information; fails if CPU is an engineering sample
-
-miscellanea/dmitest_server
- Sanity check of DMI system identification data (for servers)
-
-miscellanea/fwts_results.log
- Attaches the miscellanes/fwts_test results log to the submission.
-
-miscellanea/fwts_test
- Run Firmware Test Suite (fwts) automated tests.
-
-miscellanea/get_maas_version
- If system was installed via MAAS from a cert server, the MAAS version used
- should be contained in /etc/installed-by-maas
-
-miscellanea/get_maas_version
- If system was installed via MAAS from a cert server, the MAAS version used
- should be contained in /etc/installed-by-maas
-
-miscellanea/get_make_and_model
- Retrieve the computer's make and model for easier access than digging
- through the dmidecode output.
-
 miscellanea/ipmi_test
  This will run some basic commands in-band against a BMC, verifying that
  IPMI works. Use of MAAS to deploy the system implicitly tests out-of-band
  BMC control.
 
-optical
--------
-
 optical/detect
  Detects optical drives (CD/DVD) attached to the system.
 
-optical/read-automated
- Automated test to read a data CD/DVD and ensure the optical drive works
- properly.
-
-power-management
-----------------
+optical/read-automated_{name}
+ This is an automated version of optical/read. It assumes you have already
+ inserted a data CD into your optical drive prior to running Checkbox.
 
 power-management/rtc
  Verify that the Real-time clock (RTC) device functions properly, if
  present.
 
-stress
-------
-
-stress/cpu_stress_test
- Simulate high system load using the 'stress' tool to exercise the CPU for
- several hours. The test is considered passed if the system does not
- freeze or abend.
-
-uncategorized
--------------
-
-miscellanea/submission-resources
- A meta-job that verifies the data necessary for a complete result
- submission are present. Failure indicates that the results are incomplete
- and may be rejected.
-
-usb
----
+stress/cpu_stress_ng_test
+ Impose a high system load using the 'stress_ng' tool to exercise the CPU
+ for several hours. The test is considered passed if the system does not
+ freeze and if the stress_ng tool does not report errors.
 
 usb/detect
  Detects and shows USB devices attached to this system.
@@ -271,14 +194,95 @@ usb3/storage-preinserted
  it will only work with USB sticks and ports rated for USB 3.0 speeds or
  faster.
 
-virtualization
---------------
-
-info/kvm_output
- Attaches the debug log from the virtualization/kvm_check_vm test to the
- results submission.
-
 virtualization/kvm_check_vm
  Verifies that a KVM guest can be created and booted using an Ubuntu Server
  cloud image.
+
+mandatory include:
+------------------
+
+cpuinfo_attachment
+ Attaches a report of CPU information
+
+dkms_info_attachment
+ Attaches json dumps of installed dkms package information.
+
+dmesg_attachment
+ Attaches a copy of /var/log/dmesg to the test results
+
+dmi_attachment
+ Attaches info on DMI
+
+dmidecode_attachment
+ Attaches dmidecode output
+
+efi_attachment
+ Attaches the firmware version
+
+info/disk_partitions
+ Attaches information about disk partitions
+
+info/network_devices
+ Provides information about network devices
+
+kernel_cmdline_attachment
+ Attaches the kernel command line used to boot
+
+lsblk_attachment
+ Attaches disk block devices mount points
+
+lshw_attachment
+ Attaches lshw output
+
+lsmod_attachment
+ Attaches a list of the currently running kernel modules.
+
+lspci_attachment
+ Attaches very verbose lspci output.
+
+lsusb_attachment
+ Attaches a list of detected USB devices.
+
+meminfo_attachment
+ Attaches info on system memory as seen in /proc/meminfo.
+
+miscellanea/boot_mode
+ Test to verify that the system booted in EFI mode with Secure Boot active.
+
+miscellanea/cpus_are_not_samples
+ Sanity check of CPU information; fails if CPU is an engineering sample
+
+miscellanea/dmitest_server
+ Sanity check of DMI system identification data (for servers)
+
+miscellanea/get_maas_version
+ If system was installed via MAAS from a cert server, the MAAS version used
+ should be contained in /etc/installed-by-maas
+
+miscellanea/get_make_and_model
+ Retrieve the computer's make and model for easier access than digging
+ through the dmidecode output.
+
+miscellanea/submission-resources
+ A meta-job that verifies the data necessary for a complete result
+ submission are present. Failure indicates that the results are incomplete
+ and may be rejected.
+
+modinfo_attachment
+ Attaches modinfo information for all currently loaded modules
+
+modprobe_attachment
+ Attaches the contents of the various modprobe conf files.
+
+modules_attachment
+ Attaches the contents of the /etc/modules file.
+
+sysctl_attachment
+ Attaches the contents of various sysctl config files.
+
+sysfs_attachment
+ Attaches a report of sysfs attributes.
+
+udev_attachment
+ Attaches a dump of the udev database showing system hardware information.
 
