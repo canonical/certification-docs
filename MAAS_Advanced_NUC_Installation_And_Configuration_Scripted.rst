@@ -444,6 +444,7 @@ mirror::
     * Do you want to mirror precise (Y/n)? n
     * Do you want to mirror trusty (Y/n)? y
     * Do you want to mirror wily (Y/N)? n
+    * Do you want to mirror xenial (Y/N)? y
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -538,10 +539,9 @@ however, you are first asked which series you want to import::
     *
     * Do you want to import point-release images now (Y/n)? y
     *
-    * Do you want to import 16.04beta2 (1 image) (y/N)? n
-    * Do you want to import 15.10 (1 image) (y/N)? n
+    * Do you want to import the 16.04 series (1 image) (Y/n)? y
     * Do you want to import the 14.04 series (5 images) (Y/n)? y
-    * Do you want to import the 12.04 series (6 images) (y/N)? y
+    * Do you want to import the 12.04 series (6 images) (y/N)? n
 
 Whenever you respond ``Y`` to a question about a particular version or
 series, the script proceeds to download and register the images. (The
@@ -888,11 +888,15 @@ suit your needs. The source may be lines in the original
 whatever site you want to mirror.
 
 As an example, consider setting up a mirror of a pre-release version of
-Ubuntu. At the time of writing, Ubuntu 16.04 (Xenial Xerus) has not yet
-been released, so if you want to mirror it, you must copy and then modify
-the configuration for a working version, such as 14.04 (Trusty Tahr). The
-``/etc/apt/mirror.list`` file created by ``maniacs-setup`` includes three
-blocks for Trusty Tahr, each of which looks something like this::
+Ubuntu. In the weeks leading up to the release of Ubuntu 16.04 (Xenial
+Xerus), the ``maniacs-setup`` script would not offer to mirror this
+archive, so if you wanted to mirror it, you had to copy and then modify the
+configuration for a working version, such as 14.04 (Trusty Tahr). (Note
+that this should *not* be necessary any longer; however, the process is
+covered here because it's one of the more complex types of mirrors you
+might want to manually add.) The ``/etc/apt/mirror.list`` file created by
+``maniacs-setup`` includes three blocks for Trusty Tahr, each of which
+looks something like this::
 
   ## trusty on amd64 archives
   
