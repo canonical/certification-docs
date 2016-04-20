@@ -1184,6 +1184,24 @@ fails, then you should consult the Server Certification Team.
 Appendix E - Troubleshooting Tips
 =================================
 
+Deployment Problems
+-------------------
+
+Sometimes a node fails to deploy. When this happens, check the installation
+output on the node's MAAS page. (Scroll down to "Machine output" and click
+the radio button to the right; "Installation Output" should be one of the
+options.) Often, a clue to the nature of the problm appears near the end of
+that output. If you don't spot anything obvious, copy that output into a
+file and send it to the Server Certification Team.
+
+One common cause of deployment problems is IP address assignment issues. To
+minimize the risk of such problems, set the node's network settings to use
+DHCP exclusively. To do this, you must first release the node. You can then
+scroll to the Network section on the node's summary page in MAAS and set
+all the IP Address fields to DHCP. This change can also help prevent a
+node's IP address from changing if you shut it down for a while and then
+reboot or after the certification network tests complete.
+
 Submitting Results
 ------------------
 
