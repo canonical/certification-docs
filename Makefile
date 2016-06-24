@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 RST2PDF=rst2pdf
 RST2HTML=rst2html
-DOC_NAMES=Test_Case_Guide-16.04 Programme_Guide-16.04 Programme_Guide-14.04 Coverage_Guide-14.04 Coverage_Guide-16.04 Self-Test_Guide-14.04 Self-Test_Guide-16.04 MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration_Scripted Policy_Guide-16.04
+DOC_NAMES=Test_Case_Guide-16.04 Programme_Guide-16.04 Programme_Guide-14.04 Coverage_Guide-14.04 Coverage_Guide-16.04 Self-Test_Guide-14.04 Self-Test_Guide-16.04 MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration-2 MAAS_Advanced_NUC_Installation_And_Configuration_Scripted MAAS_Advanced_NUC_Installation_And_Configuration_Scripted-2 Policy_Guide-16.04
 HTML_NAMES=$(DOC_NAMES:=.html)
 PDF_NAMES=$(DOC_NAMES:=.pdf)
 
@@ -19,7 +19,11 @@ pdf:	$(PDF_NAMES)
 
 maniac: MAAS_Advanced_NUC_Installation_And_Configuration.pdf
 
+maniac2: MAAS_Advanced_NUC_Installation_And_Configuration-2.pdf
+
 maniacs: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.pdf
+
+maniacs2: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted-2.pdf
 
 stg: Self-Test_Guide-14.04.pdf Self-Test_Guide-16.04.pdf
 
