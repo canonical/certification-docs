@@ -2,6 +2,8 @@ certification-docs (0.1.13-0ppa1) UNRELEASED; urgency=medium
 
   * Modified MANIACS to reflect 16.04 0-day vs. 16.04 GA changes.
   * Added section to 16.04 STG on deployment problems.
+  * Major edit to 16.04 STG to remove redundancies and improve the flow;
+    reduced length of PDF version from 38 to 30 pages.
 
  -- Rod Smith <rod.smith@canonical.com>  Wed, 20 Apr 2016 14:49:28 -0400
 

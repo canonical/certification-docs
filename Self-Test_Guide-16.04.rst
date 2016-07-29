@@ -25,22 +25,16 @@
 Introduction
 ============
 
-The aim of this document is to provide the information needed to test
-a server on-site using the Canonical Server Test Suite without requiring
-an Internet connection and then submit the results of that testing to
-Canonical to meet the requirements for Server Hardware Certification.
+The aim of this document is to provide the information needed to test a
+server on-site using the Canonical Server Test Suite and then submit the
+results of that testing to Canonical to meet the requirements for Server
+Hardware Certification. Testing may be done with or without an Internet
+connection.
 
 Glossary
 ========
 
 The following definitions apply to terms used in this document.
-
-1 Gbps
-  1 Gigabit per second -- Network speed for Gigabit Ethernet (1000 Mbps).
-
-10 Gbps
-  10 Gigabits per second -- Network speed for 10 Gigabit Ethernet
-  (10,000 Mbps).
 
 BMC
   Baseboard Management Controller -- A device in many server models
@@ -69,21 +63,18 @@ IPMI
 JBOD
   Just a bunch of disks -- A non-RAID disk configuration.
 
-.. raw:: pdf
-
-   PageBreak
-
 LAN
   Local Area Network -- The network to which your SUT and Targets are
   connected. The LAN does not need to be Internet accessible (though that
   is preferable if possible).
 
+.. raw:: pdf
+
+   PageBreak
+
 MAAS
   Metal as a Service -- A Canonical product for provisioning systems
   quickly and easily.
-
-NIC
-  Network Interface Card -- The network device(s).
 
 PXE
   Pre-boot Execution Environment -- A technology that enables you to
@@ -94,11 +85,12 @@ RAID
   Redundant Array of Independent Disks - Multi-disk storage
   providing redundancy, parity checking, and data integrity.
 
-RAM
-  Random Access Memory -- System memory.
-
 SAN
   Storage Area Network -- Usually FibreChannel.
+
+Secure ID (SID)
+  A string that uniquely identifies computers on the certification site,
+  ``certification.canonical.com``.
 
 SUT
   System Under Test -- The machine you are testing for certification.
@@ -116,17 +108,11 @@ Test case
 Whitelist test
   A test that *must* pass for the SUT to be granted a certified status.
 
-Overview of the Certification Process
-=====================================
+Understanding the Certification Process
+=======================================
 
-The certification process has certain prerequisites and procedures with
-which you should be familiar before beginning. Specifically, you should
-be aware of hardware requirements and the needs of the network test
-environment. There are steps you should perform before running the
-certification tests and before uploading the results. The following
-sub-sections briefly describe these requirements. Detailed descriptions
-appear later in this document. The following flowchart shows a "birds-eye
-view" of the certification process.
+The workflow for testing SUTs is described in detail in the rest of this
+document. An overview is presented in the following flowchart:
 
 .. image:: images/certification-process-flowchart-portrait.png
            :alt: This flowchart outlines the certification process from
@@ -137,474 +123,50 @@ view" of the certification process.
 
    PageBreak
 
-Hardware Requirements
----------------------
+The highlights of this process are:
 
--  SUTs must contain at least 4 GiB of RAM and one hard disk, but using
-   the maximum amount of RAM and the maximum number of disks is
-   preferable. Likewise, if configurable, using the maximum number of
-   CPUs is desirable.
+#. Set up your MAAS server and, if necessary, connect it to the test LAN.
+   This process is covered in the MANIACS document (available from
+   https://certification.canonical.com).
 
--  If SUT model is available with differing disk sizes, testing with the
-   largest disk, or at least with a disk (or RAID array) over 2 TiB, is
-   recommended.
+#. Create an entry on https://certification.canonical.com (C3 for short)
+   for the SUT, as described in more detail shortly, in `Creating a
+   Hardware Entry on C3`_. If an entry already exists for your specific
+   device (not just the model), you should use the existing entry.
 
--  If the SUT has multiple disk controllers (such as a motherboard-based
-   disk controller and a separate RAID controller), we strongly recommend
-   that disk devices be connected to all controllers during testing.
+#. Use MAAS to deploy the SUT using a custom point-release image, as
+   described in the upcoming section, `Installing Ubuntu on the System`_.
 
--  CPUs should support virtualization (VMX/SVM), when supported by CPU
-   architecture.
+#. Check the SUT's configuration. (The ``canonical-certification-precheck``
+   script, described in more detail shortly, in `Running the Certification
+   Tests`_, can help with this.)
 
--  All firmware (BIOS/UEFI, NIC, storage controller, etc) should be
-   shipping level, *not* development level.
+#. Run the test suite on the SUT, as described in `Running the
+   Certification Tests`_.
 
--  A monitor and keyboard for the SUT are helpful because they will
-   enable you to monitor its activities. If necessary, however,
-   certification can be done without these items.
+#. Submit the test results to C3. This may be done semi-automatically
+   when running the tests, or can be done manually, as described in
+   `Manually Uploading Test Results to the Certification Site`_.
 
-Network Test Environment
-------------------------
-
--  In addition to the SUT, the network must contain at least one other
-   machine, which will run MAAS and an ``iperf3`` server; however, you may
-   want to separate these two functions.
-
-   - The MAAS Advanced NUC Installation and Configuration -- Scripted
-     (MANIACS) document (available from
-     https://certification.canonical.com) describes how to configure a MAAS
-     server. This server may be a standard part of the testing network or
-     something you bring with you for testing purposes alone. A laptop or a
-     small portable computer such as an Intel NUC is sufficient. MAAS
-     version 1.7 or later is required for certification work; the older
-     MAAS 1.5 lacks certain features that are becoming increasingly
-     important. This document describes use of MAAS 1.9. If you use MAAS
-     1.7 or 1.8, some procedures will differ slightly.
-
-  -  When testing multiple SUTs simultaneously, you will need multiple
-     ``iperf3`` targets, one for each SUT. If your ``iperf3`` Target has a
-     sufficiently fast NIC or multiple NICs, you can assign the computer
-     multiple IP addresses and treat each one as a distinct Target. This
-     topic is covered in more detail in Appendix E of the MANIACS document.
-     Alternatively, you can run network tests against a single ``iperf3``
-     Target sequentially; however, this approach complicates submission of
-     results. Note that poor network infrastructure may make multiple
-     simultaneous ``iperf3`` runs unreliable.
-
--  The MAAS server computer should run Ubuntu 14.04 (Trusty Tahr) or later,
-   and should be configured to deliver Ubuntu 16.04 images to its clients.
-   Testing with fixed point releases, as described in the MANIACS document, is
-   required.
-
--  Ideally, the network should have few or no other computers;
-   extraneous network traffic can negatively impact the network tests.
-
--  Ideally, the MAAS server system should handle DNS and DHCP for the
-   network. If other computers manage these tasks, be sure that they're
-   configured to work with the MAAS server so that the SUT obtains its
-   PXE-boot images from the MAAS server.
-
--  Network cabling, switches, and the ``iperf3`` server should be capable of
-   at least the SUT's best speed. For instance, if the SUT has 1 Gbps
-   Ethernet, the other network components should be capable of 1 Gbps or
-   faster speeds. If the local network used for testing is less capable
-   than the best network interfaces on the SUT, those interfaces must be
-   tested later on a more-capable network. If the test environment uses
-   separate networks with different speeds, with the SUT cabled to multiple
-   networks via different ports, you can specify multiple ``iperf3``
-   servers, as described later.
-
--  If desired, the MAAS server may be run inside a virtual machine;
-   however, it is advisable to run the ``iperf3`` server on "real" hardware
-   so as to minimize the risk of network tests failing because of
-   virtualization issues.
-
-Before Running Test Cases
--------------------------
-
--  The SUT must be properly configured and cabled.
-
--  The SUT must have Ubuntu 16.04 installed on it. (This must be done via
-   MAAS.) See the `Installing Ubuntu on the System`_ section below for
-   details on how to do this.
-
--  The ``canonical-certification-server`` package must be installed on the
-   SUT together with all its dependencies. (This will normally be done via
-   MAAS.) For more information about how to get all the packages, please
-   refer to the `Installing the Server Test Suite Packages`_ section below.
-
--  Be sure to have all the items described in the `Equipment to
-   Bring`_ section below.
-
--  Some manual network and disk configuration may be necessary. See the
-   `Running the Certification Tests`_ section below.
-
-Before Uploading Test Case Results
-----------------------------------
-
-Prior to uploading results to Canonical's certification site, you must
-handle some preliminary tasks:
-
--  You will need an account at the certification web site,
-   https://certification.canonical.com.
-
-   -  The certification web site is the location where all the test case
-      results will be uploaded once your testing session has finished.
-
-   -  *If you do not have an account for your company on the private
-      certification web site, please contact your account manager who will
-      work with the Server Certification Team to establish the account.*
-
--  You must create a hardware entry (unless one already exists for the
-   SUT) at the certification web site with a secure ID.
-
-   -  The secure ID is a string made from 15 alphanumeric characters that
-      is used to make sure that only authorized parties upload results to
-      the site and also to associate the results to the hardware being
-      tested. This can be found on the hardware entry page on the
-      Certification web site:
-
-      .. image:: images/secure_id.png
-         :alt: The Secure ID can be obtained from the Ceritification web site.
-         :align: left
-         :width: 70%
-
-   -  For more information on creating the hardware entry, please see
-      `Creating a Hardware Entry on C3` below.
-
--  If the SUT lacks Internet access, the package
-   ``canonical-certification-submit`` should be installed on the system
-   from which you plan to submit results. Please see the section below
-   titled `Manually Uploading Test Results to the Certification Site`_ for
-   more information on this topic.
-
-Initial Setup
-=============
-
-Before you certify the hardware, you must perform some initial setup
-steps. These steps are preparing the hardware you'll bring, configuring
-the SUT for testing, installing Ubuntu, and installing the Server Test
-Suite.
-
-Equipment to Bring
-------------------
-
-The requirements for running the tests for a server are minimal. Ensure
-that you have:
-
--  Writable USB sticks with enough free space (> 256 MB). Each stick must
-   contain a *single partition* with a *writable FAT* filesystem on it. 
-   Note that a USB stick with multiple partitions may cause problems, so if
-   necessary you should repartitition your device to have a single
-   partition. Modern computers typically provide both USB 2 and USB 3
-   ports, which are tested separately. Thus, you're likely to need two USB
-   sticks per computer, at least one of which must be a USB 3 device. If
-   you need to test more than one computer then *bring enough USB sticks to
-   test all the systems*.
-
--  A data CD with some files written to it. This is required to test the
-   system's optical drive read capabilities. Note that a movie DVD or an
-   audio CD won't be useful in this case, as they are not in the right
-   format for the test. If you need to test more than one computer then
-   *bring one medium per system*.
-
--  A computer to function as a MAAS server and ``iperf3`` target on the test
-   LAN. This server will provision the SUT. The MAAS server can be a normal
-   part of the test LAN or can be brought in specifically for testing SUTs
-   on the test LAN. (Note, however, that the MAAS server for certification
-   testing should ideally be configured to automatically install the Server
-   Test Suite on the SUT, which will not be the case for a "generic" MAAS
-   server.)
-
-Hardware Setup
---------------
-
-The following should be considered the minimum requirements for setting
-up the SUT and test environment:
-
--  Minimum loadout
-
-   -  Minimum of 4 GiB RAM
-
-   -  1 HDD or SSD (2 with minimal RAID)
-
-   -  1 CPU of a supported type
-
--  Recommended (preferred) loadout
-
-   -  Maximum supported number of HDDs or SSDs, especially if you can
-      configure multiple RAID levels (e.g. 2 for RAID 0, 3 for RAID 5, and
-      6 for RAID 50)
-
-   -  The largest disk capacity available from the OEM -- ideally, over
-      2 TiB on a single disk or RAID array.
-
-   -  Maximum amount of supported RAM
-
-   -  Maximum number of supported CPUs
-
--  If possible, as many processors as the SUT will support should be
-   installed.
-
-   -  Note that systems that ship with processors from different families
-      (e.g Broadwell vs. Skylake) will require extra testing.
-
-   -  CPU speed bumps and die shrinks do not require extra testing.
-
--  The SUT should not contain any extraneous PCI devices that are not
-   part of the certification.
-
-   -  This includes things like network, SAN and iSCSI cards.
-
-   -  Hardware RAID cards are allowed if they are used to provide RAID
-      services to the SUT's onboard storage.
-
--  The SUT should be running a release level BIOS/UEFI configured using
-   factory default settings, with the following exceptions:
-
-   -  If the hardware virtualization options in the BIOS/UEFI are not
-      enabled, enable them, save the settings and allow the SUT to reboot.
-
-   -  The SUT must be configured to PXE-boot by default.
-
-   -  If the SUT's firmware supports PXE-booting in UEFI mode, it must be
-      configured to boot in UEFI mode, rather than in BIOS/CSM/legacy mode.
-
-   -  If the UEFI supports it, the SUT must be configured to boot with
-      Secure Boot active.
-
--  Storage should be properly configured.
-
-   -  If the SUT provides multiple disk controller devices (such as an
-      on-board JBOD controller and a separate RAID controller), we strongly
-      recommend that disks be plugged into all the controllers.
-
-   -  Software RAID, including firmware-supported software RAID (aka "fake
-      RAID") should *not* be used. If hardware RAID is not available,
-      configure the server for JBOD.
-
-   -  Any additional HDDs or logical drives should be partitioned and
-      mounted prior to testing. Partitions on those additional HDDs should,
-      preferably, be a single partition that spans the entire disk.
-
-   -  Some BIOS-only computers may have problems booting from disks over
-      2 TiB in size. If the SUT fails for this reason, it may pass with
-      smaller disks (or a smaller RAID array), but this issue should be
-      noted with the results submission.
-
-   -  Disks must be configured for "flat" storage -- that is, filesystems
-      in plain partitions, rather than using LVM or bcache configurations.
-      "Flat" storage was the only option with MAAS 1.8 and earlier, but
-      MAAS 1.9 introduced LVM and bcache options.
-
--  Disks with 4,096-byte *logical* sector sizes may require booting in
-   EFI/UEFI mode. Note that disks with 4,096-byte *physical* sector sizes
-   seldom cause problems, so long as the disk's firmware translates those
-   sectors into 512-byte logical sectors.
-
--  The test environment should have a working network setup. Internet
-   access is not required, and testing should work on any private or
-   segregated LAN.
-
-   -  If possible, the test LAN's speed should match or exceed the network
-      speed of the SUT. For instance, a SUT with 1 Gbps onboard Ethernet
-      should be connected to a LAN capable of at least 1 Gbps and a system
-      with 10 Gbps Ethernet should be connected to a LAN capable of at least
-      10 Gbps. Connecting a SUT to a network with greater network speed is
-      acceptable.
-
-   -  If the primary test network cannot meet these requirements,
-      re-running the network tests in an environment that does match these
-      requirements will be necessary.
-
-   -  Every network port must be cabled to the LAN and properly configured
-      with either DHCP or static addressing. If a SUT has 4 NIC ports, then
-      all 4 must be connected to the LAN.
-
-   -  It is very strongly recommended that SUT and Target machines be on a
-      clean network (that is, one that is not full of other traffic), as
-      extraneous network traffic could impact the network testing results.
-
-   -  If you're testing multiple SUTs simultaneously, you may need as many
-      ``iperf3`` targets as you have SUTs. Alternatively, you may need to
-      re-run the network tests on most of the SUTs, as the tests are likely
-      to fail if the ``iperf3`` server is busy with another SUT's test.
-      Note also the previous point -- multiple simultaneous ``iperf3``
-      tests can cause failures of all of them, particularly if the network
-      infrastructure is poor.
-
--  The test LAN must have a working MAAS server that can provision and run
-   the tests on the SUT. The MAAS Advanced NUC Installation and
-   Configuration  -- Scripted (MANIACS) document, available at
-   https://certification.canonical.com, describes the basics of the MAAS
-   setup, but you may need to refer to additional documentation to complete
-   the task if you're not already familiar with MAAS.
-
--  The test LAN must have at least one system available to act as a Target for
-   network testing with ``iperf3``. Note that accessing an ``iperf3`` server
-   that's reachable only via a router may not work, because routing tables
-   are temporarily lost during network testing. The ``iperf3`` server is
-   normally the same as the MAAS server, but this does not need to be the
-   case. If the SUT has a faster network interface than the MAAS server,
-   you should set up another computer that matches the SUT's network
-   interface speed to function as an ``iperf3`` server.
-
--  The SUT's BMC, if present, may be configured via DHCP or with a static
-   IP address. If the BMC uses IPMI, MAAS will set up its own BMC user
-   account (``maas``) when enlisting the SUT.
-
-Installing Ubuntu on the System
--------------------------------
-
-Beginning with Ubuntu 14.04 (Trusty Tahr), server certification requires
-that the SUT be installable via MAAS. Therefore, the following procedure
-assumes the presence of a properly-configured MAAS server. The MAAS
-Advanced NUC Installation and Configuration -- Scripted (MANIACS) document
-describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 1.9. Using MAAS 1.7 or 1.8 is also
-acceptable, but some user interface details differ, particularly for MAAS
-1.7.
-
-Once the SUT and MAAS server are both connected to the network, you can
-install Ubuntu on the SUT as follows:
-
-#. Unplug any USB flash drives or external hard disks from the SUT.
-   (MAAS will attempt to install to a USB flash drive if it's detected
-   before the hard disk. This is obviously undesirable.)
-
-#. Power on the SUT and allow it to PXE-boot.
-
-   -  The SUT should boot the MAAS enlistment image and then power off.
-
-   -  You should see the SUT appear as a newly-enlisted computer in your
-      MAAS server's node list. (You may need to refresh your browser to see
-      the new entry.)
-
-#. Check and verify the following items in the MAAS server's node details
-   page:
-
-   -  If desired, change the node name for the SUT.
-
-   -  Check the SUT's power type and ensure it's set correctly (IPMI, AMT,
-      etc.). If the SUT has no BMC, you can leave this section blank or set
-      it to Wake-On-LAN (although the latter is finicky and so may require
-      manual power control).
-
-   -  Note that manual power control is acceptable only on low-end servers
-      that lack BMCs. If MAAS fails to detect a BMC that is present or if
-      MAAS cannot control a BMC that is present, please consult the
-      Canonical Server Certification Team.
-
-#. Commission the node by clicking Take Action followed by Commission
-   and then Go.
-
-   -  If the SUT has a BMC, the computer should power up, pass more
-      information about itself to the MAAS server, and then power down
-      again.
-
-   -  If the SUT does not have a BMC, you should manually power on the SUT
-      after clicking the Commission Node button. The SUT should power up,
-      pass more information about itself to the MAAS server, and then power
-      down again.
-
-#. On the MAAS server, verify that the SUT's Status is listed as Ready
-   in the node list or on the node's details page. You may need to
-   refresh the page to see the status update.
-
-#. Click Take Action followed by Deploy. Options to select the OS version
-   to deploy should appear.
-
-#. Select the Ubuntu release you want to deploy. Normally, you'll pick a
-   point release that you installed as described in the MANIACS document.
-   This image will appear as an OS type of "Custom" and a description that
-   specifies the point-release version. The normal procedure is to test
-   with 16.04 GA and (once they become available) the latest point release.
-   `Appendix D - Point Release Testing`_, elaborates on this policy.
-
-#. Click Go to begin deployment.
-
-   -  If the SUT has a BMC, it should power up and install Ubuntu. This
-      process can take several minutes.
-
-   -  If the SUT does not have a BMC, you should power it on manually after
-      clicking Go. The SUT should then boot and install Ubuntu. This
-      process can take several minutes.
-
-If MAAS has problems in any of the preceding steps, the SUT might not pass
-certification. For instance, certification requires that MAAS be able to
-detect the SUT and, in most cases, set its power type information
-automatically. If you have problems with any of these steps, contact the
-Canonical Server Certification Team to learn how to proceed; you might have
-run into a simple misconfiguration, or the server might need enablement
-work.
-
-Logging Into the SUT
---------------------
-
-Once the SUT is installed, you should be able to log into it using SSH from
-the MAAS server. Check the node details page to learn its primary IP
-address. (Using a hostname will also work if DNS is properly configured,
-but this can be fragile.) The username on the node is ``ubuntu``, and you
-should require no password when logging in from the MAAS server or from any
-other computer and account whose SSH key you've registered with the MAAS
-server.
-
-You should keep some details in mind as you continue to access the SUT:
-
--  You should *not* install updates to the SUT unless they are absolutely
-   necessary to pass certification. In that case, the Canonical
-   Certification Team will make the determination of what updates should be
-   applied.
-
--  You should verify your SUT's version by typing ``lsb_release -a``. The
-   result includes both the main release version (such as 16.04) and the
-   point release version (such as 16.04.2, on the *Description* line). You
-   can also check your kernel version by typing ``uname -r``. The kernel
-   version changes with the Ubuntu release.
-
--  By default, MAAS provides a DHCP server, and the SUT should use it to
-   obtain an IP address. If necessary for your environment, you may
-   manually change these settings on the SUT to use a static IP address.
-
--  If you want to log in at the console or from another computer, the
-   password is ``ubuntu``, assuming the certification pre-seed files are
-   used on the MAAS server. If you're using a "generic" MAAS installation,
-   you must set the password manually. Testing at the console has certain
-   advantages (described shortly).
-
--  A MAAS installation configured for certification testing should
-   provision the SUT with the Server Test Suite and related packages. If
-   you're using a more "generic" MAAS setup, you'll have to install the
-   certification software yourself, as described in `Appendix A -
-   Installing the Server Test Suite Manually`_.
-
-Installing the Server Test Suite Packages
------------------------------------------
-
-Two methods of installing the Server Test Suite are supported:
-
--  Automatically by the MAAS server
-
--  Using APT to retrieve the Server Test Suite packages on a SUT with
-   full Internet access or with access to a mirrored APT repository on
-   a local computer such as the MAAS server
-
-If MAAS is fully configured as described in the `MAAS Advanced NUC
-Installation and Configuration -- Scripted (MANIACS)` document, it should
-deploy the Server Test Suite automatically. If MAAS doesn't deploy the
-Server Test Suite properly, you can do so manually, as described in
-`Appendix A - Installing the Server Test Suite Manually`_.
+#. If desired, you can request a certificate, as described in `Requesting a
+   Certificate`_.
 
 Creating a Hardware Entry on C3
 ===============================
 
-In order to upload test results to the certification web site
-(http://certification.canonical.com, or C3 for short) you need to create a
-hardware entry for the system which you will be certifying. If the SUT has
-no direct Internet connection, you can put off creating the C3 entry until
-after the test (although doing it before testing is fine, too). If you
-don't plan to submit the results, you should not create a C3 entry for the
-machine. To create an entry you can go directly to:
+You can run certification tests without submitting them to C3; however, if
+you want to make the results available publicly, you need a C3 account. *If
+you do not have an account for your company on the private certification
+web site, please contact your account manager who will work with the Server
+Certification Team to establish the account.*
+
+In order to upload test results to C3, you need to create a hardware entry
+for the system which you will be certifying. You can put off creating the
+C3 entry until after the test, although doing it before testing is usually
+preferable. If you don't plan to submit the results, you should not create
+a C3 entry for the machine. If the specific machine you're testing already
+has a C3 entry, you should *not* create a new one. To create an entry you
+can go directly to:
 
 https://certification.canonical.com/hardware/create-system
 
@@ -673,6 +235,336 @@ When creating an entry, you must enter assorted pieces of information:
    when submitting the test results. (Note that this value is unique for
    each machine.)
 
+Preparing the Test Environment
+==============================
+
+Before you certify the hardware, you must perform some initial setup
+steps. These steps are preparing the hardware you'll bring, configuring
+the SUT for testing, and configuring the test network.
+
+Bringing Equipment for Testing
+------------------------------
+
+The requirements for running the tests for a server are minimal. Ensure
+that you have:
+
+-  Writable USB sticks with enough free space (> 256 MB). Each stick must
+   contain a *single partition* with a *writable FAT* filesystem on it. 
+   Note that a USB stick with multiple partitions may cause problems, so if
+   necessary you should repartitition your device to have a single
+   partition. Modern computers typically provide both USB 2 and USB 3
+   ports, which are tested separately. Thus, you're likely to need two USB
+   sticks per computer, at least one of which must be a USB 3 device. If
+   you need to test more than one computer then *bring enough USB sticks to
+   test all the systems*.
+
+-  Writable SD cards configured with the same rules as the USB sticks.
+   These SD cards are needed only on those (rare) servers that have
+   external SD card slots.
+
+-  A data CD with some files written to it. This is required to test the
+   system's optical drive read capabilities. Note that a movie DVD or an
+   audio CD won't be useful in this case, as they are not in the right
+   format for the test. If you need to test more than one computer then
+   *bring one medium per system*.
+
+-  A computer to function as a MAAS server and ``iperf3`` target on the test
+   LAN. This server will provision the SUT. The MAAS server can be a normal
+   part of the test LAN or can be brought in specifically for testing SUTs
+   on the test LAN. (Note, however, that the MAAS server for certification
+   testing should ideally be configured to automatically install the Server
+   Test Suite on the SUT, which will not be the case for a "generic" MAAS
+   server.)
+
+Configuring the SUT for Testing
+-------------------------------
+
+The following should be considered the minimum requirements for setting
+up the SUT and test environment:
+
+-  Minimum loadout
+
+   -  Minimum of 4 GiB RAM
+
+   -  1 HDD or SSD (2 with minimal RAID)
+
+   -  1 CPU of a supported type
+
+-  Recommended (preferred) loadout
+
+   -  Maximum supported number of HDDs or SSDs, especially if you can
+      configure multiple RAID levels (e.g. 2 for RAID 0, 3 for RAID 5, and
+      6 for RAID 50)
+
+   -  The largest disk capacity available from the OEM -- ideally, over
+      2 TiB on a single disk or RAID array.
+
+   -  Maximum amount of supported RAM
+
+   -  Maximum number of supported CPUs
+
+   - If the SUT has multiple disk controllers (such as a motherboard-based
+     disk controller and a separate RAID controller), we strongly recommend
+     that disk devices be connected to all controllers during testing.
+
+-  If possible, as many processors as the SUT will support should be
+   installed.
+
+   -  Note that systems that ship with processors from different families
+      (e.g Broadwell vs. Skylake) will require extra testing.
+
+   -  CPU speed bumps and die shrinks do not require extra testing.
+
+-  The SUT should not contain any extraneous PCI devices that are not
+   part of the certification.
+
+   -  This includes things like network, SAN and iSCSI cards.
+
+   -  Hardware RAID cards are allowed if they are used to provide RAID
+      services to the SUT's onboard storage.
+
+-  CPUs should support virtualization (VMX/SVM), when supported by the
+   CPU's architecture.
+
+-  The SUT should be running a release level (*not* development level)
+   BIOS/UEFI configured using factory default settings, with the following
+   exceptions:
+
+   -  If the hardware virtualization options in the BIOS/UEFI are not
+      enabled, enable them, save the settings and allow the SUT to reboot.
+
+   -  The SUT must be configured to PXE-boot by default.
+
+   -  If the SUT's firmware supports PXE-booting in UEFI mode, it must be
+      configured to boot in UEFI mode, rather than in BIOS/CSM/legacy mode.
+
+   -  On x86-64 systems, if the UEFI supports it, the SUT must be
+      configured to boot with Secure Boot active.
+
+-  Storage should be properly configured.
+
+   -  Some BIOS-only computers may have problems booting from disks over
+      2 TiB in size. If the SUT fails for this reason, it may pass with
+      smaller disks (or a smaller RAID array), but this issue should be
+      noted with the results submission.
+
+   -  Disks must be configured for "flat" storage -- that is, filesystems
+      in plain partitions, rather than using LVM or bcache configurations.
+      "Flat" storage was the only option with MAAS 1.8 and earlier, but
+      MAAS 1.9 introduced LVM and bcache options. Similarly, software RAID
+      must *not* be used.
+
+-  Disks with 4,096-byte *logical* sector sizes may require booting in
+   EFI/UEFI mode. Note that disks with 4,096-byte *physical* sector sizes
+   seldom cause problems, so long as the disk's firmware translates those
+   sectors into 512-byte logical sectors.
+
+-  The SUT's BMC, if present, may be configured via DHCP or with a static
+   IP address. If the BMC uses IPMI, MAAS will set up its own BMC user
+   account (``maas``) when enlisting the SUT.
+
+-  A monitor and keyboard for the SUT are helpful because they will
+   enable you to monitor its activities. If necessary, however,
+   certification can be done without these items.
+
+Preparing the Network Test Environment
+--------------------------------------
+
+Particularly if you're testing in a location where you've never before
+tested, or if you're testing a SUT with unique network hardware, you may
+need to prepare the network environment. In particular, you should pay
+attention to the following:
+
+-  In addition to the SUT, the network must contain at least one other
+   machine, which will run MAAS and an ``iperf3`` server; however, you may
+   want to separate these two functions.
+
+   - The MAAS Advanced NUC Installation and Configuration -- Scripted
+     (MANIACS) document (available from
+     https://certification.canonical.com) describes how to configure a MAAS
+     server. This server may be a standard part of the testing network or
+     something you bring with you for testing purposes alone. A laptop or a
+     small portable computer such as an Intel NUC is sufficient. MAAS
+     version 2.0 or later is required for certification work.
+
+  -  When testing multiple SUTs simultaneously, you will need multiple
+     ``iperf3`` Targets, one for each SUT. If your ``iperf3`` Target has a
+     sufficiently fast NIC or multiple NICs, you can assign the computer
+     multiple IP addresses and treat each one as a distinct Target. This
+     topic is covered in more detail in Appendix D of the MANIACS document.
+     Alternatively, you can run network tests against a single ``iperf3``
+     Target sequentially; however, this approach complicates submission of
+     results. Note that poor network infrastructure may make multiple
+     simultaneous ``iperf3`` runs unreliable.
+
+-  Ideally, the network should have few or no other computers;
+   extraneous network traffic can negatively impact the network tests.
+
+-  Network cabling, switches, and the ``iperf3`` server should be capable of
+   at least the SUT's best speed. For instance, if the SUT has 1 Gbps
+   Ethernet, the other network components should be capable of 1 Gbps or
+   faster speeds. If the local network used for testing is less capable
+   than the best network interfaces on the SUT, those interfaces must be
+   tested later on a more-capable network. If the test environment uses
+   separate networks with different speeds, with the SUT cabled to multiple
+   networks via different ports, you can specify multiple ``iperf3``
+   servers, as described later.
+
+-  If desired, the MAAS server may be run inside a virtual machine;
+   however, it is advisable to run the ``iperf3`` server on "real" hardware
+   so as to minimize the risk of network tests failing because of
+   virtualization issues.
+
+-  Every network port must be cabled to the LAN and properly configured
+   with either DHCP or static addressing. If a SUT has 4 NIC ports, then
+   all 4 must be connected to the LAN.
+
+Setting up the SUT for Testing
+==============================
+
+Before you can begin testing, you must install Ubuntu on the SUT and
+perform some certification-specific configuration tasks on the SUT. Most of
+the work of these tasks is performed with the help of MAAS, as described in
+the following sections.
+
+Installing Ubuntu on the System
+-------------------------------
+
+Beginning with Ubuntu 14.04 (Trusty Tahr), server certification requires
+that the SUT be installable via MAAS. Therefore, the following procedure
+assumes the presence of a properly-configured MAAS server. The MAAS
+Advanced NUC Installation and Configuration -- Scripted (MANIACS) document
+describes how to set up a MAAS server for certification testing purposes.
+This document describes use of MAAS 2.0, which is required beginning in the
+fall of 2016.
+
+Once the SUT and MAAS server are both connected to the network, you can
+install Ubuntu on the SUT as follows:
+
+#. Unplug any USB flash drives or external hard disks from the SUT.
+   (MAAS will attempt to install to a USB flash drive if it's detected
+   before the hard disk. This problem is rare but undesirable.)
+
+#. Power on the SUT and allow it to PXE-boot.
+
+   -  The SUT should boot the MAAS enlistment image and then power off.
+
+   -  You should see the SUT appear as a newly-enlisted computer in your
+      MAAS server's node list. (You may need to refresh your browser to see
+      the new entry.)
+
+#. Check and verify the following items in the MAAS server's node details
+   page:
+
+   -  If desired, change the node name for the SUT.
+
+   -  Check the SUT's power type and ensure it's set correctly (IPMI, AMT,
+      etc.). If the SUT has no BMC, you can set it to Manual.
+
+   -  Note that manual power control is acceptable only on low-end servers
+      that lack BMCs. If MAAS fails to detect a BMC that is present or if
+      MAAS cannot control a BMC that is present, please consult the
+      Canonical Server Certification Team.
+
+#. Commission the node by clicking Take Action followed by Commission
+   and then Go.
+
+   -  If the SUT has a BMC, the computer should power up, pass more
+      information about itself to the MAAS server, and then power down
+      again.
+
+   -  If the SUT does not have a BMC, you should manually power on the SUT
+      after clicking the Commission Node button. The SUT should power up,
+      pass more information about itself to the MAAS server, and then power
+      down again.
+
+#. On the MAAS server, verify that the SUT's Status is listed as Ready
+   in the node list or on the node's details page. You may need to
+   refresh the page to see the status update.
+
+#. Click Take Action followed by Deploy. Options to select the OS version
+   to deploy should appear.
+
+#. Select the Ubuntu release you want to deploy. Normally, you'll pick a
+   point release that you installed as described in the MANIACS document.
+   This image will appear as an OS type of "Custom" and a description that
+   specifies the point-release version. The normal procedure is to test
+   with 16.04 GA and the latest point release. `Appendix C - Testing Point
+   Releases`_, elaborates on this policy. Note that you should *not* deploy
+   the standard MAAS images on x86 or x86-64 SUITs; you *must* use the
+   custom point-release images.
+
+#. Click Go to begin deployment.
+
+   -  If the SUT has a BMC, it should power up and install Ubuntu. This
+      process can take several minutes.
+
+   -  If the SUT does not have a BMC, you should power it on manually after
+      clicking Go. The SUT should then boot and install Ubuntu. This
+      process can take several minutes.
+
+If MAAS has problems in any of the preceding steps, you should first check
+`Appendix D - Troubleshooting`_ for suggestions. If that doesn't help,
+the SUT might not pass certification. For instance, certification requires
+that MAAS be able to detect the SUT and, in most cases, set its power type
+information automatically. If you have problems with any of these steps,
+contact the Canonical Server Certification Team to learn how to proceed;
+you might have run into a simple misconfiguration, or the server might need
+enablement work.
+
+If MAAS is fully configured as described in the `MAAS Advanced NUC
+Installation and Configuration -- Scripted (MANIACS)` document, it should
+deploy the Server Test Suite automatically. If MAAS doesn't deploy the
+Server Test Suite properly, you can do so manually, as described in
+`Appendix A - Installing the Server Test Suite Manually`_.
+
+Performing Final Pre-Testing SUT Configuration
+----------------------------------------------
+
+Once the SUT is deployed, you should be able to log into it using SSH from
+the MAAS server. Check the node details page to learn its primary IP
+address. (Using a hostname will also work if DNS is properly configured,
+but this can be fragile.) The username on the node is ``ubuntu``, and you
+should require no password when logging in from the MAAS server or from any
+other computer and account whose SSH key you've registered with the MAAS
+server.
+
+You may need to perform a few additional minor tasks before running the
+Certification Suite, and keep some other factors in mind as you continue to
+access the SUT:
+
+-  If you want to log in at the console or from another computer, the
+   password is ``ubuntu``, assuming the certification preseed files are
+   used on the MAAS server. If you're using a "generic" MAAS installation,
+   you must set the password manually. Testing at the console has certain
+   advantages (described shortly).
+
+-  You should *not* install updates to the SUT unless they are absolutely
+   necessary to pass certification. In that case, the Canonical
+   Certification Team will make the determination of what updates should be
+   applied.
+
+-  You should verify your SUT's version by typing ``lsb_release -a``. The
+   result includes both the main release version (such as 16.04) and the
+   point release version (such as 16.04.1, on the *Description* line). You
+   can also check your kernel version by typing ``uname -r``. The kernel
+   version changes with the Ubuntu release.
+
+-  By default, MAAS provides a DHCP server, and the SUT should use it to
+   obtain an IP address. If necessary for your environment, you may
+   manually change these settings on the SUT to use a static IP address.
+
+-  A MAAS installation configured for certification testing should
+   provision the SUT with the Server Test Suite and related packages. If
+   you're using a more "generic" MAAS setup, you'll have to install the
+   certification software yourself, as described in `Appendix A -
+   Installing the Server Test Suite Manually`_.
+
+-  If the SUT has more than one HDD, all but the first disk must be
+   manually partitioned and mounted prior to testing. Partitions on those
+   additional HDDs should preferably be a single partition that spans the
+   entire disk and that uses the ext4 filesystem.
+
 Running the Certification Tests
 ===============================
 
@@ -687,53 +579,88 @@ You can initiate a testing session in a server as follows:
    test using either a direct console login or SSH, but an SSH login may be
    disconnected by the network tests or for other reasons.
 
-#. Before testing you must ensure that all network ports are cabled to a
-   working LAN and configured in ``/etc/network/interfaces`` using the
-   appropriate configuration (static or DHCP) for your test environment.
-   If you edit this file, either reboot or bring up the interfaces you
-   add with ``ifup`` before running tests.
-
 #. If the SUT provides the suitable ports and drives, plug in a USB 2
-   stick, plug in a USB 3 stick, and insert a suitable data CD in the
-   optical drive. Note that USB testing is not required for blades that
-   provide USB ports only via specialized dongles. These media must remain
-   inserted *throughout the test run*, because the media tests will be
-   kicked off partway through the run.
+   stick, plug in a USB 3 stick, plug in an SD card, and insert a suitable
+   data CD in the optical drive. Note that USB testing is not required for
+   blades that provide USB ports only via specialized dongles. These media
+   must remain inserted *throughout the test run*, because the media tests
+   will be kicked off partway through the run.
 
 #. If the system doesn't have Internet access, or if that access is slow:
 
-   * Copy the image you downloaded from
-     http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-i386-disk1.img (as
-     noted in `Appendix A`) to any directory of the SUT.
+   #. On a computer with better Internet access, download a cloud image
+      from:
+      http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-i386-disk1.img
 
-   * Supply the full path under the section labeled "environment" in
-     ``/etc/xdg/canonical-certification.conf``. For example::
+   #. Copy that image to any convenient directory on the SUT.
 
-       [environment]
-       KVM_TIMEOUT:
-       KVM_IMAGE: /home/ubuntu/trusty-server-cloudimg-i386-disk1.img
+   #. Supply the full path under the section labeled "environment" in
+      ``/etc/xdg/canonical-certification.conf``. For example::
+
+        [environment]
+        KVM_TIMEOUT = 300
+        KVM_IMAGE = /home/ubuntu/xenial-server-cloudimg-i386-disk1.img
 
 #. If necessary, edit the ``/etc/xdg/canonical-certification.conf`` file on
    the SUT so as to specify your ``iperf3`` server(s). For example::
 
-    TEST_TARGET_IPERF =  192.168.0.2,172.24.124.7
+    TEST_TARGET_IPERF = 192.168.0.2,172.24.124.7
 
    If you configured your MAAS server as described in the MANIACS document,
    the ``TEST_TARGET_IPERF`` line should already be set appropriately. If
    your environment includes multiple ``iperf3`` servers, you can identify
    them all, separated by commas. The test suite will attempt to use each
-   server in sequence until one results in a passed test or until they are
-   all exhausted. You can use this feature if your environment includes
-   separate networks with different speeds or simply to identify all of
-   your ``iperf3`` servers. (Note that ``iperf3`` refuses a connection if
-   a test is ongoing, so you can list multiple ``iperf3`` servers and
-   let the test suite try them all until it finds a free one.)
+   server in sequence until one results in a passed test or until a timeout
+   period of one hour has passed. You can use this feature if your
+   environment includes separate networks with different speeds or simply
+   to identify all of your ``iperf3`` servers. (Note that ``iperf3``
+   refuses a connection if a test is ongoing, so you can list multiple
+   ``iperf3`` servers and let the test suite try them all until it finds a
+   free one.)
 
-#. While editing ``/etc/xdg/canonical-certification.conf``, you may
-   optionally enter the SUT's Secure ID in the ``[transport:c3]`` section.
-   This can
-   simplify submission of results at the end of the test; however, this
-   will work only if the SUT has full Internet access.
+#. You should double-check that the server's configuration is correct by
+   running the ``canonical-certification-precheck`` script, which tests
+   critical configuration details:
+
+   - If the script does not detect a Secure ID (SID) configured in
+     ``/etc/xdg/canonical-certification.conf``, the script gives you the
+     option of entering one. Doing so can simplify submitting results;
+     however, this will work only if the SUT has full Internet access.
+
+   - Information on some critical configuration details is displayed,
+     followed by a summary, such as the following:
+
+     .. figure:: images/cert-pretest.png
+        :alt: The certification pre-test script helps you identify
+              simple problems that might make you go d'oh!
+        :width: 100%
+
+   - Summary results are color-coded, with white for information, green for
+     passed results, yellow for warnings, and red for problems that should
+     be corrected. In the preceding output, the Installed RAM value was
+     displayed in yellow because the system's RAM is a bit shy of 4 GiB;
+     and the ``iperf`` line is in red because the script detected no
+     ``iperf3`` server. If your terminal supports the feature, you can
+     scroll up to see details of any warnings or failures.
+
+   - If the precheck script detects improperly configured network ports,
+     you must correct the problem before testing. You must ensure that all
+     network ports are cabled to a working LAN and configured in
+     ``/etc/network/interfaces`` using the appropriate configuration
+     (static or DHCP) for your test environment. If you edit this file,
+     either reboot or bring up the interfaces you add with ``ifup`` before
+     running tests.
+
+   - If the script identifies any other problems, be sure to correct them.
+
+#. Verify that all your disks are mounted. Type ``df -h`` to view the
+   mounted disks, and compare the output to the disk devices available to
+   you, as shown by ``ls /dev/sd*``. (Some exotic disk devices may appear
+   under other device names, such as ``/dev/nvme*``.) If ``ls /dev/sd*``
+   shows a disk with no mounted partitions, you should partition the disk
+   (one big disk-spanning partition is best), create an ext4 filesystem on
+   it, and mount it (subdirectories of ``/mnt`` work well). Repeat this
+   process for each unmounted disk.
 
 #. If you're running the test via SSH, type screen on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go
@@ -741,38 +668,6 @@ You can initiate a testing session in a server as follows:
    disconnected, you can reconnect to your session by logging in and
    typing ``screen -r``. This step is not important if you're running the
    Server Test Suite at the console.
-
-#. Verify that all your disks are mounted. Type ``df -h`` to view the
-   mounted disks, and compare the output to the disk devices available to
-   you, as shown by ``ls /dev/sd*``. (Some exotic disk devices may appear
-   under other device names, such as ``/dev/nvme*``.) If ``ls /dev/sd*``
-   shows a disk with no mounted partitions, you should partition the disk
-   (one big disk-spanning partition is best), create a filesystem on it,
-   and mount it (subdirectories of ``/mnt`` work well). Repeat this process
-   for each unmounted disk.
-
-#. Prior to running the certification tests, you should double-check that
-   the server's configuration is correct by running the
-   ``canonical-certification-precheck``
-   script, which tests the critical configuration details that may be set
-   incorrectly. Information on most of these details is displayed, followed
-   by a summary, such as the following:
-
-   .. figure:: images/cert-pretest.png
-      :alt: The certification pre-test script helps you identify
-            simple problems that might make you go d'oh!
-      :width: 100%
-
-   Summary results are color-coded, with white for information, green for
-   passed results, yellow for warnings, and red for problems that should be
-   corrected. In the preceding output, the Installed RAM value was
-   displayed in yellow because the system's RAM is a bit shy of 4 GiB; and
-   the ``iperf`` line is in red because the script detected no ``iperf3``
-   server. If your terminal supports the feature, you can scroll up to see
-   details of any warnings or failures.
-
-#. Correct any problems identified by the
-   ``canonical-certification-precheck`` script.
 
 #. Run::
 
@@ -803,8 +698,9 @@ You can initiate a testing session in a server as follows:
    on computers that lack this hardware, are automatically ignored.) If a
    test is hanging or otherwise causing problems, please contact the
    Canonical Server Certification Team for advice on how to proceed. Using
-   this screen is fairly straightforward, but `Appendix C - Using the Test
-   Selection Screen`_ covers the details.
+   this screen is fairly straightforward -- you can use Enter to expand
+   or collapse a category, the spacebar to select or deselect an option
+   or category, arrow keys to navigate through the options, and so on.
 
    .. figure:: images/test-selection-xenial.png
       :alt: The suite selection screen enables you to pick which
@@ -815,11 +711,12 @@ You can initiate a testing session in a server as follows:
    scrolling set of technical details about the tests as they are
    performed.
 
-#. The full test suite can take several hours to complete, depending on
-   the hardware configuration (amount of RAM, disk space, etc). During
-   this time the computer may be unresponsive. This is due to the
-   inclusion of some stress test cases. These are deliberately
-   intensive and produce high load on the system's resources.
+#. The full test suite can take several hours, or in extreme cases over a
+   day, to complete, depending on the hardware configuration (amount of
+   RAM, disk space, etc). During this time the computer may be
+   unresponsive. This is due to the inclusion of some stress test cases.
+   These are deliberately intensive and produce high load on the system's
+   resources.
 
 #. If at any time during the execution you are *sure* the computer has
    crashed (or it reboots spontaneously) then after the system comes back
@@ -835,13 +732,13 @@ You can initiate a testing session in a server as follows:
    harmless reasons can also appear in this list.
 
 #. When the test run is complete, you should see a summary of tests run, a
-   note about where the ``submission*`` files have been stored,
-   and a prompt to submit the
-   results to ``certification.canonical.com``. If you're connected to the
-   Internet, typing ``y`` at this query should cause the results to be
-   submitted. You will need either a Secure ID value or to have already
-   entered this value in the ``/etc/xdg/canonical-certification.conf``
-   file.
+   note about where the ``submission*`` files have been stored, and a
+   prompt to submit the results to C3. If you're connected to the Internet,
+   typing ``y`` at this query should cause the results to be submitted. You
+   will need either a Secure ID value or to have already entered this value
+   in the ``/etc/xdg/canonical-certification.conf`` file. (The
+   ``canonical-certification-precheck`` script will edit this file
+   appropriately if you provided the SID when you ran that script.)
 
 #. Copying the results files off of the SUT is advisable. This is most
    important if the automatic submission of results fails; however,
@@ -850,7 +747,7 @@ You can initiate a testing session in a server as follows:
    problems that aren't immediately obvious. The results are stored in
    the ``~/.local/share/checkbox-ng`` directory. The upcoming section,
    `Manually Uploading Test Results to the Certification Site`_, describes
-   how to perform this task.
+   how to upload results manually to C3.
 
 You can review your results locally by loading
 ``submission_<DATECODE>.html`` in a web
@@ -1011,8 +908,7 @@ your lab must have Internet access or a local APT repository with both the
 main Ubuntu archives and the relevant PPAs. You can install the necessary
 tools using ``apt-get``.
 
-Log in to the server locally or via SSH or KVM and run the following
-commands::
+Log in to the server and run the following commands::
 
   $ sudo apt-add-repository ppa:hardware-certification/public
   $ sudo apt-add-repository ppa:firmware-testing-team/ppa-fwts-stable
@@ -1056,9 +952,9 @@ single test script, the preferred method is:
 #. Re-run ``canonical-certification-server``.
 
 #. Use one of the abbreviated testing whitelists (such as *Network-only*)
-   or adjust the set of tests to be run (as described in `Appendix C`).
+   or adjust the set of tests to be run.
 
-#. Submit the resulting ``submission.xml`` file to the C3 site.
+#. Submit the resulting ``submission_<DATECODE>.xml`` file to the C3 site.
 
 You can then request a certificate based on the main results (the one with
 the most passed tests) and refer to the secondary set of results in the
@@ -1086,13 +982,13 @@ or file is as follows:
 
 #. On the SUT, rename or delete the original file, as in::
 
-    $ sudo rm /usr/lib/2013.canonical.com\:checkbox/bin/oldscript
+    $ sudo rm /usr/lib/plainbox-provider-checkbox/bin/oldscript
 
 #. Create a symbolic link from the new script to the original name, as
    in::
 
      $ sudo ln -s /home/ubuntu/newscript \
-       /usr/lib/2013.canonical.com\:checkbox/bin/oldscript
+       /usr/lib/plainbox-provider-checkbox/bin/oldscript
 
 #. Run the tests again, using the ``canonical-certification-server`` user
    interface.
@@ -1106,43 +1002,8 @@ Certification Team can advise you about such requirements.
 
    PageBreak
 
-Appendix C - Using the Test Selection Screen
-============================================
-
-It may be necessary for you to deselect some of the tests which are to
-be run for certification. This is unlikely, though, and you should only
-do it when so instructed.
-
-The test selection screen looks like this:
-
-.. figure:: images/test-selection2-xenial.png
-   :alt: The test selection screen enables you to select the tests
-         you want to run.
-   :width: 100%
-
-Initially a list of test categories appears. Highlighting one of these
-categories and then pressing the Enter key expands the category to show the
-individual tests it contains. (The preceding figure shows the *Ethernet
-Device tests* category so expanded.)
-
-Every category and test suite name is preceded by brackets that contain
-either an *X* character or nothing to identify whether the test suite has
-been selected or not. You can select or deselect either an individual test
-or all the tests in a category by pressing the Spacebar. For instance, with
-*Ethernet Device tests* highlighted, pressing the Spacebar will deactivate
-(or re-activate) all of the Ethernet tests. You can select or de-select an
-individual test, such as the *Multi-NIC Iperf3 testing for NIC eth1* test,
-by highlighting it and pressing the Spacebar.
-
-Once you've chosen the tests you want to run, press the *T* key to begin
-the testing process.
-
-.. raw:: pdf
-
-   PageBreak
-
-Appendix D - Point Release Testing
-==================================
+Appendix C - Testing Point Releases
+===================================
 
 Ordinarily, 16.04 certification requires testing two releases:
 
@@ -1150,8 +1011,7 @@ Ordinarily, 16.04 certification requires testing two releases:
    2016.
 
 -  The current point release -- That is, version 16.04.2 or whatever is
-   the latest release in the 16.04 series. Obviously, a point-release test
-   will not be possible until 16.04.1 becomes available.
+   the latest release in the 16.04 series.
 
 In theory, compatibility will only improve with time, so a server might
 fail testing with 16.04 GA because it uses new hardware that had not
@@ -1181,11 +1041,11 @@ fails, then you should consult the Server Certification Team.
 
    PageBreak
 
-Appendix E - Troubleshooting Tips
-=================================
+Appendix D - Troubleshooting
+============================
 
-Deployment Problems
--------------------
+Fixing Deployment Problems
+--------------------------
 
 Sometimes a node fails to deploy. When this happens, check the installation
 output on the node's MAAS page. (Scroll down to "Machine output" and click
@@ -1212,8 +1072,8 @@ this on the SUT, but if network problems prevented a successful submission,
 you may need to bring the files out on a USB flash drive or other removable
 medium and submit them from a computer with better Internet connectivity.
 
-Inconsistent Message when Submitting Results
---------------------------------------------
+Addressing the Inconsistent Message when Submitting Results
+-----------------------------------------------------------
 
 If you receive a message that looks like the following when using
 ``canonical-certification-submit``, please be sure to save the
@@ -1221,8 +1081,8 @@ If you receive a message that looks like the following when using
 
   2014-04-28 10:55:33,894 CRITICAL Error: Inconsistent message
 
-Network Problems
-----------------
+Resolving Network Problems
+--------------------------
 
 Network problems are common in testing. These problems can manifest as
 complete failures of all network tests or as failures of just some
@@ -1276,11 +1136,11 @@ If you end up having to re-run the network tests, either do so from within
 ``canonical-certification-server`` or be sure to bring down all the network
 interfaces except the one you're testing before using ``iperf3`` manually.
 The way Linux manages network interfaces makes it difficult to ensure that
-network traffic will be restricted to a single network port if more than
+network traffic will be restricted to a single network device if more than
 one is active.
 
-Issues During Testing
----------------------
+Handling Miscellaneous Issues During Testing
+--------------------------------------------
 
 The testing process should be straightforward and complete without issue.
 Should you encounter problems during testing, please contact your account

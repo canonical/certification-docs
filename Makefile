@@ -80,4 +80,3 @@ Self-Test_Guide-16.04.*: images/hardware-creation-flowchart-landscape.png
 Self-Test_Guide-16.04.*: images/cert-pretest.png
 Self-Test_Guide-16.04.*: images/suite-selection-xenial.png
 Self-Test_Guide-16.04.*: images/test-selection-xenial.png
-Self-Test_Guide-16.04.*: images/test-selection2-xenial.png
