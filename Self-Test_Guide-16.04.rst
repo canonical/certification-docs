@@ -172,7 +172,7 @@ can go directly to:
 
 https://certification.canonical.com/hardware/create-system
 
-If you have problems accessing this site, contact your Technical Parner
+If you have problems accessing this site, contact your Technical Partner
 Manager.
 
 .. image:: images/hardware-creation-flowchart-landscape.png
