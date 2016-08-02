@@ -132,13 +132,13 @@ The highlights of this process are:
 #. Create an entry on https://certification.canonical.com (C3 for short)
    for the SUT, as described in more detail shortly, in `Creating a
    Hardware Entry on C3`_. If an entry already exists for your specific
-   device (not just the model), you should use the existing entry.
+   configuration (not just the model), you should use the existing entry.
 
 #. Use MAAS to deploy the SUT using a custom point-release image, as
    described in the upcoming section, `Installing Ubuntu on the System`_.
 
 #. Check the SUT's configuration. (The ``canonical-certification-precheck``
-   script, described in more detail shortly, in `Running the Certification
+   script, described in `Running the Certification
    Tests`_, can help with this.)
 
 #. Run the test suite on the SUT, as described in `Running the
@@ -155,22 +155,25 @@ Creating a Hardware Entry on C3
 ===============================
 
 You can run certification tests without submitting them to C3; however, if
-you want to make the results available publicly, you need a C3 account. *If
+you want to publicly certify the system publicly, you need a C3 account. *If
 you do not have an account for your company on the private certification
-web site, please contact your account manager who will work with the Server
+web site, or if you do not have access to your company's account, please
+contact your Technical Partner Manager, who will work with the Server
 Certification Team to establish the account.*
 
 In order to upload test results to C3, you need to create a hardware entry
 for the system which you will be certifying. You can put off creating the
 C3 entry until after the test, although doing it before testing is usually
 preferable. If you don't plan to submit the results, you should not create
-a C3 entry for the machine. If the specific machine you're testing already
+a C3 entry for the machine. If the specific machine or configuration
+you're testing already
 has a C3 entry, you should *not* create a new one. To create an entry you
 can go directly to:
 
 https://certification.canonical.com/hardware/create-system
 
-If you have problems accessing this site, contact your account manager.
+If you have problems accessing this site, contact your Technical Parner
+Manager.
 
 .. image:: images/hardware-creation-flowchart-landscape.png
            :alt: This flowchart outlines the steps necessary to create
@@ -192,22 +195,13 @@ When creating an entry, you must enter assorted pieces of information:
    * **Model** -- The name of the system itself, e.g ProLiant DL630 or
      PowerEdge R210, as you would like it to appear on the public web site.
 
-   * **Aliases** -- This is used for alternate marketing names for a
-     server. This field is only accessible to the Canonical Server
-     Certification Team.  If you need to add items to this field, please
-     contact your account manager. These appear publicly as separate
-     entries in the database (e.g. Server1000, Alias1001 and Alias1002 all
-     point to the same system, but appear as three separate entries on the
-     public web site).
-
    * **Codenames** -- This is for your internal reference and identifies
      the internal code name associated with the SUT. This data is
      *never* published and is visible only to you and to Canonical.
 
-   * **Web site** -- This optional field links to the system information on the
-     manufacturer's web site. This field is published publicly and is a way
-     for potential customers to directly access information about your
-     hardware on your own web site.
+   * **Web site** -- This optional field links to the system information on
+     the manufacturer's web site. This field is not currently published
+     publicly.
 
    * **Comment** -- This optional field holds any comment you want to make
      about the
@@ -218,7 +212,7 @@ When creating an entry, you must enter assorted pieces of information:
      not published directly, but determines where your system is displayed
      on the public site.  Client form factors appear in one place while
      server form factors appear elsewhere on the public certification site.
-     You may select any of the Server form factors you like except for
+     You may select any appropriate Server form factor for the SUT except for
      Server SoC, which is reserved for System on Chip certifications.
 
    * **Architecture** -- The CPU architecture of the SUT. This is used
@@ -242,8 +236,8 @@ Before you certify the hardware, you must perform some initial setup
 steps. These steps are preparing the hardware you'll bring, configuring
 the SUT for testing, and configuring the test network.
 
-Bringing Equipment for Testing
-------------------------------
+Ensuring Equipment is Ready
+---------------------------
 
 The requirements for running the tests for a server are minimal. Ensure
 that you have:
@@ -323,8 +317,8 @@ up the SUT and test environment:
    -  Hardware RAID cards are allowed if they are used to provide RAID
       services to the SUT's onboard storage.
 
--  CPUs should support virtualization (VMX/SVM), when supported by the
-   CPU's architecture.
+-  Virtualization (VMX/SVM) should be enabled in the BIOS/UEFI, when
+   supported by the CPU's architecture.
 
 -  The SUT should be running a release level (*not* development level)
    BIOS/UEFI configured using factory default settings, with the following
@@ -353,11 +347,6 @@ up the SUT and test environment:
       "Flat" storage was the only option with MAAS 1.8 and earlier, but
       MAAS 1.9 introduced LVM and bcache options. Similarly, software RAID
       must *not* be used.
-
--  Disks with 4,096-byte *logical* sector sizes may require booting in
-   EFI/UEFI mode. Note that disks with 4,096-byte *physical* sector sizes
-   seldom cause problems, so long as the disk's firmware translates those
-   sectors into 512-byte logical sectors.
 
 -  The SUT's BMC, if present, may be configured via DHCP or with a static
    IP address. If the BMC uses IPMI, MAAS will set up its own BMC user
@@ -404,7 +393,8 @@ attention to the following:
    at least the SUT's best speed. For instance, if the SUT has 1 Gbps
    Ethernet, the other network components should be capable of 1 Gbps or
    faster speeds. If the local network used for testing is less capable
-   than the best network interfaces on the SUT, those interfaces must be
+   than the best network interfaces on the SUT, the network test won't run,
+   and those interfaces must be
    tested later on a more-capable network. If the test environment uses
    separate networks with different speeds, with the SUT cabled to multiple
    networks via different ports, you can specify multiple ``iperf3``
@@ -581,8 +571,9 @@ You can initiate a testing session in a server as follows:
 
 #. If the SUT provides the suitable ports and drives, plug in a USB 2
    stick, plug in a USB 3 stick, plug in an SD card, and insert a suitable
-   data CD in the optical drive. Note that USB testing is not required for
-   blades that provide USB ports only via specialized dongles. These media
+   data CD in the optical drive. (Note that USB testing is not required for
+   blade/cartridge style systems *unless* the blade or cartridge has
+   dedicated USB ports that are not shared via the chassis.) These media
    must remain inserted *throughout the test run*, because the media tests
    will be kicked off partway through the run.
 
@@ -662,7 +653,7 @@ You can initiate a testing session in a server as follows:
    it, and mount it (subdirectories of ``/mnt`` work well). Repeat this
    process for each unmounted disk.
 
-#. If you're running the test via SSH, type screen on the SUT to ensure
+#. If you're running the test via SSH, type ``screen`` on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go
    down, as may happen when running the network tests. If you're
    disconnected, you can reconnect to your session by logging in and
