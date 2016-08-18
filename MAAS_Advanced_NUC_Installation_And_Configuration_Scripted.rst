@@ -1,6 +1,6 @@
-=============================================================
- MAAS Advanced NUC Installation and Configuration -- Scripted
-=============================================================
+================================================================
+ MAAS 2 Advanced NUC Installation and Configuration -- Scripted
+================================================================
 -----------------------
  (The MANIACS Document)
 -----------------------
@@ -51,9 +51,8 @@ moves on to a general description of Ubuntu installation, details on how to
 install and configure MAAS, and how to test your MAAS installation.
 Appendixes cover more esoteric or specialized topics, including how to
 update the fixed-point-release images, how to add support for i386 (32-bit)
-images, how to partially restore MAAS in case of a broken configuration,
-and how to mirror repositories not configured for mirroring by the main
-setup procedure.
+images, and how to mirror repositories not configured for mirroring by the
+main setup procedure.
 
 Figure 1 illustrates the overall configuration that this document will
 help you create. This document describes configuration of the Portable
@@ -99,7 +98,7 @@ hardware:
       computer, but you'll have to pay careful attention to the network and
       disk settings.
 
-*  System Under Test (SUT) that supports one of the power types MAAS
+*  System Under Test (SUT) that provides one of the power types MAAS
    supports:
 
    - American Power Conversion (APC) PDU
@@ -111,12 +110,13 @@ hardware:
    - IPMI
    - Intel AMT
    - Microsoft OCS - Chassis Manager
+   - OpenStack nova
    - SeaMicro 15000
    - Sentry Switch CDU
    - VMWare
    - Virsh (virtual systems)
 
-*  Small gigabit switch (8 ports should be enough)
+*  Gigabit or faster switch (we recommend 8 ports minimum)
 
    -  For laptop with Wi-Fi: one Ethernet cable
 
@@ -129,12 +129,9 @@ hardware:
 *  Monitor, keyboard, and mouse for the MAAS system (a laptop's built-in
    devices should be sufficient)
 
-*  Video cable for NUC (HDMI, Mini DisplayPort, or a converter like a
-   MiniDP to VGA)
-
 *  At least 1 TB of disk space with which to mirror the Ubuntu archives,
-   if desired (an external USB3 hard disk may be used for this, if
-   necessary)
+   if desired. (An external USB3 hard disk may be used for this, if
+   necessary.)
 
 Note that these hardware requirements are geared toward a typical
 testing environment. You may need to expand this list in some cases. For
@@ -148,22 +145,18 @@ Once you've assembled the basic hardware for your portable system, you can
 begin preparing it. The initial steps involve installing Ubuntu and setting
 up its most basic network settings:
 
-1. Install Ubuntu 14.04 (Trusty Tahr) to the portable system
+1. Install Ubuntu 16.04 (Xenial Xerus) to the portable system
 
    -  The Desktop version of Ubuntu is recommended because it enables you
-      to easily access the MAAS Dashboard locally without needing a third
+      to easily access the MAAS web UI locally without needing a third
       system.
 
    -  If you choose to use the Server version, you will probably want to
       install the X server and a desktop environment on top of that as it
       simplifies MAAS access.
 
-   -  This guide assumes the use of Ubuntu 14.04. Although another version
-      may work, some details will differ. Note that Ubuntu 14.04 is the
-      preferred version of Ubuntu on the MAAS server even for pre-release
-      (zero-day) and early post-release testing of Ubuntu 16.04. This
-      preference exists so as to avoid the rapid changes that are likely in
-      the days leading up to 16.04's release.
+   -  This guide assumes the use of Ubuntu 16.04. Although another version
+      may work, some details will differ.
 
 #. Boot the portable computer and log in.
 
@@ -184,8 +177,11 @@ up its most basic network settings:
       ``/etc/network/interfaces`` or by using the Desktop's Network Manager
       tool.
 
-#. Configure your portable computer's *internal* port. This guide assumes
-   use of ``eth0`` and a static IP address of 172.16.0.1/22 on this port.
+#. Configure your portable computer's *internal* port.
+
+   -  This guide assumes use of ``eth0`` and a static IP address of
+      172.16.0.1/22 on this port; however, your actual port name is likely
+      to be ``enp0s1``, ``p4p1``, or something else.
 
    -  If possible, configure the computer's built-in Ethernet port, rather
       than a plug-in dongle, as the internal port.
@@ -242,7 +238,7 @@ up its most basic network settings:
 
 #. If you plan to mirror the Ubuntu archives locally, ensure you have
    enough space in the ``/srv`` directory to hold your mirrors. As a
-   general rule of thumb, you should set aside about 150 GB per release. If
+   general rule of thumb, you should set aside about 150 GiB per release. If
    necessary, mount an extra disk at ``/srv`` to hold your repository
    mirror.
 
@@ -267,6 +263,9 @@ configure MAAS for use in an Ubuntu certification environment.
 Installing MAAS
 ---------------
 
+## Note: In the below, we must use ppa:maas/next for the moment (as of
+## 6/24/2016); I'm assuming this will change before TOO long....
+
 Configuring MAAS is described in generic terms at
 `http://maas.ubuntu.com/docs/install.html <http://maas.ubuntu.com/docs/install.html>`_.
 The more specific procedure for using MAAS in certification testing is:
@@ -276,17 +275,13 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo apt-add-repository ppa:maas/stable
 
-   Currently (March, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
-   This PPA holds version 1.9 of MAAS, which is the recommended version for
-   certification testing. (MAAS 1.8 is also acceptable.) In the
-   long term, MAAS 2.0 and later will be used with Ubuntu 16.04, but as
-   noted earlier, Ubuntu 14.04 is the preferred version leading up to, and
-   slightly past, the release of Ubuntu 16.04.
+   Currently (late August, 2016), Ubuntu 16.04 installs MAAS 2.0 RC 4 by default.
+   This PPA holds the release version of MAAS 2, which is recommended for
+   certification testing.
 
-#. Several scripts and configuration files, some of which are quite
-   lengthy, are available in the ``maas-cert-server`` package in the
-   hardware certification PPA. You can install the scripts and configuration files
-   as follows::
+#. Several scripts and configuration files are available in the
+   ``maas-cert-server`` package in the hardware certification PPA. You can
+   install the scripts and configuration files as follows::
 
       $ sudo apt-add-repository ppa:hardware-certification/public
       $ sudo apt-get update
@@ -301,7 +296,7 @@ The more specific procedure for using MAAS in certification testing is:
    appear outside of that directory tree. (Subsequent steps describe how to
    use these files.)
 
-#. Verify that you've installed MAAS 1.9 from the PPA, rather than
+#. Verify that you've installed MAAS 2.0 from the PPA, rather than
    some other version::
 
       $ dpkg -s maas | grep Version
@@ -318,8 +313,8 @@ The more specific procedure for using MAAS in certification testing is:
      (``eth0`` in this document).
 
    - ``EXTERNAL_NET`` must point to your *external* network device
-     (``eth1`` in this documnt, but this might be ``wlan0`` if you're
-     using a laptop).
+     (``eth1`` in this documnt, but this is likely to be some other value
+     for you).
 
    - Do not adjust other values without consulting with the Server
      Certification Team.
@@ -340,7 +335,7 @@ The more specific procedure for using MAAS in certification testing is:
    target in series until the network test passes or until the list is
    exhausted. This setting can be overridden on SUTs by editing the
    ``/etc/xdg/canonical-certification.conf`` file on the SUT. See
-   `Appendix E: Network Testing Options`_ for more on advanced network
+   `Appendix D: Network Testing Options`_ for more on advanced network
    testing configurations.
 
 Running the Setup Script
@@ -357,7 +352,7 @@ will also ask you a few questions along the way::
     ***************************************************************************
     * Identified networks:
     *   INTERNAL: 172.16.0.1 on eth0
-    *   EXTERNAL: 192.168.25.143 on eth1
+    *   EXTERNAL: 192.168.1.27 on eth1
     *
     * Is this correct (Y/n)?
 
@@ -410,7 +405,7 @@ If your work site has poor Internet connectivity or forbids outgoing
 connections, you must create a local mirror of the Ubuntu archives on your
 MAAS server. These archives will be stored in the ``/srv`` directory, but
 creating them takes a long time because of the amount of data to be
-downloaded -- about 150 GB per release. For comparison, HD video consumes
+downloaded -- about 150 GiB per release. For comparison, HD video consumes
 1-8 GiB per hour -- usually on the low end of that range for video streaming
 services. As should be clear, the result will be significant network demand
 that will degrade a typical residential DSL or cable connection for hours,
@@ -464,7 +459,7 @@ apt-mirror``.
 Note that ``maniacs-setup`` configures the system to mirror AMD64, i386,
 and source repositories because all three are required by the default APT
 configuration. If you want to tweak the mirror configuration, you can do so
-by editing the ``/etc/apt/mirror.list`` file, as described in `Appendix D:
+by editing the ``/etc/apt/mirror.list`` file, as described in `Appendix C:
 Mirroring Additional Repositories`_ -- but do so *after* finishing
 with the ``maniacs-setup`` script, and then type ``sudo apt-mirror`` to
 pull in any new directories you've specified. You can also configure the
@@ -539,7 +534,7 @@ however, you are first asked which series you want to import::
     *
     * Do you want to import point-release images now (Y/n)? y
     *
-    * Do you want to import the 16.04 series (1 image) (Y/n)? y
+    * Do you want to import 16.04 (1 image) (Y/n)? y
     * Do you want to import the 14.04 series (5 images) (Y/n)? y
     * Do you want to import the 12.04 series (6 images) (y/N)? n
 
@@ -547,19 +542,10 @@ Whenever you respond ``Y`` to a question about a particular version or
 series, the script proceeds to download and register the images. (The
 relevant output has been omitted from the preceding example.) If an image
 is already installed, ``maniacs-setup`` skips that image. Certification
-uses only LTS images; however, non-LTS images, such as 15.10, may be made
-available for testing and as a way to "preview" the features of
-future LTS series.
-
-For 16.04 zero-day testing, you should use the 16.04 beta2 image or, once
-it's available (after April 14), the RC release. After the 16.04 GA release
-on April 21, you should delete all beta and RC releases from your MAAS
-server and instead use the GA release. You can install the latest version
-as described shortly.
-
-If you're running MAAS 1.8.2 or later, ``maniacs-setup`` registers the most
-recent point-release image in any series you download as the default OS for
-deployments.
+uses only LTS images; however, non-LTS images, such as 16.10, may be made
+available for testing and as a way to "preview" the features of future LTS
+series. ``maniacs-setup`` registers the most recent point-release image in
+any series you download as the default OS for deployments.
 
 Again, this process can take a while. If you want to skip this step for
 now and return to it, you
@@ -592,7 +578,7 @@ adjusts some other details of which you should be aware:
   Suite whenever they're deployed. This detail increases deployment time
   compared to a generic MAAS installation.
 
-- When using MAAS 1.9, the default storage layout setting is changed from
+- The default storage layout setting is changed from
   "LVM" to "flat." Some certification tests assume a flat layout, which is
   the default (and only) option in MAAS 1.8 and earlier.
 
@@ -600,10 +586,10 @@ Checking the MAAS Configuration
 -------------------------------
 
 At this point, MAAS should be installed and configured; however, it's worth
-verifying the most important options in the MAAS Web UI. You may also want
+verifying the most important options in the MAAS web UI. You may also want
 to modify a few settings. To do so, follow these steps:
 
-#. Verify you can access the MAAS Dashboard:
+#. Verify you can access the MAAS web UI:
 
    -  Launch a browser and point it to \http://172.16.0.1/MAAS (your
       internal port).
@@ -616,18 +602,16 @@ to modify a few settings. To do so, follow these steps:
 
    -  You should see a login prompt.
 
-#. Log in to the Dashboard using your regular username and the password you
+#. Log in to the web UI using your regular username and the password you
    gave to the setup script.
 
 #. Click Images near the top of the MAAS web page. This page will show the
    Ubuntu images that are available on the server. The setup script imports
-   a 14.04 image for AMD64, as well as whatever custom point-release images
+   a 16.04 image for AMD64, as well as whatever custom point-release images
    you specified. You may need to take additional actions in some cases:
 
    - If you see a blue circle next to an image, it did not import
-     correctly. You can also check the Clusters page to verify the status
-     of your image downloads. A successful image import will show Synced
-     under Images.
+     correctly.
 
    - If you need to support an architecture other than AMD64, you must check
      that architecture and click Apply Changes. This process will probably
@@ -636,27 +620,41 @@ to modify a few settings. To do so, follow these steps:
    - If you need to import i386 point-release images, you must import them
      manually, as described in Appendix B.
 
-#. Click the Clusters link near the top of the web page so you can review
+#. Click the Networks link near the top of the web page so you can review
    the DHCP options:
 
-   #.  Click the cluster name for the cluster controller (Cluster Master in
+   #.  Click the subnet range for the *internal* network (172.16.0.0/22 in
        this example):
 
-       .. image:: images/clusters-page.png
+       .. image:: images/network-page.png
           :width: 98%
 
-   #.  Mouse over the *internal* (normally ``eth0``) network
-       interface. (If you don't see your internal interface listed, click
-       the "Add Interface" button to add it.) You should see a pair of
-       icons appear, one to edit the interface and one to delete it. Click
-       the former, then review the following items:
+       Note that this example shows four "fabrics" (network interface
+       devices), two of which are unused and one of which has two IP
+       address ranges. The unused interfaces are unconfigured -- a Wi-Fi
+       interface and an unused Ethernet interface in this example. The
+       interface with two network addresses was configured in this way
+       intentionally and in a manner that's not described in this document.
+       You may encounter other variants, depending on your local
+       hardware and configuration.
 
-       - Be sure that "Interface" is set to your internal port and that
-         "Management" is set to "DHCP and DNS."
+   #.  On the page for your internal network, scroll down about halfway to
+       view the Utilisation and Reserved sections. At this point, no
+       addresses should be assigned by DHCP; however, depending on your
+       network size, it's likely that about 50% of the addresses will be
+       "used" because ``maniacs-setup`` omitted them from the range that
+       MAAS's DHCP server will manage. An example looks like this:
 
-       - Review the various IP addresses and netmasks.
+       .. image:: images/networks-detail-page.png
+          :width: 98%
 
-       - Click "Save Interface" if you made any changes.
+   #.  You can optionally reserve an additional range for static addresses
+       (using the Reserve Range button) or for dynamically-assigned
+       addresses that are *not* MAAS nodes -- perhaps the nodes' BMCs, for
+       example (using the Reserve Dynamic Range button). Note that, if you
+       used a /22 address range, ``maniacs-setup`` leaves the first half of
+       that range out of the MAAS server's DHCP purvue, so you can assign
+       as many static IP addresses as you like within that range.
 
 #. Click Settings near the top of the page to load the MAAS Settings page,
    where you review several miscellaneous MAAS details. If you change any
@@ -682,12 +680,11 @@ To test it, follow these steps:
    - The test computer should PXE-boot from the portable MAAS computer.
 
    - This first boot should be to the enlistment image, which provides
-     some very basic information to the MAAS server. Once the node powers
-     itself off you should see it listed in the MAAS nodes list
-     (\http://localhost/MAAS/#/nodes/) with a Status field of "New."
-
-   - Once the test computer powers off, it should appear in the MAAS
-     server's nodes list, but if it doesn't, try refreshing the page.
+     some very basic information to the MAAS server.
+   
+   - Once the node powers itself off you should see it listed in the MAAS
+     nodes list (\http://localhost/MAAS/#/nodes/) with a Status field of
+     "New." If it doesn't appear, try refreshing the page.
 
 #. Click on the node's hostname to view the node's summary page.
 
@@ -751,11 +748,10 @@ Appendix A: Updating Fixed Point Release Images
 ===============================================
 
 From time to time, Canonical updates the LTS versions of Ubuntu with new
-point releases, such as 14.04.1, 14.04.2, and so on. Because you must run
+point releases, such as 16.04.1, 16.04.2, and so on. Because you must run
 the certification tests on the latest point release, updating your MAAS
 server with the latest point releases will become necessary, sooner or
-later. This task can be accomplished with MAAS 1.7 or later by installing
-custom images.
+later. This task can be accomplished by installing custom images.
 
 The ``maniacs-setup`` script automatically downloads and installs all the
 available point-release images at the time you first run it. After a new
@@ -769,12 +765,7 @@ the new release::
 The script will skip most of the setup steps and proceed to asking you
 which point-release images to download and install. When you select a
 series, only those point-release images that have not yet been installed
-from that series will be downloaded. Note that if you're running
-``maas-cert-server`` version 0.2.9 or earlier, you should update to the
-latest version before updating your point releases. Version 0.2.10
-introduced the ability to dynamically determine what Ubuntu point-release
-images are available for download; earlier versions used a hard-coded list,
-and so will miss updates beyond Ubuntu 14.04.3.
+from that series will be downloaded.
 
 If a particular point release is giving you problems, you can delete it
 using the MAAS web UI and then update your point-release images as just
@@ -826,56 +817,7 @@ need to certify systems using these CPUs.
 
    PageBreak
 
-Appendix C: Performing a Partial Restore
-========================================
-
-If the MAAS server's support files (the PXE boot images and related
-files) become damaged, PXE-booting SUTs may fail. The SUT may fail to
-retrieve PXE boot images or the boot may fail with any number of
-symptoms later in the process. If you're unable to discover a cause and
-solution through less drastic means, one possible recovery procedure is
-to restore those files to a fresh state; however, be aware that this
-procedure will *destroy all existing node definitions.* Thus (and because
-the solution involves downloading new boot images, which can be
-time-consuming), you should attempt this solution only as a last resort.
-Steps 1 and 6-7 of the following procedure are the minimum required;
-steps 2-5 make for a more thorough cleansing of the system. The overall
-procedure is:
-
-#. Click the Clusters link in the MAAS server's web interface (to reach
-   the server's ``/MAAS/clusters/`` page).
-
-#. Click the small trash can icon that appear near the right side of the
-   page associated with your malfunctioning cluster when you mouse over it,
-   and then confirm the operation. This will delete the cluster
-   controller's definition.
-
-#. Delete the contents, including all subdirectories, of the
-   ``/var/lib/maas/boot-resources`` directory on the portable server.
-
-#. In a shell, reconfigure the ``maas-cluster-controller`` and
-   ``maas-region-controller`` packages::
-
-      $ sudo dpkg-reconfigure maas-cluster-controller
-      $ sudo dpkg-reconfigure maas-region-controller
-
-   You should not need to adjust the default values.
-
-5. Reset the cluster controller's DHCP and DNS options.
-
-6. If necessary or desired, adjust the images you want to import.
-
-7. Re-run the ``maniacs-setup`` script with the
-   ``\-\-update-point-releases`` option, as described in Appendix A, to
-   refresh your point-release images.
-
-This procedure should restore your ability to PXE-boot your SUTs.
-
-.. raw:: pdf
-
-   PageBreak
-
-Appendix D: Mirroring Additional Repositories
+Appendix C: Mirroring Additional Repositories
 =============================================
 
 You can mirror repositories or Ubuntu versions beyond those configured by
@@ -964,7 +906,7 @@ arise.
 
    PageBreak
 
-Appendix E: Network Testing Options
+Appendix D: Network Testing Options
 ===================================
 
 A key part of certification is testing your SUT's network cards. This
@@ -1039,10 +981,10 @@ performance of all the tests, causing them all to fail.
 
 If the ``iperf3`` server has multiple interfaces of differing speeds, you
 may find that performance will match the *lowest-speed* interface. This is
-because the Linux kernel provides no means to control which of multiple
-network targets is used for outgoing traffic, so the kernel may use a
-low-speed NIC in preference to a high-speed NIC. Two solutions to this
-problem exist:
+because the Linux kernel arbitrarily decides which NIC to use for handling
+network traffic when multiple NICs are linked to one network segment, so
+the kernel may use a low-speed NIC in preference to a high-speed NIC. Two
+solutions to this problem exist:
 
 * You can disable the lower-speed NIC(s) (permanently or temporarily) and
   rely exclusively on the high-speed NIC(s), at least when performing
@@ -1060,11 +1002,11 @@ interfaces, you can launch ``iperf3`` separately on each NIC, as just
 described; however, you may run into a variant of the problem with NICs of
 differing speed -- the Linux kernel may try to communicate over just one
 NIC, causing a bottleneck and degraded performance for all tests. Using
-multiple network segments may work around this problem, at the cost of
-increased configuration complexity.
+multiple network segments or bonding NICs together may work around this
+problem, at the cost of increased configuration complexity.
 
 If your lab uses separate LANs for different network speeds, you can list
-IP address on separate LANs in ``/etc/maas-cert-server/iperf.conf`` or on
+IP addresses on separate LANs in ``/etc/maas-cert-server/iperf.conf`` or on
 SUTs in ``/etc/xdg/canonical-certification.conf``. The SUT will try each IP
 address in turn until a test passes or until all the addresses are
 exhausted.
@@ -1078,11 +1020,15 @@ suite on Group A. You'll need to adjust the
 ``/etc/xdg/canonical-certification.conf`` file on each SUT to point it to
 its own matched server.
 
+You may find the ``iftop`` utility helpful on the ``iperf3`` server system.
+This tool enables you to monitor network connections, which can help you to
+spot performance problems early.
+
 .. raw:: pdf
 
    PageBreak
 
-Appendix F: Glossary
+Appendix E: Glossary
 ====================
 
 The following definitions apply to terms used in this document.

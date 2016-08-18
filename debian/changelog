@@ -4,8 +4,10 @@ certification-docs (0.1.13-0ppa1) UNRELEASED; urgency=medium
   * Added section to 16.04 STG on deployment problems.
   * Major edit to 16.04 STG to remove redundancies and improve the flow;
     reduced length of PDF version from 38 to 30 pages.
+  * Modified Makefile and MANIACS and renamed files for release of MAAS 2.0
+    and corresponding certification documentation release.
 
- -- Rod Smith <rod.smith@canonical.com>  Wed, 20 Apr 2016 14:49:28 -0400
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 18 Aug 2016 13:49:50 -0400
 
 certification-docs (0.1.12-0ppa1) trusty; urgency=medium
 

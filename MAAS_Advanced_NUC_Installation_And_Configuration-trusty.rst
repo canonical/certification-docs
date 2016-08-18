@@ -1,6 +1,6 @@
-====================================================
- MAAS 2 Advanced NUC Installation and Configuration
-====================================================
+==================================================
+ MAAS Advanced NUC Installation and Configuration
+==================================================
 -----------------------
  (The MANIAC Document)
 -----------------------
@@ -37,16 +37,11 @@ certification testing. Consult the Ubuntu Certified Hardware Self-Testing
 Guide (available from https://certification.canonical.com) for detailed
 information on running the certification tests themselves.
 
-In this document, the MAAS server is referred to generically as a "portable
-computer" because the intent is that the MAAS server (such as an Intel NUC
-or laptop) be portable for field technicians; however, you can deploy a
-desktop computer or server in exactly the same way.
-
 Note that this document is based on using the Ubuntu Desktop image for
 ease of use, and thus some bits, the Network Manager bits especially,
 may not apply if you're using Server without a desktop.
 
-A computer configured
+A device (referred to generically as a "portable computer") configured
 as described here is not intended for general Internet use. Some
 settings relax security in the interest of ease of use, so you should
 limit use of the portable computer on the Internet at large.
@@ -94,7 +89,8 @@ hardware:
 
    -  Ensure that the portable computer has two network interfaces. A
       laptop with both Ethernet and wi-fi should suffice; or you can use a
-      USB network dongle to provide a second interface.
+      USB network dongle to provide a second interface, particularly for a
+      NUC.
 
    -  Because testing sessions can last for hours, ensure that you have a
       power brick; you should *not* run on battery power!
@@ -103,25 +99,18 @@ hardware:
       computer, but you'll have to pay careful attention to the network and
       disk settings.
 
-*  System Under Test (SUT) that provides one of the power types MAAS
+*  System Under Test (SUT) that supports one of the power types MAAS
    supports:
 
-   - American Power Conversion (APC) PDU
-   - Cisco UCS Manager 
-   - Digital Loggers, Inc. PDU
-   - HP Moonshot - iLO Chassis Manager
-   - HP Moonshot - iLO (IPMI)
-   - IBM Hardware Management Console (HMC)
-   - IPMI
-   - Intel AMT
-   - Microsoft OCS - Chassis Manager
-   - OpenStack nova
-   - SeaMicro 15000
-   - Sentry Switch CDU
-   - VMWare
-   - Virsh (virtual systems)
+   -  IPMI
+   -  AMT
+   -  WOL
+   -  Sentry PDU
+   -  SeaMicro 15000
+   -  HP Moonshot
+   -  Cisco UCS manager
 
-*  Gigabit or faster switch (we recommend 8 ports minimum)
+*  Small gigabit switch (8 ports should be enough)
 
    -  For laptop with Wi-Fi: one Ethernet cable
 
@@ -134,7 +123,10 @@ hardware:
 *  Monitor, keyboard, and mouse for the MAAS system (a laptop's built-in
    devices should be sufficient)
 
-*  At least 1 TB of disk space with which to mirror the Ubuntu archives,
+*  Video cable for NUC (HDMI, Mini DisplayPort, or a converter like a
+   MiniDP to VGA)
+
+*  At least 1TB of disk space with which to mirror the Ubuntu archives,
    if desired. (An external USB3 hard disk may be used for this, if
    necessary.)
 
@@ -150,51 +142,35 @@ Once you've assembled the basic hardware for your portable system, you can
 begin preparing it. The initial steps involve installing Ubuntu and setting
 up its most basic network settings:
 
-#. Install Ubuntu 16.04 (Xenial Xerus) to the portable system
+#. Install Ubuntu 14.04 (Trusty Tahr) to the portable system
 
-   -  The Desktop version of Ubuntu is recommended because it enables you
-      to easily access the MAAS web UI locally without needing a third
+   -  The Desktop version of Ubuntu is recommended because it allows you to
+      easily access the MAAS Dashboard locally without needing a third
       system.
 
    -  If you choose to use the Server version, you will probably want to
-      install the X server and a desktop environment on top of that as it
-      simplifies MAAS access.
+      install the desktop on top of that as it simplifies MAAS access.
 
-   -  This guide assumes the use of Ubuntu 16.04. Although another version
-      may work, some details will differ.
+   -  This guide assumes the use of Ubuntu 14.04. Although another version
+      may work, some details will differ. Note that Ubuntu 14.04 is the
+      preferred version of Ubuntu on the MAAS server even for pre-release
+      (zero-day) and early post-release testing of Ubuntu 16.04. This
+      preference exists so as to avoid the rapid changes that are likely in
+      the days leading up to 16.04's release.
 
-#. Boot the portable computer and log in.
+2. Boot the portable computer and log in.
 
-4. Configure your *external* network port:
-
-   -  On a laptop, you can use the Wi-Fi (usually ``wlan0``) port as the
-      external port.
-
-   -  If you need to use both a built-in Ethernet port and an Ethernet
-      dongle, it's best to use the latter as your external port.
-
-   -  In most cases, no explicit configuration of the external port is
-      necessary because the Ubuntu Desktop system will have set it up to
-      use DHCP, which is appropriate. You can adjust it if necessary,
-      though.
-
-   -  You can configure the external network either via
-      ``/etc/network/interfaces`` or by using the Desktop's Network Manager
-      tool.
-
-#. Configure your portable computer's *internal* port.
-
-   -  This guide assumes use of ``eth0`` and a static IP address of
-      172.16.0.1/22 on this port; however, your actual port name is likely
-      to be ``enp0s1``, ``p4p1``, or something else.
+3. Configure your portable computer's ``eth0`` as the *internal* port. This
+   guide assumes a static IP address of 192.168.0.2/16 on this port.
 
    -  If possible, configure the computer's built-in Ethernet port, rather
-      than a plug-in dongle, as the internal port.
+      than a plug-in dongle, as ``eth0``. (You can edit
+      ``/etc/udev/rules.d/70-persistent-net.rules`` to adjust network port
+      identifiers.)
 
-   -  You can either edit ``/etc/network/interfaces`` or use the GUI
-      Network tool in the System Settings panel to configure the internal
-      port. An example ``/etc/network/interfaces`` configuration resembles
-      the following::
+   -  You can either edit ``/etc/network/interfaces`` or use the GUI Network
+      tool in the System Settings panel to configure ``eth0``. An example
+      ``/etc/network/interfaces`` configuration resembles the following::
 
          auto eth0
          iface eth0 inet static
@@ -226,6 +202,31 @@ up its most basic network settings:
       ``sudo ifdown eth0`` or bring it down via your GUI tools before
       bringing it up with its changed configuration.)
 
+4. Configure your *external* network port:
+
+   -  On a laptop, you can use the Wi-Fi (usually ``wlan0``) port as the
+      external port.
+
+   -  In theory, you can configure the external network either via
+      ``/etc/network/interfaces`` or by using the Desktop's Network Manager
+      tool. In practice, the latter sometimes causes problems with name
+      resolution, so if at all possible, you should use
+      ``/etc/network/interfaces`` for this task.
+
+   -  On a NUC or laptop with an Ethernet dongle, set ``eth1`` as the external
+      port.
+
+   -  *This ordering is important,* as you want to make sure that
+      ``resolvconf`` processes the DNS services of the internal network
+      (``eth0``) before the external one (``eth1`` or ``wlan0``). This
+      shows itself in ``/etc/resolv.conf``. ``resolvconf``'s order of
+      processing is in ``/etc/resolvconf/interface-order``.
+
+   -  In most cases, no explicit configuration of the external port is
+      necessary because the Ubuntu Desktop system will have set it up to
+      use DHCP, which is appropriate. You can adjust it if necessary,
+      though.
+
 .. _`Installing and Configuring MAAS`:
 
 Installing and Configuring MAAS
@@ -252,13 +253,17 @@ The more specific procedure for using MAAS in certification testing is:
 
       $ sudo add-apt-repository ppa:maas/stable
 
-   Currently (June, 2016), Ubuntu 16.04 installs MAAS 2.0 beta 3 by default.
-   This PPA holds a non-beta version of MAAS, which is recommended for
-   certification testing.
+   Currently (February, 2016), Ubuntu 14.04 installs MAAS 1.7 by default.
+   This PPA holds version 1.9 of MAAS, which is the recommended version for
+   certification testing. (MAAS 1.7 and 1.8 are also acceptable.) In the
+   long term, MAAS 1.10 and later will be used with Ubuntu 16.04, but as
+   noted earlier, Ubuntu 14.04 is the preferred version leading up to, and
+   slightly past, the release of Ubuntu 16.04.
 
-#. Several scripts and configuration files are available in the
-   ``maas-cert-server`` package in the hardware certification PPA. You can
-   install the scripts and configuration files as follows::
+#. Several scripts and configuration files, some of which are quite
+   lengthy, are available in the ``maas-cert-server`` package in the
+   hardware certification PPA. You can install the scripts and configuration files
+   as follows::
 
       $ sudo apt-add-repository ppa:hardware-certification/public
       $ sudo apt-get update
@@ -273,7 +278,7 @@ The more specific procedure for using MAAS in certification testing is:
    appear outside of that directory tree. (Subsequent steps describe how to
    use these files.)
 
-#. Verify that you've installed MAAS 2.0 from the PPA, rather than
+#. Verify that you've installed MAAS 1.9 from the PPA, rather than
    some other version::
 
       $ dpkg -s maas | grep Version
@@ -292,16 +297,16 @@ The more specific procedure for using MAAS in certification testing is:
    qualified domain name." You can safely ignore this message, both here
    and in the next step.
 
-#. Reconfigure the rack controller with the URL for MAAS::
+#. Reconfigure the cluster controller with the URL for MAAS::
 
-      $ sudo dpkg-reconfigure maas-rack-controller
+      $ sudo dpkg-reconfigure maas-cluster-controller
 
-   Give it the URL (in the prompt) with the IP of ``eth0``, with
-   ``:5240/MAAS`` appended -- (e.g. \http://192.168.0.2:5240/MAAS).
+   Give it the URL (in the prompt) with the IP of ``eth0`` -- (e.g.
+   \http://192.168.0.2/MAAS).
 
 #. Create the MAAS superuser::
 
-      $ sudo maas-region createsuperuser
+      $ sudo maas-region-admin createsuperuser
 
    You can use any name you like for the superuser. Your login name is
    likely to be easy to remember.
@@ -414,11 +419,9 @@ mirror for these purposes, follow these steps:
      file; it should be in the ``/usr/share/maas-cert-server/etc/apt/``
      directory.
 
-   - This example file pulls down source, AMD64, and i386 architectures for
-     both 12.04 (Precise) and 14.04 (Trusty). The total disk space (and
-     network bandwidth consumed) is on the order of 300GiB. You should
-     probably modify it to retrieve 16.04 (Xenial) instead of 12.04
-     (Precise).
+   - This example file pulls down source, AMD64, and i386 architectures
+     for both 12.04 (Precise) and 14.04 (Trusty). The total disk space
+     (and network bandwidth consumed) is on the order of 300GiB.
 
    - For comparison, HD video consumes 1-8 GiB per hour -- usually on the
      low end of that range for video streaming services. As should be
@@ -556,7 +559,7 @@ With MAAS installed and (if desired) the Ubuntu archives mirrored, you can
 proceed with further MAAS configuration via its web-based user interface.
 To do so, follow these steps:
 
-#. Verify you can access the MAAS web UI:
+#. Verify you can access the MAAS Dashboard:
 
    -  Launch a browser and point it to \http://192.168.0.2/MAAS (your
       internal port).
@@ -569,7 +572,7 @@ To do so, follow these steps:
 
    -  You should see a login prompt.
 
-#. Log in to the web UI using the username and password you added
+#. Log in to the Dashboard using the username and password you added
    above for the superuser.
 
 #. Click on the down arrow next to the user name in the top right
@@ -595,10 +598,10 @@ To do so, follow these steps:
 #. Click Images near the top of the MAAS web page. This will bring you
    to a page in which you can select the architectures and Ubuntu
    versions to support. For certification, you should import a minimum
-   of Ubuntu 16.04 LTS for AMD64; however, you may want to add 14.04
+   of Ubuntu 14.04 LTS for AMD64; however, you may want to add 12.04
    LTS and i386 or other CPU types, depending on your anticipated
    needs. (Note that custom point-release images are imported later, but
-   you must import at least one image for each CPU architecture here.)
+   you must import at least one image for each CPU architecture hereJ.)
 
 #. In the Images page, select the images you want MAAS to support and
    then click Import Images. A spinner will appear as the download
@@ -847,7 +850,7 @@ accomplished with MAAS 1.7 by installing custom images:
    -  ``<API_URL>`` refers to a URL on the MAAS server, as in
       \http://192.168.0.2/MAAS/api/1.0.
 
-   -  ``<KEY>`` is a key displayed in the web UI
+   -  ``<KEY>`` is a key displayed in the Dashboard
       (\http://localhost/MAAS/account/prefs/) in the MAAS Keys section or
       can be obtained by typing ``sudo maas-region-admin apikey
       \-\-username {user}`` in a shell (substitute your MAAS username for
