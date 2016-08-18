@@ -1,4 +1,4 @@
-certification-docs (0.1.13-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.13-0ppa1) trusty; urgency=medium
 
   * Modified MANIACS to reflect 16.04 0-day vs. 16.04 GA changes.
   * Added section to 16.04 STG on deployment problems.
@@ -7,7 +7,7 @@ certification-docs (0.1.13-0ppa1) UNRELEASED; urgency=medium
   * Modified Makefile and MANIACS and renamed files for release of MAAS 2.0
     and corresponding certification documentation release.
 
- -- Rod Smith <rod.smith@canonical.com>  Thu, 18 Aug 2016 13:49:50 -0400
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 18 Aug 2016 15:10:00 -0400
 
 certification-docs (0.1.12-0ppa1) trusty; urgency=medium
 
