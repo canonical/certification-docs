@@ -44,7 +44,7 @@ desktop computer or server in exactly the same way.
 
 Note that this document is based on using the Ubuntu Desktop image for
 ease of use, and thus some bits, the Network Manager bits especially,
-may not apply if you're using Server without a desktop.
+may not apply if you're using Server without a desktop environment.
 
 A computer configured
 as described here is not intended for general Internet use. Some
@@ -103,8 +103,8 @@ hardware:
       computer, but you'll have to pay careful attention to the network and
       disk settings.
 
-*  System Under Test (SUT) that provides one of the power types MAAS
-   supports:
+*  System Under Test (SUT) that provides one of the power control types
+   MAAS supports:
 
    - American Power Conversion (APC) PDU
    - Cisco UCS Manager 
@@ -128,6 +128,9 @@ hardware:
    -  For NUC or laptop with dongle: two Ethernet cables
 
    -  For each SUT: one Ethernet cable for each NIC port including the BMC
+
+   -  Please see the Self-Test Guide for further information on network
+      requirements for certification testing.
 
 *  Monitor and keyboard for SUT (helpful, but not strictly required)
 
@@ -161,7 +164,8 @@ up its most basic network settings:
       simplifies MAAS access.
 
    -  This guide assumes the use of Ubuntu 16.04. Although another version
-      may work, some details will differ.
+      may work, some details will differ. Older versions of Ubuntu use
+      MAAS 1.9, which is different from MAAS 2.0 described here.
 
 #. Boot the portable computer and log in.
 

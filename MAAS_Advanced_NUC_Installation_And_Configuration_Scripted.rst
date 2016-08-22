@@ -98,8 +98,8 @@ hardware:
       computer, but you'll have to pay careful attention to the network and
       disk settings.
 
-*  System Under Test (SUT) that provides one of the power types MAAS
-   supports:
+*  System Under Test (SUT) that provides one of the power control types
+   MAAS supports:
 
    - American Power Conversion (APC) PDU
    - Cisco UCS Manager 
@@ -123,6 +123,9 @@ hardware:
    -  For NUC or laptop with dongle: two Ethernet cables
 
    -  For each SUT: one Ethernet cable for each NIC port including the BMC
+
+   -  Please see the Self-Test Guide for further information on network
+      requirements for certification testing.
 
 *  Monitor and keyboard for SUT (helpful, but not strictly required)
 
@@ -156,7 +159,8 @@ up its most basic network settings:
       simplifies MAAS access.
 
    -  This guide assumes the use of Ubuntu 16.04. Although another version
-      may work, some details will differ.
+      may work, some details will differ. Older versions of Ubuntu use
+      MAAS 1.9, which is different from MAAS 2.0 described here.
 
 #. Boot the portable computer and log in.
 
@@ -313,7 +317,7 @@ The more specific procedure for using MAAS in certification testing is:
      (``eth0`` in this document).
 
    - ``EXTERNAL_NET`` must point to your *external* network device
-     (``eth1`` in this documnt, but this is likely to be some other value
+     (``eth1`` in this document, but this is likely to be some other value
      for you).
 
    - Do not adjust other values without consulting with the Server
@@ -486,7 +490,7 @@ cloud image later by launching ``maniacs-setup`` with the
     *
     * To defer this task, respond 'N' to the following question.
     *
-    * Do you want to copy a cloud image for the vitualization tests (Y/n)?
+    * Do you want to copy a cloud image for the virtualization tests (Y/n)?
 
 You can customize the site that MAAS tells nodes to use for their
 repositories. If you mirrored a repository, the script points nodes to

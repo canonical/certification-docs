@@ -601,7 +601,7 @@ To do so, follow these steps:
    of Ubuntu 14.04 LTS for AMD64; however, you may want to add 12.04
    LTS and i386 or other CPU types, depending on your anticipated
    needs. (Note that custom point-release images are imported later, but
-   you must import at least one image for each CPU architecture hereJ.)
+   you must import at least one image for each CPU architecture here.)
 
 #. In the Images page, select the images you want MAAS to support and
    then click Import Images. A spinner will appear as the download
