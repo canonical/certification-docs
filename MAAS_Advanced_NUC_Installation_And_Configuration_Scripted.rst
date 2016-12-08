@@ -104,6 +104,7 @@ hardware:
    - American Power Conversion (APC) PDU
    - Cisco UCS Manager 
    - Digital Loggers, Inc. PDU
+   - Facebook's Wedge
    - HP Moonshot - iLO Chassis Manager
    - HP Moonshot - iLO (IPMI)
    - IBM Hardware Management Console (HMC)
@@ -160,7 +161,7 @@ up its most basic network settings:
 
    -  This guide assumes the use of Ubuntu 16.04. Although another version
       may work, some details will differ. Older versions of Ubuntu use
-      MAAS 1.9, which is different from MAAS 2.0 described here.
+      MAAS 1.9, which is different from MAAS 2.1 described here.
 
 #. Boot the portable computer and log in.
 
@@ -267,21 +268,18 @@ configure MAAS for use in an Ubuntu certification environment.
 Installing MAAS
 ---------------
 
-## Note: In the below, we must use ppa:maas/next for the moment (as of
-## 6/24/2016); I'm assuming this will change before TOO long....
-
 Configuring MAAS is described in generic terms at
 `http://maas.ubuntu.com/docs/install.html <http://maas.ubuntu.com/docs/install.html>`_.
 The more specific procedure for using MAAS in certification testing is:
 
-#. Install the MAAS stable PPA
-   (`https://launchpad.net/~maas/+archive/ubuntu/stable <https://launchpad.net/~maas/+archive/ubuntu/stable>`_)::
-
-      $ sudo apt-add-repository ppa:maas/stable
-
-   Currently (late August, 2016), Ubuntu 16.04 installs MAAS 2.0 RC 4 by default.
-   This PPA holds the release version of MAAS 2, which is recommended for
-   certification testing.
+.. #. Install the MAAS stable PPA
+..    (`https://launchpad.net/~maas/+archive/ubuntu/stable <https://launchpad.net/~maas/+archive/ubuntu/stable>`_)::
+.. 
+..       $ sudo apt-add-repository ppa:maas/stable
+.. 
+..    Currently (late August, 2016), Ubuntu 16.04 installs MAAS 2.0 RC 4 by default.
+..    This PPA holds the release version of MAAS 2, which is recommended for
+..    certification testing.
 
 #. Several scripts and configuration files are available in the
    ``maas-cert-server`` package in the hardware certification PPA. You can
@@ -300,8 +298,8 @@ The more specific procedure for using MAAS in certification testing is:
    appear outside of that directory tree. (Subsequent steps describe how to
    use these files.)
 
-#. Verify that you've installed MAAS 2.0 from the PPA, rather than
-   some other version::
+#. Verify that you've installed MAAS 2.1.2 or later, rather than some
+   earlier version::
 
       $ dpkg -s maas | grep Version
 
@@ -484,13 +482,35 @@ cloud image later by launching ``maniacs-setup`` with the
 ::
 
     ***************************************************************************
-    * An Ubuntu cloud image is required for virtualization tests. Having such an
-    * image on your MAAS server can be convenient, but downloading it can take
-    * a while (it's about 250MiB).
+    * An Ubuntu cloud image is required for virtualization tests. Having such
+    * an image on your MAAS server can be convenient, but downloading it can
+    * take a while (each image is about 250MiB). This process will import cloud
+    * images for whatever releases and architectures you specify.
     *
     * To defer this task, respond 'N' to the following question.
     *
-    * Do you want to copy a cloud image for the virtualization tests (Y/n)?
+    * Do you want to set up a local cloud image mirror for the virtualization
+    * tests (Y/n)?
+
+If you respond ``Y`` to this question, the script proceeds to ask you what
+Ubuntu versions and architectures to download::
+
+    * Cloud Mirror does not exist. Creating.
+    * Do you want to get images for precise release (y/N)? n
+    * Do you want to get images for trusty release (y/N)? n
+    * Do you want to get images for xenial release (Y/N)? y
+    * Do you want to get images for yakkety release (y/N)? n
+    * Do you want to get images for zesty release (y/N)? n
+    *
+    * Do you want to get images for amd64 architecture (Y/n)? y
+    * Do you want to get images for i386 architecture (y/N)? n
+    * Do you want to get images for arm64 architecture (y/N)? n
+    * Do you want to get images for armhf architecture (y/N)? n
+    * Do you want to get images for ppc64el architecture (y/N)? n
+    * Do you want to get images for s390x architecture (y/N)? n
+    * Downloading cloud images. This may take some tiime.
+    *
+    * Downloading image for xenial on amd64....
 
 You can customize the site that MAAS tells nodes to use for their
 repositories. If you mirrored a repository, the script points nodes to
@@ -538,8 +558,8 @@ however, you are first asked which series you want to import::
     *
     * Do you want to import point-release images now (Y/n)? y
     *
-    * Do you want to import 16.04 (1 image) (Y/n)? y
-    * Do you want to import the 14.04 series (5 images) (Y/n)? y
+    * Do you want to import the 16.04 series (2 images) (Y/n)? y
+    * Do you want to import the 14.04 series (6 images) (Y/n)? y
     * Do you want to import the 12.04 series (6 images) (y/N)? n
 
 Whenever you respond ``Y`` to a question about a particular version or
@@ -609,6 +629,19 @@ to modify a few settings. To do so, follow these steps:
 #. Log in to the web UI using your regular username and the password you
    gave to the setup script.
 
+#. Once you log in, MAAS presents an overview screen (accessible later
+   at ``http://localhost/MAAS/#/intro``, or equivalent on the appropriate
+   address).
+
+   #. Review these settings for sanity. Some show options that were
+      set earlier in this process. Most others should be self-explanatory.
+
+   #. When you're done, click Continue at the bottom of the page.
+
+   #. MAAS should display a screen entitled "MAAS Has Been Successfully
+      Set Up." Click Go to Dashboard on this screen after you've finished
+      reading it.
+
 #. Click Images near the top of the MAAS web page. This page will show the
    Ubuntu images that are available on the server. The setup script imports
    a 16.04 image for AMD64, as well as whatever custom point-release images
@@ -624,23 +657,18 @@ to modify a few settings. To do so, follow these steps:
    - If you need to import i386 point-release images, you must import them
      manually, as described in Appendix B.
 
-#. Click the Networks link near the top of the web page so you can review
+#. Click the Subnets link near the top of the web page so you can review
    the DHCP options:
 
-   #.  Click the subnet range for the *internal* network (172.16.0.0/22 in
+   #.  Click the subnet range for the *internal* network (172.24.124.0/22 in
        this example):
 
-       .. image:: images/network-page.png
+       .. image:: images/subnets-page.png
           :width: 98%
 
-       Note that this example shows four "fabrics" (network interface
-       devices), two of which are unused and one of which has two IP
-       address ranges. The unused interfaces are unconfigured -- a Wi-Fi
-       interface and an unused Ethernet interface in this example. The
-       interface with two network addresses was configured in this way
-       intentionally and in a manner that's not described in this document.
-       You may encounter other variants, depending on your local
-       hardware and configuration.
+       Your network, of course, may be different from this example,
+       particularly if you have unused network devices, which will show up
+       as additional "fabrics."
 
    #.  On the page for your internal network, scroll down about halfway to
        view the Utilisation and Reserved sections. At this point, no

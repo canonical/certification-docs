@@ -109,6 +109,7 @@ hardware:
    - American Power Conversion (APC) PDU
    - Cisco UCS Manager 
    - Digital Loggers, Inc. PDU
+   - Facebook's Wedge
    - HP Moonshot - iLO Chassis Manager
    - HP Moonshot - iLO (IPMI)
    - IBM Hardware Management Console (HMC)
