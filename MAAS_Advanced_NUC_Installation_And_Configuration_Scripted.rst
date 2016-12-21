@@ -642,6 +642,12 @@ to modify a few settings. To do so, follow these steps:
       Set Up." Click Go to Dashboard on this screen after you've finished
       reading it.
 
+#. On the Dashboard page (aka Getting Started), you may optionally want to
+   disable the Device Discovery feature. In theory, this feature should
+   passively detect devices and should cause no problems. In practice, it
+   may detect devices on your external network interface that shouldn't
+   interact with MAAS.
+
 #. Click Images near the top of the MAAS web page. This page will show the
    Ubuntu images that are available on the server. The setup script imports
    a 16.04 image for AMD64, as well as whatever custom point-release images
