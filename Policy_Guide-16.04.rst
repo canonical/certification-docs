@@ -658,8 +658,11 @@ Guide.
 Requesting Certificates
 -----------------------
 As of February, 2016, any system proposed for certification must also have a
-matching `Server Certification Intake
-Form <https://certification.canonical.com/server-intake/>`_ completed and submitted.
+matching Server Certification Intake Form completed and submitted.  This form is
+available at 
+
+        https://certification.canonical.com/server-intake
+
 Certificates will not be reviewed until this step is complete.
 
 Certificates should only need to be requested *one* time per System per Release.  
