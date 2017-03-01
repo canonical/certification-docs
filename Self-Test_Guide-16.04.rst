@@ -335,6 +335,14 @@ up the SUT and test environment:
    -  On x86-64 systems, if the UEFI supports it, the SUT must be
       configured to boot with Secure Boot active.
 
+-  The SUT Firmware should have verifiable identifiers in DMI Types 1, 2 and/or
+   3 that match the information entered in the hardware entry on C3.
+   -  For ODMs this means Make and Model data must be accurate in DMI Types 1
+     and 2.
+   -  For OEMs where Make and Model may not be determined yet, some other
+      identifier must exist in DMI Types 1, 2 and/or 3 that matches data
+      provided in the Hardware Entry on C3
+
 -  Storage should be properly configured.
 
    -  Some BIOS-only computers may have problems booting from disks over

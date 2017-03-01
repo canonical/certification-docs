@@ -53,6 +53,11 @@ Certification
 Greylist Test
     Tests or areas that are tested but do not block Certification if they fail.
 
+IHV
+    Independent Hardware Vendor, or the entity that builds components and
+    accessories meant to be used as part of a broader whole system (e.g.
+    network or storage device manufacturers.)
+
 Make
     The OEM/ODM/IHV that makes the device or system (e.g. HP, Dell, Broadcom,
     Intel)
@@ -60,6 +65,15 @@ Make
 Model
     The Model of the hardware being tested, the Family.  For example, DL385.
     This is the superset of a "Model" that includes all the variants of that model.
+
+ODM
+    Original Design Manufacturer, or the entity that designs and produces and
+    retails the hardware.
+
+OEM
+    Original Equipment Manufacturer, or the entity that designs and produces
+    the hardware with the intention that the hardware will be re-branded and
+    sold by a third party
 
 Partner
     The OEM, ODM, IHV or System Builder who has joined the Programme and
@@ -514,6 +528,20 @@ Firmware should be available somewhere online and not a secret build that is
 only available internally to the Partner or Canonical.  The only exception here
 is for initial release firmware that comes on a newly released system.
 
+System Identification
+---------------------
+Data in firmware must contain valid and correct identifiers for the make/model
+being tested. Typically this information is contained in DMI Types 1, 2 and 3.
+
+If the system is sold by a Partner ODM, then the DMI data must include the
+correct Make and Model for the SUT.
+
+If the system is sold by a Partner OEM and intended for resale by a different
+brand or under a different mark, then DMI must include SOME sort of verifiable
+identifier that shows the SUT is, in fact, the model being tested.  This
+distinction is allowed as in many cases, OEM systems may not have the
+Make/Model fields filled out.
+
 Installation
 ------------
 Installation must be performed by Canonical's MAAS (Metal-As-A-Service).  MAAS
@@ -576,6 +604,8 @@ supported speed for the device.  Thus, a 10 Gb NIC must be connected to a
 10 Gb LAN and the ``iperf3`` target must also have a 10 Gb NIC connected to
 the same LAN. A 1 Gb NIC may be connected to either a 1 Gb or 10 Gb LAN.
 
+All onboard network devices and ports MUST be tested.
+
 Bugs
 ----
 It is not normal to encounter significant bugs during certification, or at
@@ -627,6 +657,11 @@ Guide.
 
 Requesting Certificates
 -----------------------
+As of February, 2016, any system proposed for certification must also have a
+matching `Server Certification Intake
+Form <https://certification.canonical.com/server-intake/>`_ completed and submitted.
+Certificates will not be reviewed until this step is complete.
+
 Certificates should only need to be requested *one* time per System per Release.  
 
 If re-tests are needed to satisfy testing requirements, do *not* create separate
