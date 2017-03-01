@@ -137,6 +137,16 @@ Hardware Requirements
 -  All firmware (BIOS/UEFI, NIC, storage controller, etc) should be
    shipping level, *not* development level.
 
+-  The SUT Firmware should have verifiable identifiers in DMI Types 1, 2 and/or
+   3 that match the information entered in the hardware entry on C3.
+
+   -  For ODMs this means Make and Model data must be accurate in DMI Types 1
+      and 2.
+   
+   -  For OEMs where Make and Model may not be determined yet, some other
+      identifier must exist in DMI Types 1, 2 and/or 3 that matches data
+      provided in the Hardware Entry on C3
+
 -  A monitor and keyboard for the SUT are helpful because they will
    enable you to monitor its activities. If necessary, however,
    certification can be done without these items.
