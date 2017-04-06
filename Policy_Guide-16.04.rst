@@ -107,8 +107,8 @@ Services Provided
 The Server Hardware Certification team provides the following services to our
 customers
 
-Certification Services
-----------------------
+Certification Testing
+---------------------
 
 In-House
 ''''''''
@@ -127,7 +127,7 @@ other means.  This service is not common and requires the OEM to perform a good
 bit of lab setup prior to our accessing the network and performing tests.
 
 Certification Review
-''''''''''''''''''''
+--------------------
 We will review submissions from our partners from Self-Testing efforts.  We
 will work with the partner to ensure all coverage areas are tested and all
 whitelist tests are passed.
@@ -144,7 +144,7 @@ reserve the certificate until such time as the SUT has been made GA and the
 Partner has notified us that it's OK to publish the certificate.
 
 Test Tool Development
-'''''''''''''''''''''
+---------------------
 We will develop and maintain the Suite for all testing situations.
 We will make available the Suite in a publicly facing repository along with any
 necessary dependency packages.
@@ -404,6 +404,20 @@ the goal of introducing significant load to the system.  It is the
 responsibility of the Partner to properly benchmark their own hardware with
 Ubuntu installed.
 
+Third Party Testing
+-------------------
+Third Party Testing means testing hardware on behalf of another company. This
+happens when an OEM produces a system that is sold to a reseller who re-brands
+the hardware and sells at retail under the reseller's name and marketing model.
+
+Third Party Testing for Certification is ONLY allowed on a case-by-case basis
+and must be agreed upon by Canonical, the OEM who will be doing the testing and
+the Reseller (who may also be an OEM) who will be selling the hardware at
+retail.
+
+Any system tested in this manner MUST be readily identifiable as being the
+Reseller's system.  See `System Identification`_ for more information
+
 Public Web Site
 ---------------
 All published Certificates are accessible via our public certification website
@@ -541,6 +555,16 @@ brand or under a different mark, then DMI must include SOME sort of verifiable
 identifier that shows the SUT is, in fact, the model being tested.  This
 distinction is allowed as in many cases, OEM systems may not have the
 Make/Model fields filled out.
+
+In cases where one OEM/ODM is performing testing on behalf of another OEM/ODM
+who resells hardware from the primary OEM/ODM, that hardware MUST be
+identifiable in firmware as belonging to the reseller OEM/ODM.
+
+*Example: If Vendor A is testing hardware on behalf of Vendor B, the firmware must
+clearly show that the hardware is a model produced by Vendor B.  Typically, this
+requres that DMI Type 1 (System) shows Vendor B as the Manufacturer and uses the Vendor B
+Marketing Model for the Product field.  In these cases, DMI Types 2 and 3 can
+indicate Vendor A as the manufacturer.*
 
 Installation
 ------------
