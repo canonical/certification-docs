@@ -126,6 +126,19 @@ appear later in this document.
 Hardware Requirements
 ---------------------
 
+-  All hardware must be GA or shipping level hardware. Development level
+   is not acceptable for certification purposes.
+
+   -  This can be excepted on a case-by-case basis for pre-release systems
+     where the Partner and Canonical have arranged certification to be
+     published coinciding with a SUT's release announcement.
+
+-  All firmware (BIOS/UEFI, NIC, storage controller, etc) should be
+   shipping level, *not* development level.
+
+   -  The one exception to this rule is for using unsigned versions of firmware
+      that allow for flashing the firmware level up and down as needed.
+
 -  SUTs must contain at least 4GiB of RAM and one hard disk, but using
    the maximum amount of RAM and the maximum number of disks is
    preferable. Likewise, if configurable, using the maximum number of
@@ -133,9 +146,6 @@ Hardware Requirements
 
 -  CPUs should support virtualization (VMX/SVM), when supported by CPU
    architecture.
-
--  All firmware (BIOS/UEFI, NIC, storage controller, etc) should be
-   shipping level, *not* development level.
 
 -  The SUT Firmware should have verifiable identifiers in DMI Types 1, 2 and/or
    3 that match the information entered in the hardware entry on C3.

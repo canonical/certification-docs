@@ -301,6 +301,13 @@ up the SUT and test environment:
      disk controller and a separate RAID controller), we strongly recommend
      that disk devices be connected to all controllers during testing.
 
+-  All hardware, including CPUs, must be production level hardware. Development
+   level hardware is not eligible for certification.
+
+   -  This can be excepted on a case by case basis for pre-release systems
+      where the Partner and Canonical have arranged certification to be
+      published coinciding with a SUT's release announcement.
+
 -  If possible, as many processors as the SUT will support should be
    installed.
 
@@ -320,9 +327,17 @@ up the SUT and test environment:
 -  Virtualization (VMX/SVM) should be enabled in the BIOS/UEFI, when
    supported by the CPU's architecture.
 
--  The SUT should be running a release level (*not* development level)
-   BIOS/UEFI configured using factory default settings, with the following
-   exceptions:
+-  The SUT should be running release or GA level (*not* development level)
+   firmware. Development level firmware is generally not elligible for
+   certification.
+
+   -  The one exception to this rule is that you may use unsigned GA equivalent
+      firmware if such allows you to flash the system up and down rev as
+      needed. However, the test results must show the version to be equal to
+      the publicly available version.
+
+-  BIOS/UEFI should be configured using factory default settings, with the
+   following exceptions:
 
    -  If the hardware virtualization options in the BIOS/UEFI are not
       enabled, enable them, save the settings and allow the SUT to reboot.

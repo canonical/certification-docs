@@ -499,7 +499,7 @@ Depending on the activity, the following should apply as far as time estimates:
 * Hardware enablement or bug fixing has no set timeframe due to the nature
   of those issues.  Bugs will be resolved as quickly as we can; however,
   due to the variations in severity, complexity, and impact on other
-  releases and systems, the actual time to fix and SRU a bug  fix can vary
+  releases and systems, the actual time to fix and SRU a bug fix can vary
   from a few days to several weeks.  Additionally, hardware enablement
   requires hardware access in our labs and may take several weeks to
   develop, push into MAAS and then find its way into a MAAS update.
@@ -528,19 +528,32 @@ Certification requires MAAS to be used to deploy all test systems.
 
 Hardware
 --------
-Hardware to be Certified should be GA level hardware, *not* development level
-hardware, SDV, BBVT, FVT or any other non-ready-for-production level.  The
-hardware should be the same hardware that customers are able to purchase.
+Servers to be Certified should be GA level samples, *not* development level,
+SDV, BBVT, FVT or any other non-ready-for-production level.  The hardware
+should be the same hardware that customers are able to purchase.
+
+The one exception to this is for pre-release systems where the Partner and
+Canonical have agreed to certification and co-marketing to ensure a SUT
+certification coincides with the SUT's release announcement. This exception is
+granted on a case by case basis.
+
+CPUs
+''''
+CPUs must be production level chips.  This means that ES and QS level chips do
+not qualify for certification.  All CPUs must be GA level chips at test time.
+Pre-testing can be conducted on pre-GA CPUs, but the final, official
+certificatiuon test run must be performed using GA CPUs.
 
 Firmware
---------
+''''''''
 Firmware should be GA or similar level.  In all cases, firmware should be GA
 level, with the only exception being the need to use unsigned versions in order
 to maintain the ability to flash revisions up or down as needed.  
 
-Firmware should be available somewhere online and not a secret build that is
-only available internally to the Partner or Canonical.  The only exception here
-is for initial release firmware that comes on a newly released system.
+Firmware should be available somewhere online and accessible to users and not
+a secret location that is only available internally to the Partner or Canonical.
+The only exception here is for initial release firmware that comes on a newly
+released system and may not be downloadable directly.
 
 System Identification
 ---------------------
