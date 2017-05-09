@@ -130,8 +130,8 @@ Hardware Requirements
    is not acceptable for certification purposes.
 
    -  This can be excepted on a case-by-case basis for pre-release systems
-     where the Partner and Canonical have arranged certification to be
-     published coinciding with a SUT's release announcement.
+      where the Partner and Canonical have arranged certification to be
+      published coinciding with a SUT's release announcement.
 
 -  All firmware (BIOS/UEFI, NIC, storage controller, etc) should be
    shipping level, *not* development level.

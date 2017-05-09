@@ -328,7 +328,7 @@ up the SUT and test environment:
    supported by the CPU's architecture.
 
 -  The SUT should be running release or GA level (*not* development level)
-   firmware. Development level firmware is generally not elligible for
+   firmware. Development level firmware is generally not eligible for
    certification.
 
    -  The one exception to this rule is that you may use unsigned GA equivalent
