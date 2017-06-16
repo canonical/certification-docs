@@ -1,3 +1,16 @@
+certification-docs (0.1.16-0ppa1) UNRELEASED; urgency=medium
+
+  * Updated MANIAC/MANIACS and STG for MAAS 2.2 and recent
+    maniacs-setup changes
+  * Updated MANIAC/MANIACS and STG to emphasize use of standard
+    MAAS images rather than custom images
+  * Updated STG for recent small changes to c-c-s UI
+  * Updated STG to reflect changes to precheck script and automatic
+    configuration, which make it less likely that manual configuration
+    will be necessary
+
+ -- Rod Smith <rod.smith@ubuntu.com>  Wed, 14 Jun 2017 10:52:54 -0400
+
 certification-docs (0.1.15-0ppa1) UNRELEASED; urgency=medium
 
   * Add policy about DMI data matching C3 entry to Policy and STG guides 

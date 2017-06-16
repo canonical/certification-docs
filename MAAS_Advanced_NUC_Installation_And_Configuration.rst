@@ -116,7 +116,8 @@ hardware:
    - IPMI
    - Intel AMT
    - Microsoft OCS - Chassis Manager
-   - OpenStack nova
+   - OpenStack Nova
+   - Rack Scale Design
    - SeaMicro 15000
    - Sentry Switch CDU
    - VMWare
@@ -164,9 +165,9 @@ up its most basic network settings:
       install the X server and a desktop environment on top of that as it
       simplifies MAAS access.
 
-   -  This guide assumes the use of Ubuntu 16.04. Although another version
-      may work, some details will differ. Older versions of Ubuntu use
-      MAAS 1.9, which is different from MAAS 2.0 described here.
+   -  This guide assumes the use of Ubuntu 16.04 and MAAS 2.2. Although
+      other versions of Ubuntu and MAAS may work, some details will differ.
+      Note that MAAS 2.0 or later is required for certification.
 
 #. Boot the portable computer and log in.
 

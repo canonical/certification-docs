@@ -155,7 +155,7 @@ Creating a Hardware Entry on C3
 ===============================
 
 You can run certification tests without submitting them to C3; however, if
-you want to publicly certify the system publicly, you need a C3 account. *If
+you want to certify the system publicly, you need a C3 account. *If
 you do not have an account for your company on the private certification
 web site, or if you do not have access to your company's account, please
 contact your Technical Partner Manager, who will work with the Server
@@ -301,7 +301,7 @@ up the SUT and test environment:
      disk controller and a separate RAID controller), we strongly recommend
      that disk devices be connected to all controllers during testing.
 
--  All hardware, including CPUs, must be production level hardware. Development
+-  All hardware, including CPUs, must be production level. Development
    level hardware is not eligible for certification.
 
    -  This can be excepted on a case by case basis for pre-release systems
@@ -450,8 +450,7 @@ that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced NUC Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 2.0, which is required beginning in the
-fall of 2016.
+This document describes use of MAAS 2.2.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:
@@ -482,7 +481,7 @@ install Ubuntu on the SUT as follows:
       Canonical Server Certification Team.
 
 #. Commission the node by clicking Take Action followed by Commission
-   and then Go.
+   and then Commission Machine.
 
    -  If the SUT has a BMC, the computer should power up, pass more
       information about itself to the MAAS server, and then power down
@@ -493,6 +492,28 @@ install Ubuntu on the SUT as follows:
       pass more information about itself to the MAAS server, and then power
       down again.
 
+#. Check and, if necessary, adjust the following node details:
+
+   - On the Interfaces tab, ensure that all the node's interfaces are
+     active. (By default, MAAS activates only the first network interface
+     on most computers.) If an interface is identified as *Unconfigured,*
+     click the three horizontal bars in the Actions column, select Edit
+     Interface, and set IP Mode to Auto Assign, DHCP, or Static Assign.
+     (The first two cause MAAS to assign an IP address to the node itself,
+     either by maintaining its own list of static IP addresses or by using
+     DHCP. The Static Assign option requires you to set the IP address
+     yourself. These three options are described in more detail in the
+     MANIACS document, available from https://certification.canonical.com.)
+
+   - On the Storage tab, look under Available Disks and Partitions for
+     disks that have not been configured. If any are availble, scroll your
+     mouse over to the right of the row to activate a set of pop-up
+     options. Select the Partition option. You can then set a Filesystem
+     (specify ext4fs) and Mount Point (something under ``/mnt`` usually
+     works well, such as ``/mnt/sdb`` for the ``/dev/sdb`` disk). Click Add
+     Partition when you've set these options. Repeat this step for any
+     additional disks.
+
 #. On the MAAS server, verify that the SUT's Status is listed as Ready
    in the node list or on the node's details page. You may need to
    refresh the page to see the status update.
@@ -500,23 +521,42 @@ install Ubuntu on the SUT as follows:
 #. Click Take Action followed by Deploy. Options to select the OS version
    to deploy should appear.
 
-#. Select the Ubuntu release you want to deploy. Normally, you'll pick a
-   point release that you installed as described in the MANIACS document.
-   This image will appear as an OS type of "Custom" and a description that
-   specifies the point-release version. The normal procedure is to test
-   with 16.04 GA and the latest point release. `Appendix C - Testing Point
-   Releases`_, elaborates on this policy. Note that you should *not* deploy
-   the standard MAAS images on x86 or x86-64 SUITs; you *must* use the
-   custom point-release images.
+#. Select the Ubuntu release you want to deploy. There are two ways to do
+   this:
 
-#. Click Go to begin deployment.
+   - Normally, you'll pick the "Ubuntu" image you want to test (such as
+     "Ubuntu 16.04 LTS 'Xenial Xerus'") and either a GA or HWE kernel. (*Do
+     not* pick a low-latency kernel.) The GA kernel is from the series that
+     was used when the LTS release was first made, such as a 4.4.0-series
+     kernel for Ubuntu 16.04; and the HWE kernel is the latest kernel
+     available for that version, such as a 4.8.0-series kernel for Ubuntu
+     16.04.2. If you use this method, you will normally test with the GA
+     kernel and follow up with the HWE kernel.
+
+   - Alternatively, you can pick a custom certification point release image
+     that you installed as described in the MANIACS document. This image
+     will appear as an OS type of "Custom" and a description that specifies
+     the point-release version. These versions correspond to each
+     point-release version, such as 16.04 GA, 16.04.1, 16.04.2, and so on,
+     each of which uses its own kernel. Note that this deployment method
+     causes the network and disk configuration options described earlier to
+     be ignored; the SUT will use DHCP on all network interfaces and you'll
+     have to prepare additional disks manually after deployment. If you use
+     this method of deployment, you will normally begin with the 16.04 GA
+     image and follow up with the latest point-release image. This method
+     of testing is now deprecated.
+
+   `Appendix C - Testing Point Releases`_, elaborates on the procedures for
+   testing different kernels and point releases.
+
+#. Click Deploy Machine to begin deployment.
 
    -  If the SUT has a BMC, it should power up and install Ubuntu. This
       process can take several minutes.
 
    -  If the SUT does not have a BMC, you should power it on manually after
-      clicking Go. The SUT should then boot and install Ubuntu. This
-      process can take several minutes.
+      clicking Deploy Machine. The SUT should then boot and install Ubuntu.
+      This process can take several minutes.
 
 If MAAS has problems in any of the preceding steps, you should first check
 `Appendix D - Troubleshooting`_ for suggestions. If that doesn't help,
@@ -559,26 +599,28 @@ access the SUT:
    Certification Team will make the determination of what updates should be
    applied.
 
--  You should verify your SUT's version by typing ``lsb_release -a``. The
-   result includes both the main release version (such as 16.04) and the
-   point release version (such as 16.04.1, on the *Description* line). You
-   can also check your kernel version by typing ``uname -r``. The kernel
-   version changes with the Ubuntu release.
+-  You should verify your SUT's kernel version by typing ``uname -r``.
+   Ubuntu 16.04 GA ships with a 4.4.0-series kernel, while 16.04.2 uses a
+   4.8.0-series kernel. Note that, although updated kernels ship with most
+   point-release versions, if you use the standard MAAS images,
+   ``lsb_release -a`` will show that you have the latest point-release
+   version even if you're using the GA kernel. It's the kernel version
+   that's important for testing purposes, as elaborated on in `Appendix C -
+   Testing Point Releases`_.
 
--  By default, MAAS provides a DHCP server, and the SUT should use it to
-   obtain an IP address. If necessary for your environment, you may
-   manually change these settings on the SUT to use a static IP address.
+-  If any network interfaces are not configured, you should configure them
+   in ``/etc/network/interfaces`` and activate them with ``ifup``.
+
+-  If the SUT has more than one HDD, all but the first disk must be
+   partitioned and mounted prior to testing. Partitions on those
+   additional HDDs should preferably be a single partition that spans the
+   entire disk and that uses the ext4 filesystem.
 
 -  A MAAS installation configured for certification testing should
    provision the SUT with the Server Test Suite and related packages. If
    you're using a more "generic" MAAS setup, you'll have to install the
    certification software yourself, as described in `Appendix A -
    Installing the Server Test Suite Manually`_.
-
--  If the SUT has more than one HDD, all but the first disk must be
-   manually partitioned and mounted prior to testing. Partitions on those
-   additional HDDs should preferably be a single partition that spans the
-   entire disk and that uses the ext4 filesystem.
 
 Running the Certification Tests
 ===============================
@@ -602,38 +644,6 @@ You can initiate a testing session in a server as follows:
    must remain inserted *throughout the test run*, because the media tests
    will be kicked off partway through the run.
 
-#. If the system doesn't have Internet access, or if that access is slow:
-
-   #. On a computer with better Internet access, download a cloud image
-      from:
-      http://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-i386-disk1.img
-
-   #. Copy that image to any convenient directory on the SUT.
-
-   #. Supply the full path under the section labeled "environment" in
-      ``/etc/xdg/canonical-certification.conf``. For example::
-
-        [environment]
-        KVM_TIMEOUT = 300
-        KVM_IMAGE = /home/ubuntu/xenial-server-cloudimg-i386-disk1.img
-
-#. If necessary, edit the ``/etc/xdg/canonical-certification.conf`` file on
-   the SUT so as to specify your ``iperf3`` server(s). For example::
-
-    TEST_TARGET_IPERF = 192.168.0.2,172.24.124.7
-
-   If you configured your MAAS server as described in the MANIACS document,
-   the ``TEST_TARGET_IPERF`` line should already be set appropriately. If
-   your environment includes multiple ``iperf3`` servers, you can identify
-   them all, separated by commas. The test suite will attempt to use each
-   server in sequence until one results in a passed test or until a timeout
-   period of one hour has passed. You can use this feature if your
-   environment includes separate networks with different speeds or simply
-   to identify all of your ``iperf3`` servers. (Note that ``iperf3``
-   refuses a connection if a test is ongoing, so you can list multiple
-   ``iperf3`` servers and let the test suite try them all until it finds a
-   free one.)
-
 #. You should double-check that the server's configuration is correct by
    running the ``canonical-certification-precheck`` script, which tests
    critical configuration details:
@@ -655,28 +665,77 @@ You can initiate a testing session in a server as follows:
      passed results, yellow for warnings, and red for problems that should
      be corrected. In the preceding output, the Installed RAM value was
      displayed in yellow because the system's RAM is a bit shy of 4 GiB;
-     and the ``iperf`` line is in red because the script detected no
-     ``iperf3`` server. If your terminal supports the feature, you can
-     scroll up to see details of any warnings or failures.
-
-   - If the precheck script detects improperly configured network ports,
-     you must correct the problem before testing. You must ensure that all
-     network ports are cabled to a working LAN and configured in
-     ``/etc/network/interfaces`` using the appropriate configuration
-     (static or DHCP) for your test environment. If you edit this file,
-     either reboot or bring up the interfaces you add with ``ifup`` before
-     running tests.
+     the ``iperf`` line is in red because the script detected no ``iperf3``
+     server; and the ``USB_Disks`` line is red because no USB flash drive
+     was inserted in the SUT. If your terminal supports the feature, you
+     can scroll up to see details of any warnings or failures.
 
    - If the script identifies any other problems, be sure to correct them.
+     Some common sources of problems include the following:
 
-#. Verify that all your disks are mounted. Type ``df -h`` to view the
-   mounted disks, and compare the output to the disk devices available to
-   you, as shown by ``ls /dev/sd*``. (Some exotic disk devices may appear
-   under other device names, such as ``/dev/nvme*``.) If ``ls /dev/sd*``
-   shows a disk with no mounted partitions, you should partition the disk
-   (one big disk-spanning partition is best), create an ext4 filesystem on
-   it, and mount it (subdirectories of ``/mnt`` work well). Repeat this
-   process for each unmounted disk.
+     - If the precheck script fails the ``NICs_enabled`` test, you must
+       correct the problem before testing. You must ensure that all network
+       ports are cabled to a working LAN and configured in
+       ``/etc/network/interfaces`` using the appropriate configuration
+       (static or DHCP) for your test environment. If you edit this file,
+       either reboot or bring up the interfaces you add with ``ifup``
+       before running tests.
+
+     - If your ``IPERF`` test failed, you may need to launch the ``iperf3``
+       server on the Target system, as described earlier. Your
+       configuration may need updating in addition to or instead of this
+       change, though. To do so, edit the
+       ``/etc/xdg/canonical-certification.conf`` file on the SUT so as to
+       specify your ``iperf3`` server(s). For example::
+
+         TEST_TARGET_IPERF = 192.168.0.2,172.24.124.7
+
+       If your environment includes multiple ``iperf3`` servers, you can
+       identify them all, separated by commas. The test suite will attempt
+       to use each server in sequence until one results in a passed test or
+       until a timeout period of one hour has passed. You can use this
+       feature if your environment includes separate networks with
+       different speeds or simply to identify all of your ``iperf3``
+       servers. (Note that ``iperf3`` refuses a connection if a test is
+       ongoing, so you can list multiple ``iperf3`` servers and let the
+       test suite try them all until it finds a free one.)
+
+     - If the ``Hard_Disks`` or ``USB_Disks`` options failed, you may need
+       to attend to them. USB flash drives need only be prepared with FAT
+       filesystems and inserted into the SUT, as described earlier. Most
+       disks have device filenames of ``/dev/sda``, ``/dev/sdb``, and so
+       on; but some exotic disk devices may appear under other device
+       names, such as ``/dev/nvme*``. If ``ls /dev/sd*`` shows a disk with
+       no partitions, you should partition the disk (one big disk-spanning
+       partition is best), create an ext4 filesystem on it, and mount it
+       (subdirectories of ``/mnt`` work well). Repeat this process for each
+       unmounted disk.
+
+     - If the ``KVM_Image_Check`` or ``LXD_Image_Check`` tests failed, or
+       if your Internet access is slow, you should download the relevant
+       virtualization images on the SUT:
+
+       #. On a computer with better Internet access, download KVM and LXD
+          cloud image files from
+          http://cloud-images.ubuntu.com/xenial/current/. In particular,
+          obtain the ``xenial-server-cloudimg-amd64-disk1.img``,
+          ``xenial-server-cloudimg-amd64-root.tar.xz``, and
+          ``xenial-server-cloudimg-amd64-lxd.tar.xz`` files, or the
+          equivalent for your CPU architecture.
+
+       #. Copy those images to any convenient directory on the SUT.
+
+       #. Supply the full paths under the section labeled "environment" in
+          ``/etc/xdg/canonical-certification.conf``. For example::
+
+            [environment]
+            KVM_TIMEOUT = 300
+            KVM_IMAGE = /home/ubuntu/xenial-server-cloudimg-amd64-disk1.img
+            LXD_ROOTFS = /home/ubuntu/xenial-server-cloudimg-amd64-root.tar.xz
+            LXD_TEMPLATE = /home/ubuntu/xenial-server-cloudimg-amd64-lxd.tar.xz
+
+          Note that the KVM and LXD configurations are separated by
+          several lines of comments in the configuration file.
 
 #. If you're running the test via SSH, type ``screen`` on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go
@@ -700,13 +759,13 @@ You can initiate a testing session in a server as follows:
             tests to run
       :width: 100%
 
-#. Select the *16.04 server certification full* item and deselect the other
-   items. (These other test plans exist to enable easy re-running of subsets of
+#. Select the *16.04 server certification full* item by using the arrow
+   keys and then pressing Spacebar. (The other test
+   plans exist to enable easy re-running of subsets of
    tests that often fail in some environments or to run tests on Ubuntu
    14.04.)
 
-#. Use the arrow keys to highlight the *<OK>* option and then press
-   Enter.
+#. Press Enter to move on to the test selection screen.
 
 #. After a few seconds, a test selection screen will appear, as shown
    below. You should ordinarily leave all the tests selected. (Tests that
@@ -794,10 +853,7 @@ Manually Uploading Test Results to the Certification Site
 
 If you can't upload test results to the certification site from the
 certification program itself, you must do so manually, perhaps from
-another computer. To upload the results, you should have the Server Test
-Suite and ``canonical-certification-submit`` installed on the system from
-which you plan to submit results. The Server Test Suite is part of the
-default install on all Ubuntu Desktop systems. At this time, there is no
+another computer that runs Ubuntu. At this time, there is no
 mechanism for submitting results from an OS other than Ubuntu.
 
 To add the Hardware Certification PPA, install
@@ -895,7 +951,7 @@ problems, you can request a certificate:
       This option is available only to Canonical engineers.
 
    -  Create Note or Create Note from Template to create a note. Most
-      systems will have at least three notes:
+      systems will have at least two notes:
 
       -  *A note titled "Tester" with the name of the person who did the
          testing is required.*
@@ -1021,19 +1077,25 @@ Certification Team can advise you about such requirements.
 Appendix C - Testing Point Releases
 ===================================
 
-Ordinarily, 16.04 certification requires testing two releases:
+Ordinarily, 16.04 certification requires testing Ubuntu releases or Linux
+kernels:
 
 -  Ubuntu 16.04 GA -- That is, the version that was released in April of
-   2016.
+   2016. This version shipped with a 4.4.0-series kernel.
 
--  The current point release -- That is, version 16.04.2 or whatever is
-   the latest release in the 16.04 series.
+-  The current point release -- That is, version 16.04.2 or whatever is the
+   latest release in the 16.04 series. Ubuntu LTS releases starting with
+   the .2 version (such as 16.04.2) update the kernel to the same series as
+   the most-recently released non-LTS Ubuntu version. For instance, 16.04.2
+   uses the same kernel series as Ubuntu 16.10 -- that is, the 4.8.0 kernel
+   series.
 
 In theory, compatibility will only improve with time, so a server might
-fail testing with 16.04 GA because it uses new hardware that had not
+fail testing with 16.04 GA and its 4.4.0 kernel because it uses new
+hardware that had not
 been supported in April of 2016, but pass with the latest version. Such
 a server would be certified for that latest version, but not for the
-original GA release. If such a situation arises, testing should also be
+original GA release. If such a situation arises, testing may also be
 done with intervening releases so as to determine the earliest working
 version of Ubuntu.
 
@@ -1044,14 +1106,11 @@ request. Please notify your TPM about such problems to facilitate their
 resolution.
 
 Because Ubuntu 16.04.1 uses the same 4.4.0 kernel series as 16.04 GA,
-testing 16.04.1 is required only if 16.04 GA fails. (Although 16.04 GA
-and 16.04.1 use the same kernel series, 16.04.1 ships with a later
-kernel within that series, so it might fix a bug that blocks 16.04 GA
-certification.)
+testing 16.04.1 is not required.
 
-If the procedure for installing point releases, as described in
-the MANIACS document (available from https://certification.canonical.com),
-fails, then you should consult the Server Certification Team.
+If you have problems controlling the SUT's kernel version or installing
+particular point releases, then you should consult the Server Certification
+Team.
 
 .. raw:: pdf
 
@@ -1064,11 +1123,12 @@ Fixing Deployment Problems
 --------------------------
 
 Sometimes a node fails to deploy. When this happens, check the installation
-output on the node's MAAS page. (Scroll down to "Machine output" and click
-the radio button to the right; "Installation Output" should be one of the
-options.) Often, a clue to the nature of the problm appears near the end of
-that output. If you don't spot anything obvious, copy that output into a
-file and send it to the Server Certification Team.
+output on the node's MAAS page. (With MAAS 2.1, scroll down to "Machine
+output" and click the radio button to the right; "Installation Output"
+should be one of the options. With MAAS 2.2, click the "Installation" tab
+to see the installation output.) Often, a clue to the nature of the problm
+appears near the end of that output. If you don't spot anything obvious,
+copy that output into a file and send it to the Server Certification Team.
 
 One common cause of deployment problems is IP address assignment issues. To
 minimize the risk of such problems, set the node's network settings to use

@@ -111,7 +111,8 @@ hardware:
    - IPMI
    - Intel AMT
    - Microsoft OCS - Chassis Manager
-   - OpenStack nova
+   - OpenStack Nova
+   - Rack Scale Design
    - SeaMicro 15000
    - Sentry Switch CDU
    - VMWare
@@ -159,9 +160,9 @@ up its most basic network settings:
       install the X server and a desktop environment on top of that as it
       simplifies MAAS access.
 
-   -  This guide assumes the use of Ubuntu 16.04. Although another version
-      may work, some details will differ. Older versions of Ubuntu use
-      MAAS 1.9, which is different from MAAS 2.1 described here.
+   -  This guide assumes the use of Ubuntu 16.04 and MAAS 2.2. Although
+      other versions of Ubuntu and MAAS may work, some details will differ.
+      Note that MAAS 2.0 or later is required for certification.
 
 #. Boot the portable computer and log in.
 
@@ -203,10 +204,11 @@ up its most basic network settings:
              netmask 255.255.252.0
 
    -  If necessary or desired, you may use a different IP address on the
-      *internal* port. If your portable computer will move from one
-      *external* network to another, be sure to consider all its likely
-      *external* addresses when deciding on its *internal* address and
-      netmask.
+      *internal* port. (Be sure to use an address within the MAAS server's
+      reserved range, as described shortly!) If your portable computer will
+      move from one *external* network to another, be sure to consider all
+      its likely *external* addresses when deciding on its *internal*
+      address and netmask.
 
    -  Avoid the 10.0.3.0/24 address range, because Ubuntu 16.04 server uses
       this address range for its LXC container tool.
@@ -218,21 +220,8 @@ up its most basic network settings:
    -  If you have issues installing packages, check ``route -n`` and make
       sure you don't have a gateway route to the private LAN.
 
-   -  Using a /22 or wider network is advisable for the internal network.
-      When so configured, the setup script will use the final two of the
-      four resulting octet ranges (for instance, 172.16.2.x and 172.16.3.x
-      from 172.16.0.0/22) for DHCP addresses, leaving the first two ranges
-      (for instance, 172.16.0.x and 172.16.1.x) for static addresses -- for
-      instance, for the MAAS server itself, as well as anything else you
-      want to assign a static IP address (perhaps your BMCs).
-
-   -  If you use a /22 or wider network, the MAAS server's address can be
-      anything within the first two ranges (for instance, 172.16.0.x or
-      172.16.1.x), which are not handled by the computer's own DHCP server.
-      If you use a /23 or /24 network, the MAAS server must be within the
-      first nine addresses of that range (for instance, 172.16.0.1 through
-      172.16.0.9), since the rest of the range is assigned by MAAS's DHCP
-      server.
+   -  Using a /22 or wider network is advisable for the internal network,
+      for reasons described in `Appendix E: MAAS Network Ranges`_.
 
    -  Once you've finished configuring this network port, be sure to
       activate it. If you configured it by editing
@@ -440,8 +429,9 @@ mirror::
 
     * Do you want to mirror precise (Y/n)? n
     * Do you want to mirror trusty (Y/n)? y
-    * Do you want to mirror wily (Y/N)? n
-    * Do you want to mirror xenial (Y/N)? y
+    * Do you want to mirror xenial (Y/n)? y
+    * Do you want to mirror yakkety (Y/n)? n
+    * Do you want to mirror zesty (Y/n)? y
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -469,15 +459,14 @@ computer to use its own local mirror, if you like::
 
     * Adjust this computer to use the local mirror (Y/n)? y
 
-The script then gives you the option to retrieve an image used for
+The script then gives you the option to retrieve a images used for
 virtualization testing. If your site has good Internet connectivity, you
-may not need this image; but it's not a bad idea to have it on hand
-just in case. Note that the script skips this prompt if it detects an image
-already exists in ``/srv``. Although downloading the cloud image isn't
-nearly as time-consuming as mirroring the archives, it can take long
-enough that you may want to defer this action. You can download the
-cloud image later by launching ``maniacs-setup`` with the
-``\-\-download-virtualization-image`` (or ``-d``) option.
+may not need these images; but it's not a bad idea to have them on hand
+just in case. Although downloading the cloud images isn't nearly as
+time-consuming as mirroring the archives, it can take long enough that you
+may want to defer this action. You can download the cloud images later by
+launching ``maniacs-setup`` with the ``\-\-download-virtualization-image``
+(or ``-d``) option.
 
 ::
 
@@ -496,11 +485,11 @@ If you respond ``Y`` to this question, the script proceeds to ask you what
 Ubuntu versions and architectures to download::
 
     * Cloud Mirror does not exist. Creating.
-    * Do you want to get images for precise release (y/N)? n
     * Do you want to get images for trusty release (y/N)? n
-    * Do you want to get images for xenial release (Y/N)? y
+    * Do you want to get images for xenial release (Y/n)? y
     * Do you want to get images for yakkety release (y/N)? n
-    * Do you want to get images for zesty release (y/N)? n
+    * Do you want to get images for zesty release (y/N)? y
+    * Do you want to get images for artful release (y/N)? n
     *
     * Do you want to get images for amd64 architecture (Y/n)? y
     * Do you want to get images for i386 architecture (y/N)? n
@@ -548,9 +537,10 @@ in MAAS, but the script doesn't move on. If this happens, you can kill the
 script and, if desired, re-launch it with the ``\-\-update-point-releases``
 (or ``-u``) option to finish the installation.
 
-When MAAS has finished importing boot resources, the
-script helps you import the point-release images used for certification;
-however, you are first asked which series you want to import::
+Certification may be done using either the default MAAS images or custom
+point-release images. In the past, the latter method was preferred; but the
+default MAAS images are now the preferred method. If you want to have the
+custom images available, ``maniacs-setup`` will help you import them::
 
     ***************************************************************************
     * Ubuntu hardware certification is done using point-release images. These
@@ -558,15 +548,16 @@ however, you are first asked which series you want to import::
     *
     * Do you want to import point-release images now (Y/n)? y
     *
-    * Do you want to import the 16.04 series (2 images) (Y/n)? y
+    * Do you want to import 17.04 (1 image) (y/N)? y
+    * Do you want to import 16.10 (1 image) (y/N)? n
+    * Do you want to import the 16.04 series (3 images) (Y/n)? y
     * Do you want to import the 14.04 series (6 images) (Y/n)? y
-    * Do you want to import the 12.04 series (6 images) (y/N)? n
 
 Whenever you respond ``Y`` to a question about a particular version or
 series, the script proceeds to download and register the images. (The
 relevant output has been omitted from the preceding example.) If an image
 is already installed, ``maniacs-setup`` skips that image. Certification
-uses only LTS images; however, non-LTS images, such as 16.10, may be made
+uses only LTS images; however, non-LTS images, such as 17.04, may be made
 available for testing and as a way to "preview" the features of future LTS
 series. ``maniacs-setup`` registers the most recent point-release image in
 any series you download as the default OS for deployments.
@@ -635,12 +626,17 @@ to modify a few settings. To do so, follow these steps:
 
    #. Review these settings for sanity. Some show options that were
       set earlier in this process. Most others should be self-explanatory.
+      The standard MAAS images are among the items shown. If you want to
+      certify systems using these images rather than the custom images, be
+      sure the Ubuntu versions and architectures you need are checked, and
+      click Save Selection to import anything you need.
 
    #. When you're done, click Continue at the bottom of the page.
 
-   #. MAAS should display a screen entitled "MAAS Has Been Successfully
-      Set Up." Click Go to Dashboard on this screen after you've finished
-      reading it.
+   #. The next page shows SSH keys. You can add more keys, taken from
+      Github, Launchpad, or copied-and-pasted from your local computer.
+      When you're done adding SSH keys, click Go to Dashboard at the bottom
+      of the page.
 
 #. On the Dashboard page (aka Getting Started), you may optionally want to
    disable the Device Discovery feature. In theory, this feature should
@@ -654,7 +650,7 @@ to modify a few settings. To do so, follow these steps:
    you specified. You may need to take additional actions in some cases:
 
    - If you see a blue circle next to an image, it did not import
-     correctly.
+     correctly, or it is still importing.
 
    - If you need to support an architecture other than AMD64, you must check
      that architecture and click Apply Changes. This process will probably
@@ -677,22 +673,32 @@ to modify a few settings. To do so, follow these steps:
        as additional "fabrics."
 
    #.  On the page for your internal network, scroll down about halfway to
-       view the Utilisation and Reserved sections. At this point, no
-       addresses should be assigned by DHCP; however, depending on your
-       network size, it's likely that about 50% of the addresses will be
-       "used" because ``maniacs-setup`` omitted them from the range that
-       MAAS's DHCP server will manage. An example looks like this:
+       view the Utilisation and Reserved sections. At this point, about
+       half the addresses will be classified as "used" because
+       ``maniacs-setup`` set them aside as reserved or as managed by DHCP.
+       The "available" addresses are those that do not belong to either of
+       these categories; MAAS assigns them to nodes that are deployed using
+       its standard settings. (See `Appendix E: MAAS Network Ranges`_ for
+       details of how MAAS manages its network addresses.)
 
        .. image:: images/networks-detail-page.png
           :width: 98%
 
-   #.  You can optionally reserve an additional range for static addresses
-       (using the Reserve Range button) or for dynamically-assigned
-       addresses that are *not* MAAS nodes -- perhaps the nodes' BMCs, for
-       example (using the Reserve Dynamic Range button). Note that, if you
-       used a /22 address range, ``maniacs-setup`` leaves the first half of
-       that range out of the MAAS server's DHCP purvue, so you can assign
-       as many static IP addresses as you like within that range.
+   #.  If the various ranges (reserved, dynamic, or the implicit available
+       addresses) are not appropriate, you can edit them as follows:
+
+       #. Click the three horizontal lines on the right side of the screen
+          in the row for the range you want to delete or modify.
+
+       #. If you want to completely delete the range, click Remove in the
+          resulting pop-up menu; otherwise, click Edit.
+
+       #. If you click Edit, you can change the start and end addresses,
+          then click Save to save your changes.
+
+   #.  You can optionally reserve additional ranges for machines not
+       managed by MAAS (using the Reserve Range button) or for DHCP
+       addresses (using the Reserve Dynamic Range button).
 
 #. Click Settings near the top of the page to load the MAAS Settings page,
    where you review several miscellaneous MAAS details. If you change any
@@ -734,10 +740,11 @@ To test it, follow these steps:
 #. If necessary, click "Edit" in the Machine Summary section to change the
    architecture of the machine. Click "Save Changes" when you're done.
 
-#. If necessary, change the Power Type in the Power section of the page.
-   This may necessitate setting an IP address, MAC address, password, or
-   other information, depending on the power control technology in use.
-   Click "Save Changes" when you're done.
+#. If necessary, click Power to open the Power tab to change the Power
+   Type. (You must click Edit to make any actual changes.) This may
+   necessitate setting an IP address, MAC address, password, or other
+   information, depending on the power control technology in use. Click
+   "Save Changes" when you're done.
 
 #. Click "Take Action" near the top-right corner of the page, followed by
    "Commission Node" from the resulting drop-down menu. You must then click
@@ -1066,7 +1073,50 @@ spot performance problems early.
 
    PageBreak
 
-Appendix E: Glossary
+Appendix E: MAAS Network Ranges
+===============================
+
+As noted earlier, in `Installing and Configuring Ubuntu`_, a /22 or wider
+network on the internal port is desirable, because this provides more
+addresses that are assigned more flexibly than with smaller networks.
+Specifically, MAAS splits the internal network into three parts:
+
+- A reserved space, from which you can assign addresses manually. The MAAS
+  server itself should be in this space. You might also use this space for
+  other permanent infrastructure on the network, such as switches or other
+  necessary servers. If you assign static IP addresses to your BMCs, their
+  addresses would either come out of this space or be on another network
+  block entirely.
+
+- A DHCP space, which MAAS manages so that it can temporarily address
+  servers when enlisting and commissioning them, as explained later.
+  Depending on your needs, your BMCs and even deployed nodes may be
+  assigned via DHCP, too.
+
+- A range of addresses that MAAS assigns to servers once they've been
+  deployed in the default manner. (You can reconfigure nodes to use
+  DHCP once deployed, if you prefer.)
+
+The following table shows how the `maniacs-setup` script described in this
+document splits up a /22, a /23, and a /24 network, starting with
+172.16.0.1, between these three purposes. You can adjust the ranges after
+they've been set up by using the MAAS web UI, should the need arise. If you
+use a network block starting at something other than 172.16.0.1, the exact
+IP addresses shown in the table will be adjusted appropriately.
+
+======================  =========================  ==========================  ===========================
+*Purpose*               */22 network*              */23 network*               */24 network*
+======================  =========================  ==========================  ===========================
+Reserved                172.16.0.1 - 172.16.0.255  172.16.0.1 - 172.16.0.50    172.16.0.1 - 172.16.0.9
+DHCP                    172.16.1.0 - 172.16.1.255  172.16.0.51 - 172.16.0.255  172.16.0.10 - 172.16.0.127
+Assigned Automatically  172.16.2.0 - 172.16.3.254  172.16.1.0 - 172.16.1.254   172.16.0.128 - 172.16.0.254
+======================  =========================  ==========================  ===========================
+
+.. raw:: pdf
+
+   PageBreak
+
+Appendix F: Glossary
 ====================
 
 The following definitions apply to terms used in this document.
