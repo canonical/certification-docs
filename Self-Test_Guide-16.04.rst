@@ -155,7 +155,7 @@ Creating a Hardware Entry on C3
 ===============================
 
 You can run certification tests without submitting them to C3; however, if
-you want to certify the system publicly, you need a C3 account. *If
+you want to certify the system, you need a C3 account. *If
 you do not have an account for your company on the private certification
 web site, or if you do not have access to your company's account, please
 contact your Technical Partner Manager, who will work with the Server
