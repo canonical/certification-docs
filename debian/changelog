@@ -1,4 +1,4 @@
-certification-docs (0.1.16-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.16-0ppa1) xenial; urgency=medium
 
   * Updated MANIAC/MANIACS and STG for MAAS 2.2 and recent
     maniacs-setup changes
@@ -9,7 +9,7 @@ certification-docs (0.1.16-0ppa1) UNRELEASED; urgency=medium
     configuration, which make it less likely that manual configuration
     will be necessary
 
- -- Rod Smith <rod.smith@ubuntu.com>  Wed, 14 Jun 2017 10:52:54 -0400
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 21 Jun 2017 13:46:53 -0400
 
 certification-docs (0.1.15-0ppa1) UNRELEASED; urgency=medium
 
