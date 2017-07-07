@@ -1231,3 +1231,144 @@ tracebacks you notice to a text file and save that along with the
 previously-noted directories. (Feel free to send us a photo of the
 screen taken with a digital camera.)
 
+.. raw:: pdf
+
+   PageBreak
+
+Appendix E - Using SoL
+======================
+
+Many servers support *serial-over-LAN (SoL).* When configured in this way,
+the server mirrors its console output to a serial port device, which in
+turn is intercepted by the BMC and made accessible to you. Using SoL may be
+helpful when a server fails to enlist, commission, or deploy; or sometimes
+even if works correctly but you need to adjust its firmware settings
+remotely or obtain a record of early boot messages.
+
+The details of SoL configuration vary from one server to another. Broadly
+speaking, you must do three things:
+
+1. Identify (and possibly set) console redirection options in the
+   firmware. If the computer ships with SoL options active by default, this
+   may not be necessary except in service of the next step.
+
+2. Set kernel options to redirect kernel output to the correct serial
+   device. This step is required only if you need to access Linux kernel
+   messages or the login console remotely.
+
+3. Access the server from another computer by using ``ipmitool`` or a
+   similar utility.
+
+Setting Firmware Options
+------------------------
+
+Console access settings are typically set in the firmware setup utility,
+often under a menu option called "Advanced" and a sub-option called
+"Console Redirection" or "Remote Access." You must typically specify the
+serial port device, which is usually described in DOS form, such as
+``COM1`` or later, as well as serial port settings such as bit rate
+(115,200, 57,600, or similar), flow control, and a terminal type. You can
+set these options to whatever you like, but you must remember what the
+settings are, at least if you want to use SoL once the Linux kernel has
+gained control of the computer, because you must replicate these settings
+to use SoL after the kernel has taken over.
+
+Setting Kernel Options
+----------------------
+
+If you want to use SoL with the Linux kernel, you must replicate the
+settings you discovered or set in the firmware as options passed to the
+Linux kernel by the boot loader. The options will look something like
+this::
+
+  console=tty1 console=ttyS2,115200n8
+
+The first ``console=`` option tells the computer to continue using its main
+screen (``tty1``); the second one tells it to use a serial port device
+(``ttyS2`` in this example), as well, and specifies the speed and other
+serial port options.  Note that the firmware's ``COM1`` equates to
+``ttys0`` in Ubuntu, ``COM2`` becomes ``ttyS1``, and so on. Thus, this
+example tells the kernel to use what the firmware calls ``COM3``, at
+115,200 bps, no parity, and 8 bits.
+
+Once you know what kernel parameters you need to provide, there are three
+ways to pass them to the kernel:
+
+* **Setting post-deployment kernel options** -- If Ubuntu is already
+  installed, you can modify GRUB to pass the relevant options to the node
+  in question. You can do this as follows:
+
+  1. Open ``/etc/default/grub`` on the node in a text editor.
+
+  2. Set the ``GRUB_CMDLINE_LINUX_DEFAULT`` and ``GRUB_CMDLINE_LINUX``
+     lines to resemble the following, making changes as described earlier::
+
+       GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS2,115200n8"
+       GRUB_CMDLINE_LINUX="console=tty1 console=ttyS2,115200n8"
+
+  3. Type ``sudo update-grub`` to update the GRUB configuration file,
+     ``/boot/grub/grub.cfg``.
+
+  4. Reboot to activate these changes.
+
+* **Setting per-node kernel options** -- If Ubuntu is not yet installed,
+  you can add the kernel command line options to a single node by following
+  these instructions:
+
+  1. On the MAAS server, type ``maas admin tags create
+     name='SoL-ttyS2-115200' comment='SoL ttyS2 115200'
+     kernel_opts='console=tty1 console=ttyS2,115200n8'``, changing the
+     kernel options for your node as noted earlier. (You can change the
+     name and comment, too.) Note that this command assumes you set up the
+     MAAS server using the ``maniacs-setup`` script; if you used some other
+     way, you may need to register a login via the ``maas login admin``
+     command, which takes a MAAS URL and API key as options; or use an
+     existing MAAS CLI account name other than ``admin``, as specified in
+     this example.
+
+  2. Using the MAAS web UI, go to the node's summary page, click Edit, and
+     apply the ``SoL-ttyS2-115200`` tag to the node you want to deploy in
+     this way. Note that you can define multiple tags that set different
+     options, such as options for nodes that use different serial ports or
+     bit rates, and apply different tags to different nodes.
+
+  3. Commission or enlist the node. It should then use the SoL options
+     you've just specified. Note that this procedure will not help you if
+     you're having difficulties enlisting a node, since you can apply a tag
+     to a node only after the node has enlisted.
+
+* **Setting global kernel options** -- If Ubuntu is not yet installed, you
+  can add the kernel command line options to the Global Kernel Parameters
+  area in the MAAS settings page (``http://localhost/MAAS/settings/``).
+  **WARNING:** This action will apply these settings to *all* the nodes you
+  subsequently enlist, commission, or deploy! Unless they're all configured
+  to use SoL with the same options, the result can be enlistment,
+  commissioning, and deployment failures on the nodes that are not
+  configured to use SoL or that are configured with different settings!
+  Thus, you should use this option only for a brief period when debugging
+  enlistment, commissioning, and deployment problems -- and commissioning
+  and deployment problems are better handled using per-node kernel options,
+  as described in the previous bullet point.
+
+Remotely Accessing a Server's Console
+-------------------------------------
+
+Once SoL is configured, you can access a node via the ``ipmitool`` utility
+in Ubuntu, or similar tools in other environments. For instance::
+
+  ipmitool -H 172.24.124.253 -I lanplus -U maas -P 2TR2Rssku sol activate
+
+This example accesses the node whose BMC is at 172.24.124.253, using the
+``lanplus`` (IPMI v2.0) protocol, a username of ``maas``, and a password of
+``2TR2Rssku``. You may use the same username and password that MAAS uses,
+or any other that exist on the BMC with sufficient privileges.
+
+If you power on the node, you should see its firmware startup messages,
+possibly followed by a GRUB menu, kernel startup messages, and subsequent
+Ubuntu startup messages. If this is a normal post-deployment boot, these
+will culminate in a ``login:`` prompt. You should be able to use the SoL
+session to enter the firmware setup utility early in the process, or to log
+in to Ubuntu once deployment is complete. There are limitations to using
+SoL; for instance, you must use special escape key sequences to enter some
+keyboard characters. (See the ``ipmitool`` documentation for details.)
+

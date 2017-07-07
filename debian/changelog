@@ -1,3 +1,9 @@
+certification-docs (0.1.17-0ppa1) xenial; urgency=medium
+
+  * Added Appendix E: Using SoL to STG.
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 07 Jul 2017 10:38:40 -0400
+
 certification-docs (0.1.16-0ppa1) xenial; urgency=medium
 
   * Updated MANIAC/MANIACS and STG for MAAS 2.2 and recent
