@@ -161,6 +161,14 @@ web site, or if you do not have access to your company's account, please
 contact your Technical Partner Manager, who will work with the Server
 Certification Team to establish the account.*
 
+Additionally, anyone who needs to access the account on C3 will need their own
+account on Launchpad.net, and their Launchpad account will need to be added to
+the Access Control List for the company account. You can create a Launchpad
+account here, http://launchpad.net/+login. *If, after the Launchpad
+account is created and you have been added to the ACL, you still can not see
+the Account Information on C3, try logging out of C3, clearing any browser
+cache and cookies, and logging back into C3.*
+
 In order to upload test results to C3, you need to create a hardware entry
 for the system which you will be certifying. You can put off creating the
 C3 entry until after the test, although doing it before testing is usually

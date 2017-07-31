@@ -233,7 +233,7 @@ Before Uploading Test Case Results
 Prior to uploading results to Canonical's certification site, you must
 handle some preliminary tasks:
 
--  You will need an account at the certification web site,
+-  Your company will need an account at the certification web site,
    https://certification.canonical.com.
 
    -  The certification web site is the location where all the test case
@@ -242,6 +242,16 @@ handle some preliminary tasks:
    -  *If you do not have an account for your company on the private
       certification web site, please contact your account manager who will
       work with the Server Certification Team to establish the account.*
+
+-  You will need an account on Launchpad, and your account will need to be
+   added by the Certification Team to the proper Access Control List.  You can
+   create a Launchpad account here: http://launchpad.net/+login
+
+   -  Once your Launchpad Account is created and added to the ACL, you will be
+      able to view your company's certification data on C3.
+
+   -  *If you are unable to view the account on C3, try logging out of C3,
+      clearning your browser cache and cookies, and logging back in.*
 
 -  You must create a hardware entry (unless one already exists for the
    SUT) at the certification web site with a secure ID.
