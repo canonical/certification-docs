@@ -589,17 +589,16 @@ The exception to this involves kernel modules as outlined below.
 
 Third Party / Proprietary Drivers
 '''''''''''''''''''''''''''''''''
-Hardware that requires a third party driver must meet the following
-requirements:
+Hardware should be tested and certified using in-band drivers provided by the
+Ubuntu kernel.  In cases where hardware is not supported by the current Ubuntu
+kernel, testing should then focus on the current HWE kernel.
 
-* Driver must be packaged in the proper format
+Partners should work with their IHV upstreams to ensure necessary driver
+support is present in the Linux Kernel and will thus land naturally in the
+Ubuntu kernel.
 
-* Driver must be accessible to a MAAS server
-
-* Instructions must be clearly provided to users that explain how to add that
-  driver to MAAS
-
-* The driver must be tested.
+Out-of-Band (Proprietary) drivers may be considered for use in Certification
+but that must be determined by the Canonical Hardware Certification Team.
 
 For more information, please contact your account representative.
 
