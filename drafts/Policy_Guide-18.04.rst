@@ -598,7 +598,7 @@ support is present in the Linux Kernel and will thus land naturally in the
 Ubuntu kernel.
 
 Out-of-Band (Proprietary) drivers may be considered for use in Certification
-but that must be determined by the Canonical Hardware Certification Team.
+but that must be approved by the Canonical Hardware Certification Team.
 
 For more information, please contact your account representative.
 
