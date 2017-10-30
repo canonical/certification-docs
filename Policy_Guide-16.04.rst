@@ -217,9 +217,9 @@ Certification Testing is performed on the following LTS releases:
 
 Package Versions
 ----------------
-Installation should be performed using the custom MAAS images that the Server
-Certification Team provides.  This provides a mechanism for quickly deploying
-the Suite and a known set of packages to the SUT.
+Installation should be performed using the Ubuntu images and kernels provided
+by the default MAAS image stream hosted at 
+https://maas.io
 
 Deployed OSs for Certification should *not* be updated with current package
 versions unless explicitly instructed to by the Server Certification Team.
@@ -582,8 +582,8 @@ indicate Vendor A as the manufacturer.*
 Installation
 ------------
 Installation must be performed by Canonical's MAAS (Metal-As-A-Service).  MAAS
-must use the custom images provided by the Certification team for all
-Certification deployments.  
+must use the default Ubuntu images and kernels provided via https://maas.io for
+all Certification deployments.
 
 If a System cannot be deployed via MAAS and it is determined that this is a
 lack of support or bug in MAAS, then we will work with the partner and the MAAS
