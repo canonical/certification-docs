@@ -1,3 +1,10 @@
+certification-docs (0.1.18-0ppa1) UNRELEASED; urgency=medium
+
+  * Removed references to Custom Point-Release Images from docs
+  * Removed old trusty versions of MANIACS
+
+ -- Jeff Lane <jeff@ubuntu.com>  Thu, 02 Nov 2017 16:16:51 -0400
+
 certification-docs (0.1.17-0ppa1) xenial; urgency=medium
 
   * Added Appendix E: Using SoL to STG.
