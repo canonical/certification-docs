@@ -603,8 +603,7 @@ To do so, follow these steps:
    versions to support. For certification, you should import a minimum
    of Ubuntu 16.04 LTS for AMD64; however, you may want to add 14.04
    LTS and i386 or other CPU types, depending on your anticipated
-   needs. (Note that custom point-release images are imported later, but
-   you must import at least one image for each CPU architecture here.)
+   needs.
 
 #. In the Images page, select the images you want MAAS to support and
    then click Import Images. A spinner will appear as the download
@@ -827,111 +826,6 @@ d-i method does not currently support this feature. The method to
 deliver fixed point releases, described next, uses the fastpath install
 procedures.
 
-Configuring MAAS to Deliver Fixed Point Releases
-================================================
-
-By default, MAAS delivers whatever version of Ubuntu was packaged by the
-MAAS team when you downloaded your MAAS installation images. This
-version is likely to correspond to the current point release, possibly
-plus some updates. For certification work, it's far better to install a
-fixed point release, such as 14.04 GA or 14.04.1. This can be
-accomplished with MAAS 1.7 by installing custom images:
-
-#. Download the custom images. They are currently hosted at
-   http://certification-static.canonical.com/fixed-point-releases/.
-   Retrieve whichever images you need and store them somewhere
-   convenient, such as your user's home directory on the portable
-   computer. Images are about 250-300MiB in size.
-
-#. Return to the terminal and login to the API using maas-cli::
-
-      $ maas login <PROFILE_NAME> <API_URL> <KEY>
-
-   -  ``<PROFILE_NAME>`` is anything you wish. This guide uses ``maas`` for
-      simplicity.
-
-   -  ``<API_URL>`` refers to a URL on the MAAS server, as in
-      \http://192.168.0.2/MAAS/api/1.0.
-
-   -  ``<KEY>`` is a key displayed in the web UI
-      (\http://localhost/MAAS/account/prefs/) in the MAAS Keys section or
-      can be obtained by typing ``sudo maas-region-admin apikey
-      \-\-username {user}`` in a shell (substitute your MAAS username for
-      ``{user}``).
-
-   -  You should get a message saying "You are now logged in to the MAAS
-      server at ``<URL>`` with the profile name ``'<PROFILE_NAME>'``"
-
-   -  If you've previously run the maas command using sudo, you may need to
-      either use sudo with this command or change the ownership of
-      ``~/.maascli.db``.
-
-3. Tell MAAS about each image you want to import::
-
-      $ maas maas boot-resources create name=custom_14041_amd64 \\
-        title="Ubuntu 14.04.1 (AMD64)" architecture=amd64/generic \\
-        content@=/home/ubuntu/ubuntu-14.04.1-server-amd64-curtin.tar.gz
-
-   -  Repeat this step once for each image.
-
-   -  Give each image a unique ``name``. The name *must not exceed 20
-      characters!*
-
-   -  Adjust the ``title`` to the value you want to see in the MAAS web UI.
-      Each image must have a unique ``title``.
-
-   -  Point ``content@=`` to the image you want to add.
-
-4. Check the MAAS boot images page (\http://localhost/MAAS/images/) to
-   see that the images have imported correctly. They should appear in
-   the Custom Images section. If an image has an active spinner next to
-   it, MAAS hasn't finished importing it. If the spinner becomes a
-   hollow pink circle, the import failed.
-
-5. You may optionally change the default OS to deploy on the MAAS
-   settings page (\http://localhost/MAAS/settings/) to point to one of
-   your custom images. Note that whenever you release a node, the OS
-   changes back to the default, so you may need to alter that setting
-   whenever you release and redeploy a node.
-
-Once the images have been imported, you can select them as you would any
-other OS version in the MAAS web UI. Instead of appearing as an OS Type
-of "Ubuntu," though, these images will appear with an OS Type of
-"Custom."
-
-Once the images have been imported, you can select them as you would any
-other OS version in the MAAS web UI:
-
-#. If a node is already running, select "Take Action" followed by "Release"
-   in its node summary page. Confirm this action by clicking "Go." It may
-   take a few seconds for MAAS to fully release the node.
-
-#. Select "Take Action" followed by "Deploy." An option to choose the
-   image you want to deploy should appear.
-
-#. Select the image. It will be a Custom image with the name you
-   specified when you loaded it, as shown here:
-
-   .. image:: images/custom-image-selection.png
-      :width: 100%
-
-#. Click "Go" to deploy the image. Your node should start up and install
-   the point-release image you selected.
-
-In MAAS 1.7.0 and earlier, it was possible to set the OS prior to acquiring
-a node, which enabled a streamlined process of setting the OS and then
-using the "Acquire and Start" button; but as of version 1.7.1, you must set
-the OS between acquiring and starting the node, as just described. If you
-want to switch the OS of an already-running node, you must first release
-it, then re-acquire it, set its OS, and finally start it. You can also set
-a fixed point release to be your default OS on the Settings page
-(\http://localhost/MAAS/settings/).
-
-Note that before you can install a custom image for any given architecture,
-you must have first imported at least one image for that architecture via
-the conventional means, as described earlier, in "Installing and
-Configuring MAAS."
-
 .. _`Installing Certification Packages Automatically via MAAS`:
 
 Installing Certification Packages Automatically via MAAS
@@ -963,25 +857,18 @@ MAAS can automatically install the certification packages every time you
    This action creates a configuration file that causes nodes to install
    the certification suite after a standard/d-i install.
 
-4. Back up the original ``curtin_userdata`` and
-   ``curtin_userdata_custom`` files::
+4. Back up the original ``curtin_userdata`` file::
 
    $ sudo cp curtin_userdata curtin_userdata-orig
-   $ sudo cp curtin_userdata_custom curtin_userdata_custom-orig
 
 5. Copy ``curtin_userdata`` from ``/usr/share/maas-cert-server/preseed/`` to
-   ``/etc/maas/preseeds``, as both ``cutin_userdata`` and as
-   ``curtin_userdata_custom``::
+   ``/etc/maas/preseeds``::
 
       $ sudo cp /usr/share/maas-cert-server/preseed/curtin_userdata ./
-      $ sudo cp /usr/share/maas-cert-server/preseed/curtin_userdata \
-        ./curtin_userdata_custom
 
    The modified ``curtin_userdata`` file causes nodes started via the
    fastpath/curtin method to install the certification software. This file
-   affects nodes of all architectures. The ``curtin_userdata_custom`` file
-   does the same thing for the custom images used for testing with specific
-   point releases.
+   affects nodes of all architectures.
 
 6. The preseed files each include two or three lines that refer to the
    ``ppa.launchpad.net`` repository. If you are relying on a mirrored

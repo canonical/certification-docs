@@ -49,10 +49,9 @@ so you should limit use of the portable computer on the Internet at large.
 This document begins with information on the required hardware and then
 moves on to a general description of Ubuntu installation, details on how to
 install and configure MAAS, and how to test your MAAS installation.
-Appendixes cover more esoteric or specialized topics, including how to
-update the fixed-point-release images, how to add support for i386 (32-bit)
-images, and how to mirror repositories not configured for mirroring by the
-main setup procedure.
+Appendixes cover more esoteric or specialized topics, including how to add
+support for i386 (32-bit) images, and how to mirror repositories not
+configured for mirroring by the main setup procedure.
 
 Figure 1 illustrates the overall configuration that this document will
 help you create. This document describes configuration of the Portable
@@ -266,8 +265,8 @@ The more specific procedure for using MAAS in certification testing is:
 .. 
 ..       $ sudo apt-add-repository ppa:maas/stable
 .. 
-..    Currently (late August, 2016), Ubuntu 16.04 installs MAAS 2.0 RC 4 by default.
-..    This PPA holds the release version of MAAS 2, which is recommended for
+..    Currently (early November, 2017), Ubuntu 16.04 installs MAAS 2.0 by default.
+..    This PPA holds the most recent release version of MAAS 2, which is recommended for
 ..    certification testing.
 
 #. Several scripts and configuration files are available in the
@@ -534,39 +533,7 @@ can use the MAAS web UI or launch ``maniacs-setup`` with the
 
 Sometimes this process hangs. Typically, the boot images end up available
 in MAAS, but the script doesn't move on. If this happens, you can kill the
-script and, if desired, re-launch it with the ``\-\-update-point-releases``
-(or ``-u``) option to finish the installation.
-
-Certification may be done using either the default MAAS images or custom
-point-release images. In the past, the latter method was preferred; but the
-default MAAS images are now the preferred method. If you want to have the
-custom images available, ``maniacs-setup`` will help you import them::
-
-    ***************************************************************************
-    * Ubuntu hardware certification is done using point-release images. These
-    * can take a LONG time to download. You can do so now or defer this task.
-    *
-    * Do you want to import point-release images now (Y/n)? y
-    *
-    * Do you want to import 17.04 (1 image) (y/N)? y
-    * Do you want to import 16.10 (1 image) (y/N)? n
-    * Do you want to import the 16.04 series (3 images) (Y/n)? y
-    * Do you want to import the 14.04 series (6 images) (Y/n)? y
-
-Whenever you respond ``Y`` to a question about a particular version or
-series, the script proceeds to download and register the images. (The
-relevant output has been omitted from the preceding example.) If an image
-is already installed, ``maniacs-setup`` skips that image. Certification
-uses only LTS images; however, non-LTS images, such as 17.04, may be made
-available for testing and as a way to "preview" the features of future LTS
-series. ``maniacs-setup`` registers the most recent point-release image in
-any series you download as the default OS for deployments.
-
-Again, this process can take a while. If you want to skip this step for
-now and return to it, you
-can; you should re-launch ``maniacs-setup`` with its
-``\-\-update-point-releases`` (or ``-u``) option when you're ready to
-download these images.
+script and, if desired, re-launch it to finish the installation.
 
 Finally, the script announces it's finished its work::
 
@@ -626,10 +593,9 @@ to modify a few settings. To do so, follow these steps:
 
    #. Review these settings for sanity. Some show options that were
       set earlier in this process. Most others should be self-explanatory.
-      The standard MAAS images are among the items shown. If you want to
-      certify systems using these images rather than the custom images, be
-      sure the Ubuntu versions and architectures you need are checked, and
-      click Save Selection to import anything you need.
+      The standard MAAS images are among the items shown. Be sure the Ubuntu
+      versions and architectures you need are checked, and click Save Selection
+      to import anything you need.
 
    #. When you're done, click Continue at the bottom of the page.
 
@@ -646,8 +612,8 @@ to modify a few settings. To do so, follow these steps:
 
 #. Click Images near the top of the MAAS web page. This page will show the
    Ubuntu images that are available on the server. The setup script imports
-   a 16.04 image for AMD64, as well as whatever custom point-release images
-   you specified. You may need to take additional actions in some cases:
+   a 16.04 image for AMD64 but you may need to take additional actions in
+   some cases:
 
    - If you see a blue circle next to an image, it did not import
      correctly, or it is still importing.
@@ -655,9 +621,6 @@ to modify a few settings. To do so, follow these steps:
    - If you need to support an architecture other than AMD64, you must check
      that architecture and click Apply Changes. This process will probably
      take several minutes to complete.
-
-   - If you need to import i386 point-release images, you must import them
-     manually, as described in Appendix B.
 
 #. Click the Subnets link near the top of the web page so you can review
    the DHCP options:
@@ -789,49 +752,7 @@ related to the node. (You may have to refresh the page to see new events.)
 
    PageBreak
 
-Appendix A: Updating Fixed Point Release Images
-===============================================
-
-From time to time, Canonical updates the LTS versions of Ubuntu with new
-point releases, such as 16.04.1, 16.04.2, and so on. Because you must run
-the certification tests on the latest point release, updating your MAAS
-server with the latest point releases will become necessary, sooner or
-later. This task can be accomplished by installing custom images.
-
-The ``maniacs-setup`` script automatically downloads and installs all the
-available point-release images at the time you first run it. After a new
-point release is made, you can re-run the script with the
-``\-\-update-point-releases`` (or ``-u``) option to have the script install
-the new release::
-
-    $ sudo apt-get install maas-cert-server
-    $ sudo maniacs-setup --update-point-releases
-
-The script will skip most of the setup steps and proceed to asking you
-which point-release images to download and install. When you select a
-series, only those point-release images that have not yet been installed
-from that series will be downloaded.
-
-If a particular point release is giving you problems, you can delete it
-using the MAAS web UI and then update your point-release images as just
-described; this will refresh the image to the latest available version.
-Similarly, if the Server Certification Team releases new images, you should
-first delete the old ones using the web UI and then update your point
-releases.
-
-Note that before you can install a custom image for any given architecture,
-you must have first imported at least one image for that architecture via
-the conventional means. The ``maniacs-setup`` script detects whether you've
-installed the standard i386 images and will install i386 point-release
-images if and only if the standard i386 images are already installed.
-Currently, only AMD64 and i386 point-release images are available.
-
-
-.. raw:: pdf
-
-   PageBreak
-
-Appendix B: Adding i386 Support
+Appendix A: Adding i386 Support
 ===============================
 
 By default, the ``maniacs-setup`` script supports only AMD64 (64-bit,
@@ -848,21 +769,15 @@ add support for such systems in MAAS:
    process can take several minutes, and perhaps over an hour on a slow
    Internet connection.
 
-#. Re-run the ``maniacs-setup`` script, but add the
-   ``\-\-update-point-releases`` option to the script, as described in
-   Appendix A. This will cause the script to download and add the
-   point-release images for i386 systems.
-
 That's it. You can add support for ppc64el, ARM64, or other architectures
-in a similar way; however, there are currently no point-release images for
-these architectures. Please consult the Server Certification Team if you
-need to certify systems using these CPUs.
+in a similar way these architectures. Please consult the Server Certification
+Team if you need to certify systems using these CPUs.
 
 .. raw:: pdf
 
    PageBreak
 
-Appendix C: Mirroring Additional Repositories
+Appendix B: Mirroring Additional Repositories
 =============================================
 
 You can mirror repositories or Ubuntu versions beyond those configured by
@@ -951,7 +866,7 @@ arise.
 
    PageBreak
 
-Appendix D: Network Testing Options
+Appendix C: Network Testing Options
 ===================================
 
 A key part of certification is testing your SUT's network cards. This
@@ -1073,7 +988,7 @@ spot performance problems early.
 
    PageBreak
 
-Appendix E: MAAS Network Ranges
+Appendix D: MAAS Network Ranges
 ===============================
 
 As noted earlier, in `Installing and Configuring Ubuntu`_, a /22 or wider
@@ -1116,7 +1031,7 @@ Assigned Automatically  172.16.2.0 - 172.16.3.254  172.16.1.0 - 172.16.1.254   1
 
    PageBreak
 
-Appendix F: Glossary
+Appendix E: Glossary
 ====================
 
 The following definitions apply to terms used in this document.
