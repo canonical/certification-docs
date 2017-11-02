@@ -60,7 +60,6 @@ MAAS_Advanced_NUC_Installation_And_Configuration.*: images/logo-canonical_no-tm-
 MAAS_Advanced_NUC_Installation_And_Configuration.*: images/maniac-network.png
 MAAS_Advanced_NUC_Installation_And_Configuration.*: images/maas-dropdown.png
 MAAS_Advanced_NUC_Installation_And_Configuration.*: images/clusters-page.png
-MAAS_Advanced_NUC_Installation_And_Configuration.*: images/custom-image-selection.png
 MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/logo-ubuntu_su-white_orange-hex.png
 MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/logo-canonical_no-tm-white-hex.png
 MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/maniac-network.png
