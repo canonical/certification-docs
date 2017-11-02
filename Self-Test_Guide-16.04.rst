@@ -134,8 +134,8 @@ The highlights of this process are:
    Hardware Entry on C3`_. If an entry already exists for your specific
    configuration (not just the model), you should use the existing entry.
 
-#. Use MAAS to deploy the SUT using a custom point-release image, as
-   described in the upcoming section, `Installing Ubuntu on the System`_.
+#. Use MAAS to deploy the SUT, as described in the upcoming section,
+   `Installing Ubuntu on the System`_.
 
 #. Check the SUT's configuration. (The ``canonical-certification-precheck``
    script, described in `Running the Certification
@@ -529,30 +529,29 @@ install Ubuntu on the SUT as follows:
 #. Click Take Action followed by Deploy. Options to select the OS version
    to deploy should appear.
 
-#. Select the Ubuntu release you want to deploy. There are two ways to do
-   this:
+#. Select the Ubuntu release you want to deploy:
 
-   - Normally, you'll pick the "Ubuntu" image you want to test (such as
-     "Ubuntu 16.04 LTS 'Xenial Xerus'") and either a GA or HWE kernel. (*Do
-     not* pick a low-latency kernel.) The GA kernel is from the series that
-     was used when the LTS release was first made, such as a 4.4.0-series
-     kernel for Ubuntu 16.04; and the HWE kernel is the latest kernel
-     available for that version, such as a 4.8.0-series kernel for Ubuntu
-     16.04.2. If you use this method, you will normally test with the GA
-     kernel and follow up with the HWE kernel.
+   - Choose the Ubuntu version you wish to deploy from the list of available
+     Ubuntu releases. The options will appear similar to **Ubuntu 16.04 LTS
+     "Xenial Xerus"** in the middle drop-down box.
 
-   - Alternatively, you can pick a custom certification point release image
-     that you installed as described in the MANIACS document. This image
-     will appear as an OS type of "Custom" and a description that specifies
-     the point-release version. These versions correspond to each
-     point-release version, such as 16.04 GA, 16.04.1, 16.04.2, and so on,
-     each of which uses its own kernel. Note that this deployment method
-     causes the network and disk configuration options described earlier to
-     be ignored; the SUT will use DHCP on all network interfaces and you'll
-     have to prepare additional disks manually after deployment. If you use
-     this method of deployment, you will normally begin with the 16.04 GA
-     image and follow up with the latest point-release image. This method
-     of testing is now deprecated.
+   - Choose the kernel with which you wish to deploy.  The available kernels
+     are in the rightmost dropdown box. For 14.04 LTS (Trusty) they will have names
+     similar to **trusty (hwe-t)**.  For 16.04 LTS and later, they will be named
+     similar to **xenial (ga-16.04)**.
+
+     - When deploying the SUT for testing, you should always start out with the
+       original GA kernel.  For 14.04 LTS, you would chose the **trusty
+       (hwe-t)** option and for 16.04 LTS, the **xenial (ga-16.04)** option. If
+       the sysetm is not deployable or fails certification using the GA kernel,
+       you will then need to re-deploy the SUT choosing the correct HWE kernel
+       option.  In this case, for 14.04 LTS, you would choose the **trusty
+       (hwe-x)** option which would deploy Ubuntu 14.04.5 with the 4.4 kernel,
+       and for 16.04 LTS you would choose the **xenial (hwe-16.04)** option
+       which, as of this writing, would deploy 16.04.3 LTS and the 4.10 kernel.
+
+     - For 16.04 LTS and later, do not choose any of the **edge** or
+       **lowlatency** kernel options for official Certification testing.
 
    `Appendix C - Testing Point Releases`_, elaborates on the procedures for
    testing different kernels and point releases.
