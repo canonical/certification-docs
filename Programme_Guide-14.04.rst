@@ -45,7 +45,7 @@ As of Ubuntu Server 14.04 LTS, MAAS will be used as part of the testing
 process for testing scale out deployment capabilities which will be a
 requirement for a system to be listed as Ubuntu Server Certified Hardware. 
 This means that a given server must be able to be automatically provisioned
-by Canonical's `Metal as a Service tool (MAAS)`_ tool, with no unnecessary manual
+by Canonical's `Metal as a Service (MAAS)`_ tool, with no unnecessary manual
 intervention.
 
 .. _`Metal as a Service (MAAS)`:
