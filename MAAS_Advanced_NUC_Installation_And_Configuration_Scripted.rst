@@ -220,7 +220,7 @@ up its most basic network settings:
       sure you don't have a gateway route to the private LAN.
 
    -  Using a /22 or wider network is advisable for the internal network,
-      for reasons described in `Appendix E: MAAS Network Ranges`_.
+      for reasons described in `Appendix D: MAAS Network Ranges`_.
 
    -  Once you've finished configuring this network port, be sure to
       activate it. If you configured it by editing
@@ -325,7 +325,7 @@ The more specific procedure for using MAAS in certification testing is:
    target in series until the network test passes or until the list is
    exhausted. This setting can be overridden on SUTs by editing the
    ``/etc/xdg/canonical-certification.conf`` file on the SUT. See
-   `Appendix D: Network Testing Options`_ for more on advanced network
+   `Appendix C: Network Testing Options`_ for more on advanced network
    testing configurations.
 
 Running the Setup Script
@@ -450,7 +450,7 @@ apt-mirror``.
 Note that ``maniacs-setup`` configures the system to mirror AMD64, i386,
 and source repositories because all three are required by the default APT
 configuration. If you want to tweak the mirror configuration, you can do so
-by editing the ``/etc/apt/mirror.list`` file, as described in `Appendix C:
+by editing the ``/etc/apt/mirror.list`` file, as described in `Appendix B:
 Mirroring Additional Repositories`_ -- but do so *after* finishing
 with the ``maniacs-setup`` script, and then type ``sudo apt-mirror`` to
 pull in any new directories you've specified. You can also configure the
@@ -641,7 +641,7 @@ to modify a few settings. To do so, follow these steps:
        ``maniacs-setup`` set them aside as reserved or as managed by DHCP.
        The "available" addresses are those that do not belong to either of
        these categories; MAAS assigns them to nodes that are deployed using
-       its standard settings. (See `Appendix E: MAAS Network Ranges`_ for
+       its standard settings. (See `Appendix D: MAAS Network Ranges`_ for
        details of how MAAS manages its network addresses.)
 
        .. image:: images/networks-detail-page.png
