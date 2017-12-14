@@ -611,6 +611,16 @@ against all three configurations.
 
 The Server Test Suite provides a ``storage-only`` whitelist for this purpose.
 
+Storage Management Software
+'''''''''''''''''''''''''''
+Any storage management software meant to manage, modify, monitor storage
+devices including internal and/or external arrays, JBODs, or other storage
+subsystems should be provided to Ubuntu users in a manner equal to the way it
+is presented to users of other operating systems. The preferred method is via
+a Debian package provided via download from the Partner's website. The package
+should be presented equally with the same software packaged for other Operating
+Systems.
+
 USB Testing
 -----------
 USB Testing requires at least one USB stick for each type of port (USB2, USB3).
@@ -806,19 +816,3 @@ This does not mandate that hardware is required to be sent to Canonical;
 *however*, partners are not prohibited from sending sample hardware to
 Canonical on a loan or permanent basis to be placed into our labs for ongoing
 testing or support or other related work.
-
-OpenStack Interoperability Labs
--------------------------------
-Canonical offers Partners the option of participating in our OpenStack
-Interoperability Lab (http://partners.ubuntu.com/programmes/openstack).  
-
-Participation in OIL does not automatically grant certified status; however,
-any server that is placed into OIL must be certified before it can be
-placed in OIL.
-
-The typical workflow looks like this:
-
-1. Hardware sent to Canonical Lab
-2. Certification Team tests and certifies
-3. Hardware transferred to OIL
-4. Interoperability testing begins.
