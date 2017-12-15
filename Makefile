@@ -17,6 +17,10 @@ pdf:	$(PDF_NAMES)
 %.html: %.rst
 	$(RST2HTML) --smart-quotes=yes $< $@
 
+18.04: drafts/Policy_Guide-18.04.pdf drafts/Coverage_Guide-18.04.pdf
+
+18.04h: drafts/Policy_Guide-18.04.html drafts/Coverage_Guide-18.04.html
+
 maniac: MAAS_Advanced_NUC_Installation_And_Configuration.pdf
 
 maniacs: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.pdf
@@ -46,7 +50,7 @@ programmeh: Programme_Guide-14.04.html Programme_Guide-16.04.html
 testcaseh: Test_Case_Guide-16.04.html
 
 clean:
-	rm -rf *.pdf *.html debian/files debian/certification-docs*
+	rm -rf *.pdf *.html debian/files debian/certification-docs* drafts/*.pdf drafts/*.html
 
 # dependencies
 
