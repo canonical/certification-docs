@@ -1,9 +1,14 @@
-certification-docs (0.1.18-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.1.18-0ppa1) xenial; urgency=medium
 
+  [ Jeff Lane ]
   * Removed references to Custom Point-Release Images from docs
   * Removed old trusty versions of MANIACS
 
- -- Jeff Lane <jeff@ubuntu.com>  Thu, 02 Nov 2017 16:16:51 -0400
+  [ Rod Smith ]
+  * Removed MANIACS' Appendix B, which is now redundant
+  * Made miscellaneous changes relating to MAAS 2.3
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 05 Jan 2018 16:00:51 -0500
 
 certification-docs (0.1.17-0ppa1) xenial; urgency=medium
 
