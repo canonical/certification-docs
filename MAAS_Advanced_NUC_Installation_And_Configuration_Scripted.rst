@@ -50,8 +50,8 @@ This document begins with information on the required hardware and then
 moves on to a general description of Ubuntu installation, details on how to
 install and configure MAAS, and how to test your MAAS installation.
 Appendixes cover more esoteric or specialized topics, including how to add
-support for i386 (32-bit) images, and how to mirror repositories not
-configured for mirroring by the main setup procedure.
+support for i386 (32-bit) images and how to set up advanced network
+configurations.
 
 Figure 1 illustrates the overall configuration that this document will
 help you create. This document describes configuration of the Portable
@@ -140,7 +140,7 @@ hardware:
 Note that these hardware requirements are geared toward a typical
 testing environment. You may need to expand this list in some cases. For
 instance, if you test multiple servers simultaneously, you may need
-additional Ethernet ports.
+additional Ethernet ports and cables.
 
 Installing and Configuring Ubuntu
 =================================
@@ -159,7 +159,7 @@ up its most basic network settings:
       install the X server and a desktop environment on top of that as it
       simplifies MAAS access.
 
-   -  This guide assumes the use of Ubuntu 16.04 and MAAS 2.2. Although
+   -  This guide assumes the use of Ubuntu 16.04 and MAAS 2.3. Although
       other versions of Ubuntu and MAAS may work, some details will differ.
       Note that MAAS 2.0 or later is required for certification.
 
@@ -220,7 +220,7 @@ up its most basic network settings:
       sure you don't have a gateway route to the private LAN.
 
    -  Using a /22 or wider network is advisable for the internal network,
-      for reasons described in `Appendix D: MAAS Network Ranges`_.
+      for reasons described in `Appendix C: MAAS Network Ranges`_.
 
    -  Once you've finished configuring this network port, be sure to
       activate it. If you configured it by editing
@@ -286,13 +286,13 @@ The more specific procedure for using MAAS in certification testing is:
    appear outside of that directory tree. (Subsequent steps describe how to
    use these files.)
 
-#. Verify that you've installed MAAS 2.1.2 or later, rather than some
+#. Verify that you've installed MAAS 2.3.0 or later, rather than some
    earlier version::
 
       $ dpkg -s maas | grep Version
 
-   If the wrong version is installed, fixing the problem (presumably a
-   misconfigured PPA) and upgrading may work. If you upgrade from an
+   If the wrong version is installed, fixing the problem (presumably an
+   out-of-date mirror repository) and upgrading may work. If you upgrade from an
    earlier version of MAAS, be sure to select the option to upgrade all the
    configuration files when the package manager asks about this.
 
@@ -325,7 +325,7 @@ The more specific procedure for using MAAS in certification testing is:
    target in series until the network test passes or until the list is
    exhausted. This setting can be overridden on SUTs by editing the
    ``/etc/xdg/canonical-certification.conf`` file on the SUT. See
-   `Appendix C: Network Testing Options`_ for more on advanced network
+   `Appendix B: Network Testing Options`_ for more on advanced network
    testing configurations.
 
 Running the Setup Script
@@ -426,11 +426,11 @@ If you respond ``n`` to this question, the script asks you to specify
 another archive site. The script then asks you which Ubuntu releases to
 mirror::
 
-    * Do you want to mirror precise (Y/n)? n
     * Do you want to mirror trusty (Y/n)? y
     * Do you want to mirror xenial (Y/n)? y
-    * Do you want to mirror yakkety (Y/n)? n
     * Do you want to mirror zesty (Y/n)? y
+    * Do you want to mirror artful (Y/n)? y
+    * Do you want to mirror bionic (Y/n)? n
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -450,8 +450,7 @@ apt-mirror``.
 Note that ``maniacs-setup`` configures the system to mirror AMD64, i386,
 and source repositories because all three are required by the default APT
 configuration. If you want to tweak the mirror configuration, you can do so
-by editing the ``/etc/apt/mirror.list`` file, as described in `Appendix B:
-Mirroring Additional Repositories`_ -- but do so *after* finishing
+by editing the ``/etc/apt/mirror.list`` file -- but do so *after* finishing
 with the ``maniacs-setup`` script, and then type ``sudo apt-mirror`` to
 pull in any new directories you've specified. You can also configure the
 computer to use its own local mirror, if you like::
@@ -486,9 +485,9 @@ Ubuntu versions and architectures to download::
     * Cloud Mirror does not exist. Creating.
     * Do you want to get images for trusty release (y/N)? n
     * Do you want to get images for xenial release (Y/n)? y
-    * Do you want to get images for yakkety release (y/N)? n
     * Do you want to get images for zesty release (y/N)? y
     * Do you want to get images for artful release (y/N)? n
+    * Do you want to get images for bionic release (y/N)? n
     *
     * Do you want to get images for amd64 architecture (Y/n)? y
     * Do you want to get images for i386 architecture (y/N)? n
@@ -534,6 +533,28 @@ can use the MAAS web UI or launch ``maniacs-setup`` with the
 Sometimes this process hangs. Typically, the boot images end up available
 in MAAS, but the script doesn't move on. If this happens, you can kill the
 script and, if desired, re-launch it to finish the installation.
+
+After boot resources are set up, the script configures personal package
+archives (PPAs), in which the latest certification software is stored.
+You'll want to configure PPAs for whatever architectures you intend to test::
+
+    ***************************************************************************
+    * Now we will set up the PPAs necessary for installing the certification
+    * tools when deploying the SUT.
+    *
+    * Do you want to set PPAs for amd64 architecture (Y/n)? Y
+    * Do you want to set PPAs for i386 architecture (y/N)? n
+    * Do you want to set PPAs for arm64 architecture (y/N)? n
+    * Do you want to set PPAs for armhf architecture (y/N)? n
+    * Do you want to set PPAs for ppc64el architecture (y/N)? n
+    *
+    * Adding PPAs for the following architectures: amd64
+    *
+    * Hardware Certification Stable PPA
+    * Firmware Test Suite Stable PPA
+    * Hardware Certification Development PPA (Disabled by default)
+    *
+    * PPA Setup Complete
 
 Finally, the script announces it's finished its work::
 
@@ -587,9 +608,7 @@ to modify a few settings. To do so, follow these steps:
 #. Log in to the web UI using your regular username and the password you
    gave to the setup script.
 
-#. Once you log in, MAAS presents an overview screen (accessible later
-   at ``http://localhost/MAAS/#/intro``, or equivalent on the appropriate
-   address).
+#. Once you log in, MAAS presents an overview screen.
 
    #. Review these settings for sanity. Some show options that were
       set earlier in this process. Most others should be self-explanatory.
@@ -641,7 +660,7 @@ to modify a few settings. To do so, follow these steps:
        ``maniacs-setup`` set them aside as reserved or as managed by DHCP.
        The "available" addresses are those that do not belong to either of
        these categories; MAAS assigns them to nodes that are deployed using
-       its standard settings. (See `Appendix D: MAAS Network Ranges`_ for
+       its standard settings. (See `Appendix C: MAAS Network Ranges`_ for
        details of how MAAS manages its network addresses.)
 
        .. image:: images/networks-detail-page.png
@@ -653,7 +672,7 @@ to modify a few settings. To do so, follow these steps:
        #. Click the three horizontal lines on the right side of the screen
           in the row for the range you want to delete or modify.
 
-       #. If you want to completely delete the range, click Remove in the
+       #. If you want to completely delete the range, click Remove Range in the
           resulting pop-up menu; otherwise, click Edit.
 
        #. If you click Edit, you can change the start and end addresses,
@@ -777,96 +796,7 @@ Team if you need to certify systems using these CPUs.
 
    PageBreak
 
-Appendix B: Mirroring Additional Repositories
-=============================================
-
-You can mirror repositories or Ubuntu versions beyond those configured by
-``maniacs\-setup`` by editing the ``/etc/apt/mirror.list`` file. This
-feature may be helpful to mirror a PPA you need locally or to mirror a
-pre-release version of Ubuntu. In most cases, the easiest way to do this is
-to cut-and-paste a similar block of configuration lines and modify them to
-suit your needs. The source may be lines in the original
-``/etc/apt/mirror.list`` file or an example in the documentation for
-whatever site you want to mirror.
-
-As an example, consider setting up a mirror of a pre-release version of
-Ubuntu. In the weeks leading up to the release of Ubuntu 16.04 (Xenial
-Xerus), the ``maniacs-setup`` script would not offer to mirror this
-archive, so if you wanted to mirror it, you had to copy and then modify the
-configuration for a working version, such as 14.04 (Trusty Tahr). (Note
-that this should *not* be necessary any longer; however, the process is
-covered here because it's one of the more complex types of mirrors you
-might want to manually add.) The ``/etc/apt/mirror.list`` file created by
-``maniacs-setup`` includes three blocks for Trusty Tahr, each of which
-looks something like this::
-
-  ## trusty on amd64 archives
-  
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty main restricted universe \
-            multiverse
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty-security main restricted \
-            universe multiverse
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty-backports main restricted \
-            universe multiverse
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ trusty-updates main restricted \
-            universe multiverse
-  
-  deb-amd64 http://ppa.launchpad.net/hardware-certification/public/ubuntu trusty \
-            main
-  deb-amd64 http://ppa.launchpad.net/firmware-testing-team/ppa-fwts-stable/ubuntu \
-            trusty main
-
-Two other blocks have lines beginning with ``deb-i386`` and ``deb-src``,
-respectively, but are otherwise similar. Your file may refer to an archive
-site other than ``archive.ubuntu.com``, as well. Also, this example wraps
-long lines to fit on the page, but you should not wrap long lines in this
-way.
-
-Once you've found these blocks, duplicate *all three of them* and then
-modify them to suit your needs -- in this example, you should change
-``trusty`` on each line to ``xenial``. If you're mirroring from something
-other than an official Ubuntu repository (``archive.ubuntu.com`` or a
-regional ``*.archive.ubuntu.com`` site), you may need to change to an
-official Canonical repository to mirror pre-release software. If in doubt,
-check your preferred source with a web browser to see if the pre-release
-version is available on it. The result, for the block shown earlier, looks
-something like this::
-
-  ## xenial on amd64 archives
-  
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial main restricted universe \
-            multiverse
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial-security main restricted \
-            universe multiverse
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial-backports main restricted \
-            universe multiverse
-  deb-amd64 http://archive.ubuntu.com/ubuntu/ xenial-updates main restricted \
-            universe multiverse
-  
-  deb-amd64 http://ppa.launchpad.net/hardware-certification/public/ubuntu xenial \
-            main
-  deb-amd64 http://ppa.launchpad.net/firmware-testing-team/ppa-fwts-stable/ubuntu \
-            xenial main
-
-If you're mirroring something other than an Ubuntu release, you may be able
-to get by with mirroring just one architecture -- or perhaps you want to
-mirror an architecture other than those described in this guide. Feel free
-to experiment, but remember that some archives are quite large, so you may
-end up consuming considerable network bandwidth and disk space creating
-your mirror.
-
-Another key point to remember when modifying the ``/etc/apt/mirror.list``
-file created by ``maniacs-setup`` is that re-running that script may
-overwrite your changes. Thus, you should back up your customized
-``/etc/apt/mirror.list`` file so that you can cut-and-paste any changes you
-make back into the file that ``maniacs-setup`` regenerates, should the need
-arise.
-
-.. raw:: pdf
-
-   PageBreak
-
-Appendix C: Network Testing Options
+Appendix B: Network Testing Options
 ===================================
 
 A key part of certification is testing your SUT's network cards. This
@@ -974,7 +904,8 @@ exhausted.
 If you want to test multiple SUTs but your network lacks a high-speed NIC
 or a system with multiple NICs, you can do so by splitting your SUTs into
 two equal-sized groups. On Group A, launch ``iperf3`` as a server, then run
-the certification suite on Group B. When that run is done, reverse their
+the certification suite on Group B, configuring these SUTs to point to
+Group A's ``iperf3`` servers. When that run is done, reverse their
 roles -- run ``iperf3`` as a server on Group B and run the certification
 suite on Group A. You'll need to adjust the
 ``/etc/xdg/canonical-certification.conf`` file on each SUT to point it to
@@ -988,7 +919,7 @@ spot performance problems early.
 
    PageBreak
 
-Appendix D: MAAS Network Ranges
+Appendix C: MAAS Network Ranges
 ===============================
 
 As noted earlier, in `Installing and Configuring Ubuntu`_, a /22 or wider
@@ -1031,7 +962,7 @@ Assigned Automatically  172.16.2.0 - 172.16.3.254  172.16.1.0 - 172.16.1.254   1
 
    PageBreak
 
-Appendix E: Glossary
+Appendix D: Glossary
 ====================
 
 The following definitions apply to terms used in this document.

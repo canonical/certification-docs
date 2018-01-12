@@ -101,9 +101,9 @@ Target
   any special configuration. The MAAS server may double as the Target.
 
 Test case
-  A test to be executed as part of the certification test
-  suite. Test cases include things such as "CPU Stress" and "CPU
-  Topology."
+  A test to be executed as part of the certification test suite. Test cases
+  include things such as "stress test of system memory" and "test the CPU
+  for clock jitter."
 
 Whitelist test
   A test that *must* pass for the SUT to be granted a certified status.
@@ -240,7 +240,7 @@ When creating an entry, you must enter assorted pieces of information:
 Preparing the Test Environment
 ==============================
 
-Before you certify the hardware, you must perform some initial setup
+Before you test the hardware, you must perform some initial setup
 steps. These steps are preparing the hardware you'll bring, configuring
 the SUT for testing, and configuring the test network.
 
@@ -320,7 +320,7 @@ up the SUT and test environment:
    installed.
 
    -  Note that systems that ship with processors from different families
-      (e.g Broadwell vs. Skylake) will require extra testing.
+      (e.g Skylake vs. Kaby Lake) will require extra testing.
 
    -  CPU speed bumps and die shrinks do not require extra testing.
 
@@ -377,9 +377,7 @@ up the SUT and test environment:
 
    -  Disks must be configured for "flat" storage -- that is, filesystems
       in plain partitions, rather than using LVM or bcache configurations.
-      "Flat" storage was the only option with MAAS 1.8 and earlier, but
-      MAAS 1.9 introduced LVM and bcache options. Similarly, software RAID
-      must *not* be used.
+      Similarly, software RAID must *not* be used.
 
 -  The SUT's BMC, if present, may be configured via DHCP or with a static
    IP address. If the BMC uses IPMI, MAAS will set up its own BMC user
@@ -458,7 +456,7 @@ that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced NUC Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 2.2.
+This document describes use of MAAS 2.3.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:
@@ -491,6 +489,9 @@ install Ubuntu on the SUT as follows:
 #. Commission the node by clicking Take Action followed by Commission
    and then Commission Machine.
 
+   -  On some systems, it is necessary to remove the smartctl-validate
+      option under Hardware Tests before clicking Commission Machine.
+
    -  If the SUT has a BMC, the computer should power up, pass more
       information about itself to the MAAS server, and then power down
       again.
@@ -506,18 +507,19 @@ install Ubuntu on the SUT as follows:
      active. (By default, MAAS activates only the first network interface
      on most computers.) If an interface is identified as *Unconfigured,*
      click the three horizontal bars in the Actions column, select Edit
-     Interface, and set IP Mode to Auto Assign, DHCP, or Static Assign.
+     Physical, and set IP Mode to Auto Assign, DHCP, or Static Assign.
      (The first two cause MAAS to assign an IP address to the node itself,
      either by maintaining its own list of static IP addresses or by using
      DHCP. The Static Assign option requires you to set the IP address
      yourself. These three options are described in more detail in the
      MANIACS document, available from https://certification.canonical.com.)
+     When you've made this change, click Save.
 
    - On the Storage tab, look under Available Disks and Partitions for
-     disks that have not been configured. If any are availble, scroll your
-     mouse over to the right of the row to activate a set of pop-up
-     options. Select the Partition option. You can then set a Filesystem
-     (specify ext4fs) and Mount Point (something under ``/mnt`` usually
+     disks that have not been configured. If any are availble, click the
+     three horizontal bars in the Actions column and select the Add
+     Partition option. You can then set a Filesystem
+     (specify ext4) and Mount Point (something under ``/mnt`` usually
      works well, such as ``/mnt/sdb`` for the ``/dev/sdb`` disk). Click Add
      Partition when you've set these options. Repeat this step for any
      additional disks.
@@ -607,8 +609,8 @@ access the SUT:
    applied.
 
 -  You should verify your SUT's kernel version by typing ``uname -r``.
-   Ubuntu 16.04 GA ships with a 4.4.0-series kernel, while 16.04.2 uses a
-   4.8.0-series kernel. Note that, although updated kernels ship with most
+   Ubuntu 16.04 GA ships with a 4.4.0-series kernel, while 16.04.3 uses a
+   4.10.0-series kernel. Note that, although updated kernels ship with most
    point-release versions, if you use the standard MAAS images,
    ``lsb_release -a`` will show that you have the latest point-release
    version even if you're using the GA kernel. It's the kernel version
@@ -766,7 +768,7 @@ You can initiate a testing session in a server as follows:
             tests to run
       :width: 100%
 
-#. Select the *16.04 server certification full* item by using the arrow
+#. Select the *16.04 Server Certification Full* item by using the arrow
    keys and then pressing Spacebar. (The other test
    plans exist to enable easy re-running of subsets of
    tests that often fail in some environments or to run tests on Ubuntu
@@ -931,8 +933,8 @@ problems, you can request a certificate:
 
    -  Status is fixed at In Progress.
 
-   -  Release indicates the Ubuntu release used for testing, and for which
-      the certificate will be issued.
+   -  Certified Release indicates the Ubuntu release used for testing, and
+      for which the certificate will be issued.
 
    -  Level indicates the type of certification:
 
@@ -940,7 +942,7 @@ problems, you can request a certificate:
          Ubuntu. This is the option to choose for server hardware as that
          typically does not ship with a pre-installed operating system.
 
-      -  Certified Pre-installed is for hardware that  ships with a (possibly
+      -  Certified Pre-install is for hardware that  ships with a (possibly
          customized) version of Ubuntu. This option is used almost exclusively
          for Client hardware such as desktops, laptops and tablets that 
          typically ship with a pre-installed operating system.
@@ -951,17 +953,18 @@ problems, you can request a certificate:
       http://certification.canonical.com. Other public pre-existing
       certificates, or those issued in the future, will remain public.
 
-#. Click Submit. You'll see a new screen in which you can (and in one
-   case *must*) enter more information. In particular, you can click:
+#. Click Submit. You'll see a new screen in which you can enter more
+   information. In particular, you can click:
 
    -  Link Bug to link to a bug on https://bugs.launchpad.net.
       This option is available only to Canonical engineers.
 
-   -  Create Note or Create Note from Template to create a note. Most
+   -  Create Note or Add Note from Template to create a note. Most
       systems will have at least two notes:
 
       -  *A note titled "Tester" with the name of the person who did the
-         testing is required.*
+         testing is required.* This note should be created automatically,
+         but you may optionally modify it.
 
       -  A note titled "Test Notes" is usually present. It describes
          test-specific quirks, such as why a failure should be ignored
@@ -1030,7 +1033,7 @@ single test script, the preferred method is:
 
 #. Re-run ``canonical-certification-server``.
 
-#. Use one of the abbreviated testing whitelists (such as *Network-only*)
+#. Use one of the abbreviated testing whitelists (such as *Network Only*)
    or adjust the set of tests to be run.
 
 #. Submit the resulting ``submission_<DATECODE>.xml`` file to the C3 site.
@@ -1090,23 +1093,24 @@ kernels:
 -  Ubuntu 16.04 GA -- That is, the version that was released in April of
    2016. This version shipped with a 4.4.0-series kernel.
 
--  The current point release -- That is, version 16.04.2 or whatever is the
+-  The current point release -- That is, version 16.04.3 or whatever is the
    latest release in the 16.04 series. Ubuntu LTS releases starting with
    the .2 version (such as 16.04.2) update the kernel to the same series as
    the most-recently released non-LTS Ubuntu version. For instance, 16.04.2
    uses the same kernel series as Ubuntu 16.10 -- that is, the 4.8.0 kernel
-   series.
+   series; and Ubuntu 16.04.3 uses the same kernel as Ubuntu 17.10 -- the
+   4.10.0 series.
 
 In theory, compatibility will only improve with time, so a server might
 fail testing with 16.04 GA and its 4.4.0 kernel because it uses new
 hardware that had not
-been supported in April of 2016, but pass with the latest version. Such
+been supported in April of 2016, but pass with the latest kernel. Such
 a server would be certified for that latest version, but not for the
 original GA release. If such a situation arises, testing may also be
-done with intervening releases so as to determine the earliest working
+done with intervening kernels so as to determine the earliest working
 version of Ubuntu.
 
-If a server fails certification with a more recent release but works
+If a server fails certification with a more recent kernel but works
 with an earlier one, this situation is treated as a regression; a bug
 report should be filed and note made of the problem in the certificate
 request. Please notify your TPM about such problems to facilitate their
@@ -1130,20 +1134,19 @@ Fixing Deployment Problems
 --------------------------
 
 Sometimes a node fails to deploy. When this happens, check the installation
-output on the node's MAAS page. (With MAAS 2.1, scroll down to "Machine
-output" and click the radio button to the right; "Installation Output"
-should be one of the options. With MAAS 2.2, click the "Installation" tab
-to see the installation output.) Often, a clue to the nature of the problm
+output on the node's MAAS page. (With MAAS 2.3, click the Logs tab and
+ensure that Installation Output is selected in the selector on the left of
+the screen. Often, a clue to the nature of the problm
 appears near the end of that output. If you don't spot anything obvious,
 copy that output into a file and send it to the Server Certification Team.
 
-One common cause of deployment problems is IP address assignment issues. To
-minimize the risk of such problems, set the node's network settings to use
-DHCP exclusively. To do this, you must first release the node. You can then
-scroll to the Network section on the node's summary page in MAAS and set
-all the IP Address fields to DHCP. This change can also help prevent a
-node's IP address from changing if you shut it down for a while and then
-reboot or after the certification network tests complete.
+One common cause of deployment problems is IP address assignment issues.
+Depending on your MAAS configuration and local network needs, your network
+might work better with DHCP, Auto Assign, or Static Assign as the method of
+IP address assignment. To change this setting, you must first release the
+node. You can then click the Interfaces tab on the node's summary page in
+MAAS and reconfigure the network options by using the Actions field, as
+described earlier, in `Installing Ubuntu on the System`_.
 
 Submitting Results
 ------------------
@@ -1322,9 +1325,12 @@ ways to pass them to the kernel:
   you can add the kernel command line options to a single node by following
   these instructions:
 
-  1. On the MAAS server, type ``maas admin tags create
-     name='SoL-ttyS2-115200' comment='SoL ttyS2 115200'
-     kernel_opts='console=tty1 console=ttyS2,115200n8'``, changing the
+  1. On the MAAS server, type::
+  
+       $ maas admin tags create name='SoL-ttyS2-115200' comment='SoL ttyS2 115200' \
+         kernel_opts='console=tty1 console=ttyS2,115200n8'
+     
+     Change the
      kernel options for your node as noted earlier. (You can change the
      name and comment, too.) Note that this command assumes you set up the
      MAAS server using the ``maniacs-setup`` script; if you used some other
