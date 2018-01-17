@@ -1148,6 +1148,21 @@ node. You can then click the Interfaces tab on the node's summary page in
 MAAS and reconfigure the network options by using the Actions field, as
 described earlier, in `Installing Ubuntu on the System`_.
 
+Adding PPAs Manually
+--------------------
+
+Sometimes you may need to add a PPA manually. In order for this to work, your
+SUT must be able to reach the internet and more specifically reach
+launchpad.net.  If either of those requirements are not met, you will receive a
+somewhat confusing message like this:
+
+ubuntu@ubuntu:~$ sudo apt-add-repository ppa:hardware-certification/public
+Cannot add PPA: 'ppa:hardware-certification/public'.
+Please check that the PPA name or format is correct.
+
+To resolve this, ensure that your SUT can reach the internet and can reach
+launchpad.net directly.
+
 Submitting Results
 ------------------
 

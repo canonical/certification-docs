@@ -1308,3 +1308,17 @@ tracebacks you notice to a text file and save that along with the
 previously-noted directories. (Feel free to send us a photo of the
 screen taken with a digital camera.)
 
+Adding PPAs Manually
+--------------------
+
+Sometimes you may need to add a PPA manually. In order for this to work, your
+SUT must be able to reach the internet and more specifically reach
+launchpad.net.  If either of those requirements are not met, you will receive a
+somewhat confusing message like this:
+
+ubuntu@ubuntu:~$ sudo apt-add-repository ppa:hardware-certification/public
+Cannot add PPA: 'ppa:hardware-certification/public'.
+Please check that the PPA name or format is correct.
+
+To resolve this, ensure that your SUT can reach the internet and can reach
+launchpad.net directly.
