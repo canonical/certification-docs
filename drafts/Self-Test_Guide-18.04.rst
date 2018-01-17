@@ -1145,6 +1145,21 @@ all the IP Address fields to DHCP. This change can also help prevent a
 node's IP address from changing if you shut it down for a while and then
 reboot or after the certification network tests complete.
 
+Adding PPAs Manually
+--------------------
+
+Sometimes you may need to add a PPA manually. In order for this to work, your
+SUT must be able to reach the internet and more specifically reach
+launchpad.net.  If either of those requirements are not met, you will receive a
+somewhat confusing message like this:
+
+ubuntu@ubuntu:~$ sudo apt-add-repository ppa:hardware-certification/public
+Cannot add PPA: 'ppa:hardware-certification/public'.
+Please check that the PPA name or format is correct.
+
+To resolve this, ensure that your SUT can reach the internet and can reach
+launchpad.net directly.
+
 Submitting Results
 ------------------
 
