@@ -1,6 +1,6 @@
-=================================================================
- Ubuntu Server Certified Hardware Self-Testing Guide (18.04 LTS) 
-=================================================================
+=====================================================
+ Ubuntu Server Certified Hardware Self-Testing Guide 
+=====================================================
 
 .. header:: |ubuntu_logo|
 
@@ -101,9 +101,9 @@ Target
   any special configuration. The MAAS server may double as the Target.
 
 Test case
-  A test to be executed as part of the certification test
-  suite. Test cases include things such as "CPU Stress" and "CPU
-  Topology."
+  A test to be executed as part of the certification test suite. Test cases
+  include things such as "stress test of system memory" and "test the CPU
+  for clock jitter."
 
 Whitelist test
   A test that *must* pass for the SUT to be granted a certified status.
@@ -162,9 +162,9 @@ contact your Technical Partner Manager, who will work with the Server
 Certification Team to establish the account.*
 
 Additionally, anyone who needs to access the account on C3 will need their own
-account on Launchpad.net, and their Launchpad account will need to be added to
+account on ``launchpad.net``, and their Launchpad account will need to be added to
 the Access Control List for the company account. You can create a Launchpad
-account here, http://launchpad.net/+login. *If, after the Launchpad
+account at http://launchpad.net/+login. *If, after the Launchpad
 account is created and you have been added to the ACL, you still can not see
 the Account Information on C3, try logging out of C3, clearing any browser
 cache and cookies, and logging back into C3.*
@@ -203,7 +203,7 @@ When creating an entry, you must enter assorted pieces of information:
    * **Model** -- The name of the system itself, e.g ProLiant DL630 or
      PowerEdge R210, as you would like it to appear on the public web site.
 
-   * **Codenames** -- This is for your internal reference and identifies
+   * **Codename** -- This is for your internal reference and identifies
      the internal code name associated with the SUT. This data is
      *never* published and is visible only to you and to Canonical.
 
@@ -240,7 +240,7 @@ When creating an entry, you must enter assorted pieces of information:
 Preparing the Test Environment
 ==============================
 
-Before you certify the hardware, you must perform some initial setup
+Before you test the hardware, you must perform some initial setup
 steps. These steps are preparing the hardware you'll bring, configuring
 the SUT for testing, and configuring the test network.
 
@@ -320,7 +320,7 @@ up the SUT and test environment:
    installed.
 
    -  Note that systems that ship with processors from different families
-      (e.g Broadwell vs. Skylake) will require extra testing.
+      (e.g Skylake vs. Kaby Lake) will require extra testing.
 
    -  CPU speed bumps and die shrinks do not require extra testing.
 
@@ -377,9 +377,7 @@ up the SUT and test environment:
 
    -  Disks must be configured for "flat" storage -- that is, filesystems
       in plain partitions, rather than using LVM or bcache configurations.
-      "Flat" storage was the only option with MAAS 1.8 and earlier, but
-      MAAS 1.9 introduced LVM and bcache options. Similarly, software RAID
-      must *not* be used.
+      Similarly, software RAID must *not* be used.
 
 -  The SUT's BMC, if present, may be configured via DHCP or with a static
    IP address. If the BMC uses IPMI, MAAS will set up its own BMC user
@@ -423,8 +421,8 @@ attention to the following:
    extraneous network traffic can negatively impact the network tests.
 
 -  Network cabling, switches, and the ``iperf3`` server should be capable of
-   at least the SUT's best speed. For instance, if the SUT has 1 Gbps
-   Ethernet, the other network components should be capable of 1 Gbps or
+   at least the SUT's best speed. For instance, if the SUT has 10 Gbps
+   Ethernet, the other network components should be capable of 10 Gbps or
    faster speeds. If the local network used for testing is less capable
    than the best network interfaces on the SUT, the network test won't run,
    and those interfaces must be
@@ -453,12 +451,12 @@ the following sections.
 Installing Ubuntu on the System
 -------------------------------
 
-Beginning with Ubuntu 14.04 (Trusty Tahr), server certification requires
+Server certification requires
 that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced NUC Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 2.2.
+This document describes use of MAAS 2.3.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:
@@ -491,6 +489,9 @@ install Ubuntu on the SUT as follows:
 #. Commission the node by clicking Take Action followed by Commission
    and then Commission Machine.
 
+   -  On some systems, it is necessary to remove the smartctl-validate
+      option under Hardware Tests before clicking Commission Machine.
+
    -  If the SUT has a BMC, the computer should power up, pass more
       information about itself to the MAAS server, and then power down
       again.
@@ -506,18 +507,19 @@ install Ubuntu on the SUT as follows:
      active. (By default, MAAS activates only the first network interface
      on most computers.) If an interface is identified as *Unconfigured,*
      click the three horizontal bars in the Actions column, select Edit
-     Interface, and set IP Mode to Auto Assign, DHCP, or Static Assign.
+     Physical, and set IP Mode to Auto Assign, DHCP, or Static Assign.
      (The first two cause MAAS to assign an IP address to the node itself,
      either by maintaining its own list of static IP addresses or by using
      DHCP. The Static Assign option requires you to set the IP address
      yourself. These three options are described in more detail in the
      MANIACS document, available from https://certification.canonical.com.)
+     When you've made this change, click Save.
 
    - On the Storage tab, look under Available Disks and Partitions for
-     disks that have not been configured. If any are availble, scroll your
-     mouse over to the right of the row to activate a set of pop-up
-     options. Select the Partition option. You can then set a Filesystem
-     (specify ext4fs) and Mount Point (something under ``/mnt`` usually
+     disks that have not been configured. If any are availble, click the
+     three horizontal bars in the Actions column and select the Add
+     Partition option. You can then set a Filesystem
+     (specify ext4) and Mount Point (something under ``/mnt``
      works well, such as ``/mnt/sdb`` for the ``/dev/sdb`` disk). Click Add
      Partition when you've set these options. Repeat this step for any
      additional disks.
@@ -532,23 +534,21 @@ install Ubuntu on the SUT as follows:
 #. Select the Ubuntu release you want to deploy:
 
    - Choose the Ubuntu version you wish to deploy from the list of available
-     Ubuntu releases. The options will appear similar to **Ubuntu 16.04 LTS
-     "Xenial Xerus"** in the middle drop-down box.
+     Ubuntu releases. The options will appear similar to **Ubuntu 18.04 LTS
+     "Bionic Beaver"** in the middle drop-down box.
 
    - Choose the kernel with which you wish to deploy.  The available kernels
      are in the rightmost dropdown box. For 14.04 LTS (Trusty) they will have names
      similar to **trusty (hwe-t)**.  For 16.04 LTS and later, they will be named
      similar to **xenial (ga-16.04)**.
 
-     - When deploying the SUT for testing, you should always start out with the
-       original GA kernel.  For 14.04 LTS, you would chose the **trusty
-       (hwe-t)** option and for 16.04 LTS, the **xenial (ga-16.04)** option. If
-       the sysetm is not deployable or fails certification using the GA kernel,
-       you will then need to re-deploy the SUT choosing the correct HWE kernel
-       option.  In this case, for 14.04 LTS, you would choose the **trusty
-       (hwe-x)** option which would deploy Ubuntu 14.04.5 with the 4.4 kernel,
-       and for 16.04 LTS you would choose the **xenial (hwe-16.04)** option
-       which, as of this writing, would deploy 16.04.3 LTS and the 4.10 kernel.
+     - When deploying the SUT for testing, you should always start out with
+       the original GA kernel.  For 18.04 LTS, the **bionic (ga-18.04)**
+       option is appropriate. If the sysetm is not deployable or fails
+       certification using the GA kernel, you will then need to re-deploy
+       the SUT choosing the correct HWE kernel option (if available). Note
+       that an HWE kernel option becomes available only after the first
+       point release for an LTS version, such as 16.04.1 or 18.04.1.
 
      - For 16.04 LTS and later, do not choose any of the **edge** or
        **lowlatency** kernel options for official Certification testing.
@@ -586,8 +586,8 @@ Performing Final Pre-Testing SUT Configuration
 Once the SUT is deployed, you should be able to log into it using SSH from
 the MAAS server. Check the node details page to learn its primary IP
 address. (Using a hostname will also work if DNS is properly configured,
-but this can be fragile.) The username on the node is ``ubuntu``, and you
-should require no password when logging in from the MAAS server or from any
+but this can be fragile.) The username on the node is ``ubuntu``, and no
+password should be required when logging in from the MAAS server or from any
 other computer and account whose SSH key you've registered with the MAAS
 server.
 
@@ -607,16 +607,32 @@ access the SUT:
    applied.
 
 -  You should verify your SUT's kernel version by typing ``uname -r``.
-   Ubuntu 16.04 GA ships with a 4.4.0-series kernel, while 16.04.2 uses a
-   4.8.0-series kernel. Note that, although updated kernels ship with most
+   Ubuntu 18.04 GA ships with a 4.15.0-series kernel. Note that,
+   although updated kernels ship with most
    point-release versions, if you use the standard MAAS images,
    ``lsb_release -a`` will show that you have the latest point-release
    version even if you're using the GA kernel. It's the kernel version
    that's important for testing purposes, as elaborated on in `Appendix C -
    Testing Point Releases`_.
 
--  If any network interfaces are not configured, you should configure them
-   in ``/etc/network/interfaces`` and activate them with ``ifup``.
+-  If any network interfaces are not configured, you should configure them:
+
+   - The best way is to release the node in MAAS, adjust the network
+     configuration as described in `Installing Ubuntu on the System`_, and
+     re-deploy the node. If the interfaces don't show up in MAAS, then you
+     should re-commission the node.
+
+   - If MAAS doesn't detect an interface, or if it requires configuration
+     MAAS can't handle, you can reconfigure the network in the deployed
+     installation:
+
+     - For Ubuntu 16.04 and earlier, edit ``/etc/network/interfaces`` and
+       activate the interfaces with ``sudo ifup``.
+
+     - For Ubuntu 18.04, edit ``/etc/netplan/50-cloud-init.yaml`` and
+       activate the changes with ``sudo netplan apply``. (NetPlan
+       configuration is described in more detail at
+       https://wiki.ubuntu.com/Netplan/Design.)
 
 -  If the SUT has more than one HDD, all but the first disk must be
    partitioned and mounted prior to testing. Partitions on those
@@ -655,10 +671,11 @@ You can initiate a testing session in a server as follows:
    running the ``canonical-certification-precheck`` script, which tests
    critical configuration details:
 
-   - If the script does not detect a Secure ID (SID) configured in
-     ``/etc/xdg/canonical-certification.conf``, the script gives you the
-     option of entering one. Doing so can simplify submitting results;
-     however, this will work only if the SUT has full Internet access.
+   - If the script detects that the
+     ``/etc/xdg/canonical-certification.conf`` file is missing information,
+     it will give you the opportunity to fill it in. This information
+     includes the SUT's Secure ID (SID) number and pointers to KVM and LXD
+     image files.
 
    - Information on some critical configuration details is displayed,
      followed by a summary, such as the following:
@@ -677,16 +694,13 @@ You can initiate a testing session in a server as follows:
      was inserted in the SUT. If your terminal supports the feature, you
      can scroll up to see details of any warnings or failures.
 
-   - If the script identifies any other problems, be sure to correct them.
+   - If the script identifies any problems, be sure to correct them.
      Some common sources of problems include the following:
 
      - If the precheck script fails the ``NICs_enabled`` test, you must
        correct the problem before testing. You must ensure that all network
-       ports are cabled to a working LAN and configured in
-       ``/etc/network/interfaces`` using the appropriate configuration
-       (static or DHCP) for your test environment. If you edit this file,
-       either reboot or bring up the interfaces you add with ``ifup``
-       before running tests.
+       ports are cabled to a working LAN and configured as described
+       earlier, in `Performing Final Pre-Testing SUT Configuration`_.
 
      - If your ``IPERF`` test failed, you may need to launch the ``iperf3``
        server on the Target system, as described earlier. Your
@@ -724,10 +738,10 @@ You can initiate a testing session in a server as follows:
 
        #. On a computer with better Internet access, download KVM and LXD
           cloud image files from
-          http://cloud-images.ubuntu.com/xenial/current/. In particular,
-          obtain the ``xenial-server-cloudimg-amd64-disk1.img``,
-          ``xenial-server-cloudimg-amd64-root.tar.xz``, and
-          ``xenial-server-cloudimg-amd64-lxd.tar.xz`` files, or the
+          http://cloud-images.ubuntu.com/bionic/current/. In particular,
+          obtain the ``bionic-server-cloudimg-amd64.img``,
+          ``bionic-server-cloudimg-amd64.squashfs``, and
+          ``bionic-server-cloudimg-amd64-lxd.tar.xz`` files, or the
           equivalent for your CPU architecture.
 
        #. Copy those images to any convenient directory on the SUT.
@@ -737,9 +751,9 @@ You can initiate a testing session in a server as follows:
 
             [environment]
             KVM_TIMEOUT = 300
-            KVM_IMAGE = /home/ubuntu/xenial-server-cloudimg-amd64-disk1.img
-            LXD_ROOTFS = /home/ubuntu/xenial-server-cloudimg-amd64-root.tar.xz
-            LXD_TEMPLATE = /home/ubuntu/xenial-server-cloudimg-amd64-lxd.tar.xz
+            KVM_IMAGE = /home/ubuntu/bionic-server-cloudimg-amd64.img
+            LXD_ROOTFS = /home/ubuntu/bionic-server-cloudimg-amd64.squashfs
+            LXD_TEMPLATE = /home/ubuntu/bionic-server-cloudimg-amd64-lxd.tar.xz
 
           Note that the KVM and LXD configurations are separated by
           several lines of comments in the configuration file.
@@ -751,47 +765,17 @@ You can initiate a testing session in a server as follows:
    typing ``screen -r``. This step is not important if you're running the
    Server Test Suite at the console.
 
-#. Run::
+#. Run the certification tests by typing an appropriate command, such as::
 
-    $ canonical-certification-server
+    $ certify-18.04
 
-#. A welcome message will be displayed. Make sure to read the message
-   and follow its instructions.
+   In some cases, though, another command may be necessary:
 
-#. Press the Enter key. The system will display a Suite Selection
-   screen:
+   - If you're testing an Ubuntu 16.04 installation, you must change the
+     version number.
 
-   .. figure:: images/suite-selection-xenial.png
-      :alt: The suite selection screen enables you to pick which
-            tests to run
-      :width: 100%
-
-#. Select the *16.04 server certification full* item by using the arrow
-   keys and then pressing Spacebar. (The other test
-   plans exist to enable easy re-running of subsets of
-   tests that often fail in some environments or to run tests on Ubuntu
-   14.04.)
-
-#. Press Enter to move on to the test selection screen.
-
-#. After a few seconds, a test selection screen will appear, as shown
-   below. You should ordinarily leave all the tests selected. (Tests that
-   are irrelevant for a given computer, such as tests of the optical drive
-   on computers that lack this hardware, are automatically ignored.) If a
-   test is hanging or otherwise causing problems, please contact the
-   Canonical Server Certification Team for advice on how to proceed. Using
-   this screen is fairly straightforward -- you can use Enter to expand
-   or collapse a category, the spacebar to select or deselect an option
-   or category, arrow keys to navigate through the options, and so on.
-
-   .. figure:: images/test-selection-xenial.png
-      :alt: The suite selection screen enables you to pick which
-            tests to run
-      :width: 100%
-
-#. Press the *T* key to start testing. The screen will begin displaying a
-   scrolling set of technical details about the tests as they are
-   performed.
+   - More exotic options, including running a limited set of tests, are
+     described in `Appendix B - Re-Testing and Installing Updated Tests`_.
 
 #. The full test suite can take several hours, or in extreme cases over a
    day, to complete, depending on the hardware configuration (amount of
@@ -802,16 +786,24 @@ You can initiate a testing session in a server as follows:
 
 #. If at any time during the execution you are *sure* the computer has
    crashed (or it reboots spontaneously) then after the system comes back
-   up you should run the ``canonical-certification-server`` command again
+   up you should run the ``certify-18.04`` command again
    and respond `y` when asked if you want to resume the previous session.
 
-#. If any tests fail or do not run, the test selection screen will
-   reappear, but it will show only those tests that failed or did not run.
-   You can use this opportunity to re-run a test if you believe it failed
-   for a transient reason, such as if your ``iperf3`` server crashed or was
-   unavailable. Note that the presence of a test in this list does not
-   necessarily mean that the test failed; tests that were skipped for
-   harmless reasons can also appear in this list.
+#. If any tests fail or do not run, a screen will appear that summarizes
+   those tests that failed or did not run. You can use this opportunity to
+   re-run a test if you believe it failed for a transient reason, such as
+   if your ``iperf3`` server crashed or was unavailable or if you forgot to
+   insert a USB drive. Note that the presence of a test in this list does
+   not necessarily mean that the test failed; tests that were skipped for
+   harmless reasons can also appear in this list. To re-run tests, use the
+   arrow keys to highlight each test you want to re-run, press Spacebar to
+   select it, and then press the **R** key to re-run the selected tests.
+   If you don't want to re-run any tests, press **F** to finish.
+
+     .. figure:: images/cert-failures.png
+        :alt: You can sometimes correct problems and re-run tests
+              before submitting results.
+        :width: 100%
 
 #. When the test run is complete, you should see a summary of tests run, a
    note about where the ``submission*`` files have been stored, and a
@@ -835,8 +827,8 @@ You can review your results locally by loading
 ``submission_<DATECODE>.html`` in a web
 browser. This enables you to
 quickly spot failed tests because they're highlighted in red with a
-"FAILED" notation in the Result column, whereas passed tests acquire a
-green color, with the word "PASSED." Note, however, that *a failed test
+"failed" notation in the Result column, whereas passed tests acquire a
+green color, with the word "passed." Note, however, that *a failed test
 does not necessarily denote a failed certification*. Reasons a test might
 fail but still enable a certification to pass include the following:
 
@@ -874,12 +866,11 @@ instructions:
 
 #. Install the package::
 
-   $ sudo apt-get install canonical-certification-submit
+   $ sudo apt-get install checkbox-ng
 
 #. Run the following command::
 
-    $ canonical-certification-submit --secure_id <SUT_SECURE_ID> \
-      <PATH_TO>/submission_<DATECODE>.xml
+    $ checkbox-cli submit <SUT_SECURE_ID> <PATH_TO>/submission_<DATECODE>.tar.xz
 
    where:
 
@@ -893,7 +884,7 @@ instructions:
          :width: 70%
 
    -  ``<PATH_TO>`` refers to the location of the
-      ``submission_{datecode}.xml`` file
+      ``submission_<DATECODE>.tar.xz`` file
       (which should be contained in the ``~/.local/share/checkbox-ng``
       directory you copied to the USB key).
 
@@ -908,9 +899,8 @@ submission::
   $ canonical-certification-submit --secure_id a00D000000XndQJIAZ \
     ~/.local/share/checkbox_ng/submission_2016-03-23T19\:06\:18.244727.xml 
   Successfully sent, submission status at
-  https://certification.canonical.com/submissions/status/20409
+  https://certification.canonical.com/submissions/status/28d85e09-11d4
 
-  
 Once results submission is complete, use the provided link in the output
 to review the results and confirm that they are correct.
 
@@ -931,8 +921,8 @@ problems, you can request a certificate:
 
    -  Status is fixed at In Progress.
 
-   -  Release indicates the Ubuntu release used for testing, and for which
-      the certificate will be issued.
+   -  Certified Release indicates the Ubuntu release used for testing, and
+      for which the certificate will be issued.
 
    -  Level indicates the type of certification:
 
@@ -940,7 +930,7 @@ problems, you can request a certificate:
          Ubuntu. This is the option to choose for server hardware as that
          typically does not ship with a pre-installed operating system.
 
-      -  Certified Pre-installed is for hardware that  ships with a (possibly
+      -  Certified Pre-install is for hardware that  ships with a (possibly
          customized) version of Ubuntu. This option is used almost exclusively
          for Client hardware such as desktops, laptops and tablets that 
          typically ship with a pre-installed operating system.
@@ -951,17 +941,18 @@ problems, you can request a certificate:
       http://certification.canonical.com. Other public pre-existing
       certificates, or those issued in the future, will remain public.
 
-#. Click Submit. You'll see a new screen in which you can (and in one
-   case *must*) enter more information. In particular, you can click:
+#. Click Submit. You'll see a new screen in which you can enter more
+   information. In particular, you can click:
 
    -  Link Bug to link to a bug on https://bugs.launchpad.net.
       This option is available only to Canonical engineers.
 
-   -  Create Note or Create Note from Template to create a note. Most
+   -  Create Note or Add Note from Template to create a note. Most
       systems will have at least two notes:
 
-      -  *A note titled "Tester" with the name of the person who did the
-         testing is required.*
+      -  *A note titled "Requester" with the name of the person who
+         requested the certificate is required.* This note should be
+         created automatically, but you may optionally modify it.
 
       -  A note titled "Test Notes" is usually present. It describes
          test-specific quirks, such as why a failure should be ignored
@@ -1008,6 +999,8 @@ situations or when debugging problems that necessitate booting in this way.
 
 During the installation, you may be prompted for a password for ``mysql``.
 This can be set to anything you wish; it will not be used during testing.
+You may also be prompted to configure the Postfix mail server. Selecting
+**No configuration** is appropriate.
 
 At this point, the test suite and dependencies should be installed.
 
@@ -1023,25 +1016,93 @@ instance, if a USB flash drive is defective or improperly prepared, the
 relevant USB tests will fail. Another common source of problems is
 network tests, which can fail because of busy LANs, flaky switches, bad
 cables, and so on. When this happens, you must re-run the relevant
-test(s).
+test(s). Broadly speaking, there are two ways to re-run tests: via a
+limited test script and by manually selecting a subset of tests. You may
+also need to install updated test scripts in some cases.
 
-Although it's often possible to re-run a test by directly executing a
-single test script, the preferred method is:
+Running a Limited Test Script
+-----------------------------
 
-#. Re-run ``canonical-certification-server``.
+In addition to the ``certify-18.04`` test script, several others are
+provided with the Server Test Suite:
 
-#. Use one of the abbreviated testing whitelists (such as *Network-only*)
-   or adjust the set of tests to be run.
+- If you're testing a System-on-Chip (SoC) rather than a production
+  server, you should run ``certify-soc-18.04``.
 
-#. Submit the resulting ``submission_<DATECODE>.xml`` file to the C3 site.
+- If you're testing a virtual machine, you should run
+  ``certify-vm-18.04``.
 
-You can then request a certificate based on the main results (the one with
-the most passed tests) and refer to the secondary set of results in the
-certificate notes. This procedure ensures that all the necessary data will
-be present on C3. It also ensures that (sometimes subtle) problems will be
-avoided; for instance, network tests may not be valid if network ports that
-are not being tested are active. The ``canonical-certification-server``
-framework ensures that such potential problems are avoided.
+- The ``test-firmware`` command runs firmware tests.
+
+- The ``test-functional-18.04`` command runs functional tests.
+
+- The ``test-network-18.04`` command runs network tests.
+
+- The ``test-storage`` command runs tests of storage devices.
+
+- The ``test-usb`` command runs tests of USB ports.
+
+- The ``test-virtualization`` command runs virtualization (KVM and
+  LXD) tests.
+
+If you're testing Ubuntu 16.04, change the version number in commands that
+include it. Consult your Technical Partner Manager if you need help
+deciding which of these tests to run.
+
+When the test run completes, submit the test result in the same way you
+would for a complete test run. You can then request a certificate based on
+the main results (the one with the most passed tests) and refer to the
+secondary set of results in the certificate notes. This procedure ensures
+that all the necessary data will be present on C3.
+
+Manually Selecting a Subset of Tests
+------------------------------------
+
+If you need to run a mish-mash of different tests, you can do so via the
+``certify-advanced`` command:
+
+#. Run::
+
+    $ certify-advanced
+
+#. Press the Enter key. The system will display a Suite Selection
+   screen:
+
+   .. figure:: images/suite-selection-bionic.png
+      :alt: The Select Test Plan screen enables you to pick which
+            tests to run
+      :width: 100%
+
+#. Select the *18.04 Server Certification Full* item by using the arrow
+   keys and then pressing Spacebar. (In some cases, another selection may
+   be appropriate. For instance, if you need to re-run a single network
+   test, you might select *18.04 Network Only Test Plan*.)
+
+#. Press Enter to move on to the test selection screen.
+
+#. After a few seconds, a test selection screen will appear, as shown
+   below. Using this screen is fairly straightforward -- you can use Enter
+   to expand or collapse a category, the spacebar to select or deselect an
+   option or category, arrow keys to navigate through the options, and so
+   on. Using these controls, de-select all the tests you do *not* want to
+   run, leaving only the relevant tests selected.
+
+   .. figure:: images/test-selection-xenial.png
+      :alt: The suite selection screen enables you to pick which
+            tests to run
+      :width: 100%
+
+#. Press the *T* key to start testing. The screen will begin displaying a
+   scrolling set of technical details about the tests as they are
+   performed.
+
+#. When the test run is complete, submit the test results in the same way
+   you would for a complete test run, and then request a certificate based
+   on the main test run, including a note referring to this secondary run
+   to complete the results.
+
+Installing and Running Updated Tests
+------------------------------------
 
 From time to time, a test will be found to contain a bug or need to be
 updated to deal with a problem. In such cases, it is often impractical
@@ -1073,7 +1134,7 @@ or file is as follows:
    interface.
 
 In some cases, another procedure might be necessary; for instance, a bug
-fix might require installing a new Debian package with the dpkg command,
+fix might require installing a new Debian package with the ``dpkg`` command,
 or you might need to edit a configuration file. The Canonical Server
 Certification Team can advise you about such requirements.
 
@@ -1084,36 +1145,42 @@ Certification Team can advise you about such requirements.
 Appendix C - Testing Point Releases
 ===================================
 
-Ordinarily, 16.04 certification requires testing Ubuntu releases or Linux
-kernels:
+Ubuntu LTS releases are updated to a new *point release* version
+approximately three months after each intervening release -- that is,
+18.04.1 will be released around July of 2018 (three months after 18.04),
+18.04.2 will be released around January of 2019 (three months after 18.10),
+and so on. These updates use the kernels from the latest interim release,
+which can affect hardware compatibility; however, the new kernels are
+supported for a limited period of time compared to the GA kernel.
+Therefore, certification can involve testing multiple Ubuntu releases or
+Linux kernels:
 
--  Ubuntu 16.04 GA -- That is, the version that was released in April of
-   2016. This version shipped with a 4.4.0-series kernel.
+-  The GA release -- That is, the version that was released in April of the
+   release year (2016 for 16.04, 2018 for 18.04). Ubuntu 16.04 shipped with
+   a 4.4.0-series kernel, and 18.04 shipped with a 4.15.0-series kernel.
 
--  The current point release -- That is, version 16.04.2 or whatever is the
-   latest release in the 16.04 series. Ubuntu LTS releases starting with
-   the .2 version (such as 16.04.2) update the kernel to the same series as
-   the most-recently released non-LTS Ubuntu version. For instance, 16.04.2
-   uses the same kernel series as Ubuntu 16.10 -- that is, the 4.8.0 kernel
-   series.
+-  The current point release -- That is, version 16.04.4 or whatever is the
+   latest release in the series. Testing point-release versions starting
+   with the .2 point release in addition to the original GA version serves
+   as a check for regressions in the kernel, and may be required if the GA
+   kernel doesn't work on a SUT.
 
 In theory, compatibility will only improve with time, so a server might
-fail testing with 16.04 GA and its 4.4.0 kernel because it uses new
-hardware that had not
-been supported in April of 2016, but pass with the latest version. Such
-a server would be certified for that latest version, but not for the
-original GA release. If such a situation arises, testing may also be
-done with intervening releases so as to determine the earliest working
-version of Ubuntu.
+fail testing with the original GA kernel because it uses new hardware that
+had not been supported in April of the OS release year, but pass with the
+latest kernel in a subsequent point-release. Such a server would be
+certified for that latest version, but not for the original GA release. If
+such a situation arises, testing may also be done with intervening kernels
+so as to determine the earliest working version of Ubuntu.
 
-If a server fails certification with a more recent release but works
+If a server fails certification with a more recent kernel but works
 with an earlier one, this situation is treated as a regression; a bug
 report should be filed and note made of the problem in the certificate
 request. Please notify your TPM about such problems to facilitate their
 resolution.
 
-Because Ubuntu 16.04.1 uses the same 4.4.0 kernel series as 16.04 GA,
-testing 16.04.1 is not required.
+Because x.04.1 releases use the same kernel series as their corresponding
+GA releases, testing with x.04.1 point releases is not required.
 
 If you have problems controlling the SUT's kernel version or installing
 particular point releases, then you should consult the Server Certification
@@ -1130,41 +1197,53 @@ Fixing Deployment Problems
 --------------------------
 
 Sometimes a node fails to deploy. When this happens, check the installation
-output on the node's MAAS page. (With MAAS 2.1, scroll down to "Machine
-output" and click the radio button to the right; "Installation Output"
-should be one of the options. With MAAS 2.2, click the "Installation" tab
-to see the installation output.) Often, a clue to the nature of the problm
+output on the node's MAAS page. (With MAAS 2.3, click the Logs tab and
+ensure that Installation Output is selected in the selector on the left of
+the screen.) Often, a clue to the nature of the problm
 appears near the end of that output. If you don't spot anything obvious,
 copy that output into a file and send it to the Server Certification Team.
 
-One common cause of deployment problems is IP address assignment issues. To
-minimize the risk of such problems, set the node's network settings to use
-DHCP exclusively. To do this, you must first release the node. You can then
-scroll to the Network section on the node's summary page in MAAS and set
-all the IP Address fields to DHCP. This change can also help prevent a
-node's IP address from changing if you shut it down for a while and then
-reboot or after the certification network tests complete.
+One common cause of deployment problems is IP address assignment issues.
+Depending on your MAAS configuration and local network needs, your network
+might work better with DHCP, Auto Assign, or Static Assign as the method of
+IP address assignment. To change this setting, you must first release the
+node. You can then click the Interfaces tab on the node's summary page in
+MAAS and reconfigure the network options by using the Actions field, as
+described earlier, in `Installing Ubuntu on the System`_.
+
+If, when you try to deploy a GA kernel, MAAS complains that the kernel is
+too old, try this:
+
+#. Click the *Configuration* tab in MAAS.
+
+#. Click *Edit* under *Machine Configuration.*
+
+#. In the *Minimum Kernel* radio button, select *No Minimum Kernel.*
+
+#. Click *Save Changes.*
+
+#. Try to re-deploy.
 
 Adding PPAs Manually
 --------------------
 
 Sometimes you may need to add a PPA manually. In order for this to work, your
 SUT must be able to reach the internet and more specifically reach
-launchpad.net.  If either of those requirements are not met, you will receive a
-somewhat confusing message like this:
+``launchpad.net``.  If either of those requirements are not met, you will receive a
+somewhat confusing message like this::
 
-ubuntu@ubuntu:~$ sudo apt-add-repository ppa:hardware-certification/public
-Cannot add PPA: 'ppa:hardware-certification/public'.
-Please check that the PPA name or format is correct.
+ ubuntu@ubuntu:~$ sudo apt-add-repository ppa:hardware-certification/public
+ Cannot add PPA: 'ppa:hardware-certification/public'.
+ Please check that the PPA name or format is correct.
 
 To resolve this, ensure that your SUT can reach the internet and can reach
-launchpad.net directly.
+``launchpad.net`` directly.
 
 Submitting Results
 ------------------
 
 If submitting results from the Server Test Suite itself fails, you can use
-the ``canonical-certification-submit`` program, as described earlier, in
+the ``checkbox-cli`` program, as described earlier, in
 `Manually Uploading Test Results to the Certification Site`_. You can try
 this on the SUT, but if network problems prevented a successful submission,
 you may need to bring the files out on a USB flash drive or other removable
@@ -1174,8 +1253,8 @@ Addressing the Inconsistent Message when Submitting Results
 -----------------------------------------------------------
 
 If you receive a message that looks like the following when using
-``canonical-certification-submit``, please be sure to save the
-``submission.xml`` file and contact your account manager::
+``checkbox-cli`` to submit results, please be sure to save the
+``submission*.tar.xz`` file and contact your account manager::
 
   2014-04-28 10:55:33,894 CRITICAL Error: Inconsistent message
 
@@ -1220,22 +1299,220 @@ tests. Specific suggestions for fixing these problems include:
    the SUT.
 
 -  **Check the SUT's network configuration** -- A failure to configure the
-   network ports in ``/etc/network/interfaces`` will cause a failure of the
+   network ports will cause a failure of the
    network tests. Likewise, a failure to bring up a network interface
    before testing will cause the test to fail, even if
-   ``canonical-certification-server`` detects the interface.
+   the Server Test Suite detects the interface.
 
 -  **Check your DHCP server** -- A sluggish or otherwise malfunctioning
    DHCP server can delay bringing up the SUT's network interfaces (which
    repeatedly go down and come up during testing). This in turn can cause
    network testing failures.
 
-If you end up having to re-run the network tests, either do so from within
-``canonical-certification-server`` or be sure to bring down all the network
-interfaces except the one you're testing before using ``iperf3`` manually.
-The way Linux manages network interfaces makes it difficult to ensure that
-network traffic will be restricted to a single network device if more than
-one is active.
+If you end up having to re-run the network tests, you can do so as
+described earlier, in `Appendix B - Re-Testing and Installing Updated
+Tests`_.
+
+Network Performance Tuning
+--------------------------
+
+Ubuntu's default network configuration works fine for most 1Gbps and 10Gbps
+network devices; however, some servers require a little tweaking of
+settings to perform adequately at higher speeds. The following procedure
+was used to tune a system with a 100Gbps NIC, and may be used as a starting
+point for tweaking other systems; however, details may need to be adjusted
+for specific SUTs. Note that similar steps may be needed on both the SUT
+and the ``iperf3`` server.
+
+#. Find the device's NUMA node::
+
+    # cat /sys/class/net/enp94s0f0/device/numa_node 
+    0
+    # cat /sys/class/net/enp94s0f1/device/numa_node 
+    0
+
+#. Find with which CPU(s) the nodes are associated::
+
+    # lscpu |grep NUMA
+    NUMA node(s):          2
+    NUMA node0 CPU(s):     0-17,36-53
+    NUMA node1 CPU(s):     18-35,54-71
+
+   This lets us set affinity to keep the iperf processes close to the CPU
+
+#. Check current CPU frequencies::
+
+    # grep -E '^cpu MHz' /proc/cpuinfo
+    cpu MHz         : 1000.000
+
+#. Set governor on all CPUs (Requires install of ``cpufrequtils``)::
+
+    for x in `seq 0 71`;do
+	    cpufreq-set -r -g performance -c $x
+    done
+
+#. Check frequencies again::
+
+    # grep -E '^cpu MHz' /proc/cpuinfo
+    cpu MHz         : 2301.000
+
+   Note they should now be at or above the CPU max.
+
+#. Make sure the card is in the right slot (100Gb cards should show speed
+   of 8GT/s and Width of 16x otherwise the PCIe slot it’s in can’t
+   handle the throughput)::
+
+    # lspci -s 04:00.0 -vvv | grep Speed
+    LnkCap: Port #0, Speed 8GT/s, Width x16, ASPM not supported,
+      Exit Latency L0s unlimited, L1 unlimited
+    LnkSta: Speed 8GT/s, Width x16, TrErr- Train- SlotClk+ DLActive-
+      BWMgmt- ABWMgmt-
+
+#. Check the ``MaxReadRequest`` using the PCI address of each port (you
+   have to set this per port)::
+
+    # lspci -s 04:00.0 -vvv | grep MaxReadReq
+    MaxPayload 256 bytes, MaxReadReq 512 bytes
+    # setpci -s 04:00.0 68.w
+    2936
+
+#. Set Max Read Request to the upper limit::
+
+    # setpci -s 04:00.0 68.w=5936
+    # lspci -s 04:00.0 -vvv | grep MaxReadReq
+    MaxPayload 256 bytes, MaxReadReq 4096 bytes
+
+#. Set buffer to 512M Buffers::
+
+    # sysctl net.core.rmem_max=563870912
+    net.core.rmem_max = 563870912
+    # sysctl net.core.wmem_max=563870912
+    net.core.wmem_max = 563870912
+
+#. Increase Linux autotuning TCP Buffer limits to 256MB::
+
+    # sysctl net.ipv4.tcp_rmem="4096 87380 268435456"
+    net.ipv4.tcp_rmem = 4096 87380 268435456
+    # sysctl net.ipv4.tcp_wmem="4096 87380 268435456"
+    net.ipv4.tcp_wmem = 4096 87380 268435456
+
+#. Set max_backlog to 300K::
+
+    # sysctl net.core.netdev_max_backlog=300000
+    net.core.netdev_max_backlog = 300000
+
+#. Don't cache ``ssthresh`` from previous connection::
+
+    # sysctl net.ipv4.tcp_no_metrics_save=1
+    net.ipv4.tcp_no_metrics_save = 1
+
+#. Explicitly set ``htcp`` as the congestion control. You could also set
+   this to ``bbr``::
+
+    # sysctl net.ipv4.tcp_congestion_control=htcp
+    net.ipv4.tcp_congestion_control = htcp
+
+#. If you are using jumbo frames, also set this::
+
+    # sysctl net.ipv4.tcp_mtu_probing=1
+    net.ipv4.tcp_mtu_probing = 1
+
+#. Set default ``qdisc`` to ``fq``::
+
+    # sysctl net.core.default_qdisc=fq
+    net.core.default_qdisc = fq
+
+#. NIC tweaks:
+
+   - Turn on Large Receive Offload::
+
+      # ethtool -K enp216s0f0 lro on
+      # ethtool -K enp216s0f1 lro on
+
+   - Set ``txqueuelen`` buffer higher::
+
+      # ifconfig enp216s0f0 txqueuelen 20000
+      # ifconfig enp216s0f1 txqueuelen 20000
+
+   - Enable jumbo frames::
+
+      # ip link set enp216s0f0 mtu 9000
+      # ip link set enp216s0f1 mtu 9000
+
+   - Turn off ``irqbalance``::
+
+      # systemctl stop irqbalance
+      # systemctl status irqbalance |grep Active
+         Active: inactive (dead) since Tue 2018-04-17 20:58:16 UTC; 23s ago
+
+For testing with ``iperf3``: On the ``iperf3`` target server, start 4
+``iperf3`` daemons on different ports, pinned to NUMA Node 0 cores (see #2
+above)::
+
+ # iperf3 -sD -B 172.16.21.2 -p5101 -A0
+ # iperf3 -sD -B 172.16.21.2 -p5102 -A14
+ # iperf3 -sD -B 172.16.21.2 -p5103 -A36
+ # iperf3 -sD -B 172.16.21.2 -p5104 -A52
+
+Note we're using ``-A`` to ensure each process is on a CPU core on the same
+NUMA node to which our 100Gbps NIC is attached. On the SUT, kick off four
+``iperf3`` processes, one for each remote port::
+
+ $ iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5101 -R -i 60 -T s1 & \
+   iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5102 -R -i 60 -T s2 & \
+   iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5103 -R -i 60 -T s3 & \
+   iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5104 -R -i 60 -T s4 &
+
+This is abbreviated output::
+
+ s4:  [ ID] Interval           Transfer     Bandwidth       Retr
+ s4:  [  4]   0.00-60.00  sec   161 GBytes  23.1 Gbits/sec  18726             sender
+ s4:  [  4]   0.00-60.00  sec   161 GBytes  23.1 Gbits/sec                  receiver
+ s4:  
+ s4:  iperf Done.
+ s3:  [ ID] Interval           Transfer     Bandwidth
+ s3:  [  4]   0.00-60.00  sec   160 GBytes  22.9 Gbits/sec                  
+ s3:  - - - - - - - - - - - - - - - - - - - - - - - - -
+ s3:  [ ID] Interval           Transfer     Bandwidth       Retr
+ s3:  [  4]   0.00-60.00  sec   160 GBytes  22.9 Gbits/sec  16953             sender
+ s3:  [  4]   0.00-60.00  sec   160 GBytes  22.9 Gbits/sec                  receiver
+ s3:  
+ s3:  iperf Done.
+ s2:  [ ID] Interval           Transfer     Bandwidth
+ s2:  [  4]   0.00-60.00  sec   163 GBytes  23.3 Gbits/sec                  
+ s2:  - - - - - - - - - - - - - - - - - - - - - - - - -
+ s2:  [ ID] Interval           Transfer     Bandwidth       Retr
+ s2:  [  4]   0.00-60.00  sec   163 GBytes  23.3 Gbits/sec  17582             sender
+ s2:  [  4]   0.00-60.00  sec   163 GBytes  23.3 Gbits/sec                  receiver
+ s1:  [ ID] Interval           Transfer     Bandwidth
+ s2:  
+ s2:  iperf Done.
+ s1:  [  4]   0.00-60.00  sec   159 GBytes  22.7 Gbits/sec                  
+ s1:  - - - - - - - - - - - - - - - - - - - - - - - - -
+ s1:  [ ID] Interval           Transfer     Bandwidth       Retr
+ s1:  [  4]   0.00-60.00  sec   159 GBytes  22.7 Gbits/sec  17869             sender
+ s1:  [  4]   0.00-60.00  sec   159 GBytes  22.7 Gbits/sec                  receiver
+
+The average bandwidth over 60 seconds for all four threads adds up to
+92Gb/s. Note that you can run this via ``parallel`` (``apt install
+parallel``) as well.  Create a file that looks like this::
+
+ # cat commands.txt 
+ iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5101 -R -i 60 -T s1
+ iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5102 -R -i 60 -T s2
+ iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5103 -R -i 60 -T s3
+ iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5104 -R -i 60 -T s4
+
+Execute it like this::
+
+ # parallel -a commands.txt |tee -a 100Gb-Port0.log
+
+References:
+
+- https://srcc.stanford.edu/100g-network-adapter-tuning
+- https://community.mellanox.com/docs/DOC-2496
+- https://linuxconfig.org/how-to-enable-jumbo-frames-in-linux
+- https://fasterdata.es.net/
 
 Handling Miscellaneous Issues During Testing
 --------------------------------------------
@@ -1337,9 +1614,12 @@ ways to pass them to the kernel:
   you can add the kernel command line options to a single node by following
   these instructions:
 
-  1. On the MAAS server, type ``maas admin tags create
-     name='SoL-ttyS2-115200' comment='SoL ttyS2 115200'
-     kernel_opts='console=tty1 console=ttyS2,115200n8'``, changing the
+  1. On the MAAS server, type::
+  
+       $ maas admin tags create name='SoL-ttyS2-115200' comment='SoL ttyS2 115200' \
+         kernel_opts='console=tty1 console=ttyS2,115200n8'
+     
+     Change the
      kernel options for your node as noted earlier. (You can change the
      name and comment, too.) Note that this command assumes you set up the
      MAAS server using the ``maniacs-setup`` script; if you used some other
@@ -1361,7 +1641,7 @@ ways to pass them to the kernel:
 
 * **Setting global kernel options** -- If Ubuntu is not yet installed, you
   can add the kernel command line options to the Global Kernel Parameters
-  area in the MAAS settings page (``http://localhost/MAAS/settings/``).
+  area in the MAAS settings page (``http://localhost:5240/MAAS/settings/``).
   **WARNING:** This action will apply these settings to *all* the nodes you
   subsequently enlist, commission, or deploy! Unless they're all configured
   to use SoL with the same options, the result can be enlistment,

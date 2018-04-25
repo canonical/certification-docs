@@ -106,6 +106,6 @@ Some tips when editing the .rst files:
 * Use your favorite text editor.
 * If necessary, you can insert page breaks manually; but use this feature
   only if absolutely necessary.
-* Once a year, the images/cover-background.xcf file must be edited and
-  re-exported to cover-background.png to update the copyright date that
-  appears on the cover page.
+* Once a year, the src/cover-background.xcf file must be edited and
+  re-exported to images/cover-background.png to update the copyright date
+  that appears on the cover page.

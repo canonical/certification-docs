@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 RST2PDF=rst2pdf
 RST2HTML=rst2html
-DOC_NAMES=Test_Case_Guide-16.04 Test_Case_Guide-18.04 Programme_Guide-16.04 Programme_Guide-18.04 Coverage_Guide-18.04 Coverage_Guide-16.04 Self-Test_Guide-18.04 Self-Test_Guide-16.04 MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration_Scripted Policy_Guide-16.04 Policy_Guide-18.04
+DOC_NAMES=Test_Case_Guide-16.04 Test_Case_Guide-18.04 Programme_Guide-16.04 Programme_Guide-18.04 Coverage_Guide-18.04 Coverage_Guide-16.04 Self-Test_Guide MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration_Scripted Policy_Guide-16.04 Policy_Guide-18.04
 HTML_NAMES=$(DOC_NAMES:=.html)
 PDF_NAMES=$(DOC_NAMES:=.pdf)
 
@@ -21,7 +21,7 @@ maniac: MAAS_Advanced_NUC_Installation_And_Configuration.pdf
 
 maniacs: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.pdf
 
-stg: Self-Test_Guide-16.04.pdf Self-Test_Guide-18.04.pdf
+stg: Self-Test_Guide.pdf Self-Test_Guide.pdf
 
 coverage: Coverage_Guide-16.04.pdf Coverage_Guide-18.04.pdf
 
@@ -35,7 +35,7 @@ maniach: MAAS_Advanced_NUC_Installation_And_Configuration.html
 
 maniacsh: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.html
 
-stgh: Self-Test_Guide-16.04.html Self-Test_Guide-18.04.html
+stgh: Self-Test_Guide.html Self-Test_Guide.html
 
 coverageh: Coverage_Guide-16.04.html Coverage_Guide-18.04.html
 
@@ -71,8 +71,8 @@ Self-Test_Guide-16.04.*: images/test-selection-xenial.png
 Self-Test_Guide-18.04.*: images/logo-ubuntu_su-white_orange-hex.png
 Self-Test_Guide-18.04.*: images/logo-canonical_no-tm-white-hex.png
 Self-Test_Guide-18.04.*: images/certification-process-flowchart-portrait.png
-Self-Test_Guide-18.04.*: images/secure_id.png
-Self-Test_Guide-18.04.*: images/hardware-creation-flowchart-landscape.png
-Self-Test_Guide-18.04.*: images/cert-pretest.png
-Self-Test_Guide-18.04.*: images/suite-selection-xenial.png
-Self-Test_Guide-18.04.*: images/test-selection-xenial.png
+Self-Test_Guide.*: images/secure_id.png
+Self-Test_Guide.*: images/hardware-creation-flowchart-landscape.png
+Self-Test_Guide.*: images/cert-pretest.png
+Self-Test_Guide.*: images/suite-selection-xenial.png
+Self-Test_Guide.*: images/test-selection-xenial.png
