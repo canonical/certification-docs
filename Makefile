@@ -46,7 +46,7 @@ programmeh: Programme_Guide-16.04.html Programme_Guide-18.04.html
 testcaseh: Test_Case_Guide-16.04.html Test_Case_guide-18.04.html
 
 clean:
-	rm -rf *.pdf *.html debian/files debian/certification-docs* drafts/*.pdf drafts/*.html
+	rm -rf *.pdf *.html debian/files debian/certification-docs* 
 
 # dependencies
 
