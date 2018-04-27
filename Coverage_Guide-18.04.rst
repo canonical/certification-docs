@@ -38,32 +38,32 @@ its life cycle.
 
 The following test categories are specified: 
 
-Whitelist
+Blocking
   Features that are required for certification. If any of the tests in the
   whitelist fails, the  certification will fail.
 
-Greylist
+Non-Blocking
   Features that are tested, but that don't block certification. If any of
   the tests under the greylist fail, a note will be added to the
   certificate to warn the potential customer or user.
 
-Blacklist
-  Features that are not currently tested. The items in the blacklist
+Untested
+  Features that are not currently tested. The items in the Untested
   category are just reference items: **anything not explicitly called out in
-  the whitelist or greylist categories can be considered part of the
-  blacklist category.**  Canonical has the option to add and remove tests,
+  the Blocking or Non-Blocking categories can be considered part of the
+  Untested category.**  Canonical has the option to add and remove tests,
   provided they are preapproved between Canonical and the customer.
 
-For Blacklist items, Canonical **may** introduce tests for those items at
-any point; however, those tests will be introduced as Greylist items until
+For Untested items, Canonical **may** introduce tests for those items at
+any point; however, those tests will be introduced as Non-Blocking items until
 the next major suite revision.  For example:
 
 MAAS compatibility testing was not required for 12.04 LTS.  As of 12.04.3,
-MAAS was tested as a Greylist item during certification. Thus, if a
-greylist item does not work, the certification is not blocked but the
+MAAS was tested as a Non-Blocking item during certification. Thus, if a
+Non-Blocking item does not work, the certification is not blocked but the
 testing is performed and that data is recorded.  As of 14.04, MAAS
 compatibility was required to pass certification, and thus the MAAS test
-moved from Greylist to Whitelist.  Prior releases of Ubuntu Server LTS test
+moved from Non-Blocking to Blocking.  Prior releases of Ubuntu Server LTS test
 relied on outside setup of PXE, FTP, TFTP, and Power (IPMI) testing.  With
 Ubuntu Server 14.04 LTS testing all of that functionality is now provided
 via the testing tools and framework to ease setup,  reduce variability
@@ -95,8 +95,8 @@ Model B, and will be considered tested for both.
 Additional changes to Server Certification Test Coverage are highlighted
 below.
 
-Whitelist
----------
+Blocking
+--------
 
 * Processors:
 
@@ -146,6 +146,10 @@ Whitelist
   * Ethernet devices are tested at their full speed and must show a minimum of
     80% of advertised maximum speed.
 
+  * High Speed network devices (40 Gb/s and faster must also meet this
+    requirement, however additional configuration and testing steps may be
+    required)
+
   * Testing is conducted for 1 hour per port.
 
 * System management [2]_ [3]_:
@@ -182,14 +186,25 @@ Whitelist
 
   * Running an Ubuntu image on KVM
 
-Greylist
---------
+* Containers
+
+  * LXC must function
 
 * System Identification
 
   * Ensure that the Make/Model being returned to the operating system and
     via OOB Management is the same as what is being submitted for
-    certification.
+    certification. Firmware must accurately reflect the Make/Model being
+    certified.
+
+
+Non-Blocking
+------------
+
+* NVMe Devices
+
+  * Vendor Approved NVMe devices will be tested as storage. Passing devices
+    will be listed as Certified, Failing devices will be listed as Unsupported.
 
 * Firmware Updates
 
@@ -218,16 +233,16 @@ Greylist
 
   * External keyboard (basic functionality)
 
-Blacklist
----------
+Untested
+--------
 
-* External PCI cards
+* GPU Coprocessors (for Compute, not Graphics Display)
 
-* Graphics
+* Graphics Display Adapters
 
 * Tape devices
 
-* Advanced network configuration
+* Advanced network configuration (Bonding, Failover, etc)
 
 * E-Star requirements
 
@@ -252,7 +267,9 @@ What about non-x86 processors?
   Any architecture supported by Ubuntu may be certified.  At this time, this
   includes ia32, x86_64, ARM, ARM64, PPC64LE and s390x.
 
-
+Why don't you certify GPUs?
+  At this time, there is no reliable, consistent way to test GPU Coprocessors.
+  
 Complete Test Plan
 ==================
 
