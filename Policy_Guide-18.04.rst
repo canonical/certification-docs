@@ -1,5 +1,5 @@
 ===========================================================
- Ubuntu Server Hardware Certification Policies (16.04 LTS)
+ Ubuntu Server Hardware Certification Policies (18.04 LTS)
 ===========================================================
 
 .. include:: <isonum.txt>
@@ -52,8 +52,9 @@ provided to anyone involved in this effort from engineering to management.
 
 Definitions
 -----------
-Blacklist Test
-    Tests or areas that are not tested and not required for Certification.
+Blocking Test
+    Tests or coverage areas that are required to be tested and  required to pass
+    for Certification.
 
 Certificate
     An indicator that a system has been tested and is considered fully
@@ -63,7 +64,7 @@ Certification
     The process by which a system is tested and deemed "Ubuntu Server
     Certified."
 
-Greylist Test
+Non-Blocking Test
     Tests or areas that are tested but do not block Certification if they fail.
 
 IHV
@@ -118,10 +119,6 @@ Variant
 Vendor Approved Option
     Any device that can be ordered by the customer for a given Server Model.
     This includes Network devices, HBAs, RAID controllers, and so forth.
-
-Whitelist Test
-    Tests or coverage areas that are required to be tested and  required to pass
-    for Certification.
 
 Services Provided
 =================
@@ -393,7 +390,7 @@ Test Requirements Changes
 The requirements for Certification are considered fluid up to the day the LTS
 is released.  At that point, certification requirements are locked in and will
 not change for the life of that LTS.  Any new test cases will be introduced as
-Greylist items and will not gate certifications.  
+Non-Blocking items and will not gate certifications.  
 
 Note that this only applies to additions to the requirements.  Requirements can
 be eased (tests removed) at any time and *will* be applicable to all
@@ -405,25 +402,25 @@ Progression of New Tests
 As the Suite *is* constantly evolving, there is a natural progression for tests
 that is applied throughout the development cycle.  
 
-Any new test is introduced as a Greylist item.  This implies that the test must
+Any new test is introduced as a Non-Blocking item.  This implies that the test must
 be run, but will *not* gate the certification effort for the current LTS.  As we
-approach the next LTS, Greylist tests are re-evaluated for promotion to
-Whitelist (Required) tests and likewise, Whitelist tests are evaluated for
-demotion to Greylist or removal altogether.
+approach the next LTS, Non-Blocking tests are re-evaluated for promotion to
+Blocking (Required) tests and likewise, Blocking tests are evaluated for
+demotion to Non-Blocking or removal altogether.
 
 As a more concrete example, let's suppose a new Storage I/O stress test is
 introduced after 18.04 LTS is released but before 20.04 LTS.  That new test
-would be introduced as a Greylist test, thus any failures would *not* gate 18.04
+would be introduced as a Non-Blocking test, thus any failures would *not* gate 18.04
 certifications. This "Break-In" period is a chance to review and improve the
 test as well as gather data from various testing scenarios to determine its
 viability later on.
 
 As we approach 20.04, we would re-evaluate this new Storage Stress test.  If it
-is seen as important and reliable enough, then it will be promoted to Whitelist
+is seen as important and reliable enough, then it will be promoted to Blocking
 for 20.04 and be required to pass for all 20.04 certifications.  
 
 Also keep in mind that even though this test would now be required for 20.04,
-it will still remain a Greylist item for 18.04 certifications. 
+it will still remain a Non-Blocking item for 18.04 certifications. 
 
 Changes to Certification Policies
 '''''''''''''''''''''''''''''''''
@@ -730,7 +727,7 @@ Thus if a system supports JBOD and onboard RAID plus an optional PCIe add-in
 RAID card (that controls onboard disks), the storage tests should be run
 against all three configurations.
 
-The Server Test Suite provides a ``storage-only`` whitelist for this purpose.
+The Server Test Suite provides a ``storage-only`` testplan for this purpose.
 
 Storage Management Software
 '''''''''''''''''''''''''''
