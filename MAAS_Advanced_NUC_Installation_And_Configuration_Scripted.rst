@@ -158,9 +158,6 @@ up its most basic network settings:
       Although other versions of Ubuntu and MAAS may work, some details
       will differ. Some notable variants include:
 
-      - Ubuntu Desktop may be used, but installation and network
-        configuration details will differ.
-
       - If your MAAS server requires use of LVM or other exotic disk
         configurations, you may need to install using the older
         Debian-based installation medium, which you can obtain at
@@ -169,9 +166,10 @@ up its most basic network settings:
         however, some installation details differ from what's described in
         this document.
 
-      - When you boot the installation medium, you should select the
-        *Install Ubuntu* option, not either of the *Install MAAS bare-metal
-        cloud* options.
+      - **When you boot the installation medium, you should select the
+        "Install Ubuntu" option, not either of the "Install MAAS bare-metal
+        cloud" options.** The procedure in this document involves
+        installing MAAS later.
 
    -  On the *Network connections* screen, configure your network ports:
 
@@ -243,7 +241,8 @@ up its most basic network settings:
       - If you plan to mirror the Ubuntu archives locally, ensure you have
         enough space in the ``/srv`` directory to hold your mirrors. As a
         general rule of thumb, you should set aside about 200 GiB per
-        release. If necessary, mount an extra disk at ``/srv`` to hold your
+        release. In most cases, a 1 TB disk dedicated to this task works
+        well. If necessary, mount an extra disk at ``/srv`` to hold your
         repository mirror. (You can do this after installing Ubuntu, if you
         like.)
 
@@ -284,9 +283,10 @@ up its most basic network settings:
 #. If desired, install X11 and your preferred desktop environment. This
    will enable you to use the portable computer itself to access the MAAS
    web UI. You can skip this step if your MAAS server will be accessed
-   remotely. In most cases, you can install X11 and the desktop environment
-   with a single command, such as the following to install Ubuntu 18.04's
-   GNOME::
+   remotely. If in doubt, don't install X11 and a desktop environment. You
+   can always install it later if you discover it's necessary. In most
+   cases, you can install X11 and the desktop environment with a single
+   command, such as the following to install Ubuntu 18.04's GNOME::
 
     sudo apt install ubuntu-gnome-desktop
 
@@ -446,17 +446,17 @@ enabled and ``0`` if it's not enabled.
 
 If your work site has poor Internet connectivity or forbids outgoing
 connections, you must create a local mirror of the Ubuntu archives on your
-MAAS server. These archives will be stored in the ``/srv`` directory, but
-creating them takes a long time because of the amount of data to be
-downloaded -- about 200 GiB per release. For comparison, HD video consumes
-1-8 GiB per hour -- usually on the low end of that range for video streaming
-services. As should be clear, the result will be significant network demand
-that will degrade a typical residential DSL or cable connection for hours,
-and possibly exceed your monthly bandwidth allocation. If you want to defer
-creating a mirror, you should respond ``N`` to the following prompt, then
-re-launch ``maniacs-setup`` with the ``\-\-mirror-archives`` (or ``-m``)
-option later. In any event, you make your selection at the following
-prompt::
+MAAS server. These archives will be stored in the ``/srv/mirrors/``
+directory, but creating them takes a long time because of the amount of
+data to be downloaded -- about 200 GiB per release. For comparison, HD
+video consumes 1-8 GiB per hour -- usually on the low end of that range for
+video streaming services. As should be clear, the result will be
+significant network demand that will degrade a typical residential DSL or
+cable connection for hours, and possibly exceed your monthly bandwidth
+allocation. If you want to defer creating a mirror, you should respond
+``N`` to the following prompt, then re-launch ``maniacs-setup`` with the
+``\-\-mirror-archives`` (or ``-m``) option later. In any event, you make
+your selection at the following prompt::
 
     ***************************************************************************
     * Mirroring an archive site is necessary if you'll be doing testing while
@@ -770,7 +770,7 @@ To test it, follow these steps:
      change the architecture of the machine. Click "Save Changes" when
      you're done.
 
-   - With the exception of servers that use IPMI for power control, you
+   - For non-IPMI machines, you
      will most likely have to enter power control details by clicking Edit
      next to the Power Configuration heading. This may necessitate setting
      an IP address, MAC address, password, or other information, depending
@@ -812,7 +812,7 @@ To test it, follow these steps:
      was properly installed, and at this point, additional steps are needed
      for the precheck script to say the node's ready for testing. These
      details are described in the Self-Testing Guide, which is available
-     from http://certification.canonical.com.
+     from your MAAS server itself, such as \http://172.24.124.1.
 
 If any of these steps fail, you may have run into a MAAS bug; your test
 computer may have a buggy PXE, IPMI, or other subsystem; or you may have
@@ -857,22 +857,15 @@ Appendix B: Network Testing Options
 A key part of certification is testing your SUT's network cards. This
 document is written with the assumption of a fairly basic configuration;
 however, some labs may have more advanced needs. Differences also exist
-between Ubuntu 14.04 and 16.04 testing; and between network configuration
+between network configuration
 on Ubuntu 18.04 and earlier LTS releases. Important variables include:
-
-* **Network test software** -- The certification suite for Ubuntu 14.04
-  relies on ``iperf`` (version 2), but this has changed to ``iperf3`` for
-  Ubuntu 16.04 and later. Thus, you may need to be prepared to run both
-  programs.
 
 * **Multiple simultaneous network tests** -- A single server takes about 60
   minutes per network port to run its network tests -- long enough that
   testing multiple SUTs simultaneously is likely to result in contention
-  for access to the ``iperf`` (2) or ``iperf3`` server. This is especially
+  for access to the ``iperf3`` server. This is especially
   true if SUTs have multiple network ports -- a server with four ports will
-  tie up an ``iperf`` server for four hours. An ``iperf`` 2 server will
-  permit multiple connections, which will result in failed tests if the
-  server's network hardware is not fast enough to handle the connections.
+  tie up an ``iperf3`` server for four hours.
   An ``iperf3`` server will refuse multiple connections, which should at
   least enable one SUT's network tests to pass; but if the ``iperf3``
   server has a sufficiently fast NIC, it will then be under-utilized.
@@ -880,21 +873,17 @@ on Ubuntu 18.04 and earlier LTS releases. Important variables include:
 * **Advanced network interfaces** -- A portable computer configured as
   described here will likely have a 1 Gbps link to the internal LAN. If
   you're testing systems with faster interfaces, you will need a separate
-  computer to function as an ``iperf`` or ``iperf3`` server.
+  computer to function as an ``iperf3`` server.
 
-* **Network configuration methods** -- Three network configuration tools
-  have been used in recent versions of Ubuntu:
+* **Network configuration methods** -- Two network configuration tools
+  have been used in recent versions of Ubuntu Server:
 
-  * All Desktop versions of Ubuntu use NetworkManager, which is most easily
-    configured through desktop GUI tools.
-
-  * Server versions through 17.04 used a system built around the
+  * Versions through 17.04 used a system built around the
     ``/etc/network/interfaces`` file and the ``ifup`` and ``ifdown``
     commands.
 
-  * Server versions starting with 17.10 use the new NetPlan system
-    (https://netplan.io). (Desktop versions also use NetPlan, but it's
-    configured to defer to NetworkManager.)
+  * Versions starting with 17.10 use the new NetPlan system
+    (https://netplan.io).
 
   Deploying a SUT via MAAS automatically configures its network ports --
   or at least, those ports that are configured via the MAAS web UI. Thus,
@@ -902,10 +891,10 @@ on Ubuntu 18.04 and earlier LTS releases. Important variables include:
   need to learn the new NetPlan tools for advanced configuration of your
   MAAS server, though.
 
-If your ``iperf`` or ``iperf3`` target system has a fast NIC and want to
-test multiple slower SUTs, you can configure the fast NIC with multiple IP
-addresses. An ``/etc/network/interfaces`` entry for Ubuntu 17.04 or earlier
-to do this might look like this::
+If your ``iperf3`` target system has a fast NIC and want to test multiple
+slower SUTs, you can configure the fast NIC with multiple IP addresses. An
+``/etc/network/interfaces`` entry for Ubuntu 17.04 or earlier to do this
+might look like this::
 
   # The 10Gbps network interface
   auto eno2
@@ -968,7 +957,7 @@ You would then launch ``iperf3`` separately on each IP address::
   iperf3 -sD -B 172.24.124.3
   iperf3 -sD -B 172.24.124.4
 
-On the MAAS server, you can enter all of the ``iperf`` (version 2) and
+On the MAAS server, you can enter all of the
 ``iperf3`` target addresses in ``/etc/maas-cert-server/iperf.conf``::
 
   172.24.124.2,172.24.124.3,172.24.124.4
@@ -1075,7 +1064,7 @@ addresses shown in the table will be adjusted appropriately.
 ======================  =============================  ==============================  ===============================
 Reserved                172.24.124.1 - 172.24.124.255  172.24.124.1 - 172.24.124.50    172.24.124.1 - 172.24.124.9
 Assigned via DHCP       172.24.125.0 - 172.24.125.255  172.24.124.51 - 172.24.124.255  172.24.124.10 - 172.24.124.127
-Assigned Automatically  172.24.26.0 - 172.24.127.254   172.24.125.0 - 172.24.125.254   172.24.124.128 - 172.24.124.254
+Assigned Automatically  172.24.126.0 - 172.24.127.254  172.24.125.0 - 172.24.125.254   172.24.124.128 - 172.24.124.254
 ======================  =============================  ==============================  ===============================
 
 .. raw:: pdf
