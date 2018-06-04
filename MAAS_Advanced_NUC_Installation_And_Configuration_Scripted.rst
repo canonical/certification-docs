@@ -149,96 +149,146 @@ Once you've assembled the basic hardware for your portable system, you can
 begin preparing it. The initial steps involve installing Ubuntu and setting
 up its most basic network settings:
 
-1. Install Ubuntu 16.04 (Xenial Xerus) to the portable system
+1. Install Ubuntu 18.04 (Bionic Beaver) to the portable system.
 
-   -  The Desktop version of Ubuntu is recommended because it enables you
-      to easily access the MAAS web UI locally without needing a third
-      system.
+   -  The version of Ubuntu Server 18.04 described here can be
+      obtained from https://www.ubuntu.com/download/server.
 
-   -  If you choose to use the Server version, you will probably want to
-      install the X server and a desktop environment on top of that as it
-      simplifies MAAS access.
+   -  This guide assumes the use of Ubuntu Server 18.04 and MAAS 2.4.
+      Although other versions of Ubuntu and MAAS may work, some details
+      will differ. Some notable variants include:
 
-   -  This guide assumes the use of Ubuntu 16.04 and MAAS 2.3. Although
-      other versions of Ubuntu and MAAS may work, some details will differ.
-      Note that MAAS 2.0 or later is required for certification.
+      - If your MAAS server requires use of LVM or other exotic disk
+        configurations, you may need to install using the older
+        Debian-based installation medium, which you can obtain at
+        http://cdimage.ubuntu.com/releases/18.04/release/, rather than by
+        using the "live server" installation medium that's described here;
+        however, some installation details differ from what's described in
+        this document.
 
-#. Boot the portable computer and log in.
+      - **When you boot the installation medium, you should select the
+        "Install Ubuntu" option, not either of the "Install MAAS bare-metal
+        cloud" options.** The procedure in this document involves
+        installing MAAS later.
 
-#. Configure your *external* network port:
+   -  On the *Network connections* screen, configure your network ports:
 
-   -  On a laptop, you can use the Wi-Fi (usually ``wlan0``) port as the
-      external port.
+      - Configure your *external* network port:
 
-   -  If you need to use both a built-in Ethernet port and an Ethernet
-      dongle, it's best to use the latter as your external port.
+        - If you need to use both a built-in Ethernet port and an
+          Ethernet dongle, it's best to use the latter as your external
+          port.
 
-   -  In most cases, no explicit configuration of the external port is
-      necessary because the Ubuntu Desktop system will have set it up to
-      use DHCP, which is appropriate. You can adjust it if necessary,
-      though.
+        - Use DHCP or a static IP address, as required by your
+          environment.
 
-   -  You can configure the external network either via
-      ``/etc/network/interfaces`` or by using the Desktop's Network Manager
-      tool.
+        - If you use a static configuration, provide a gateway and
+          DNS server, if possible.
 
-#. Configure your portable computer's *internal* port.
+        - In most cases, no explicit configuration of the external port
+          is necessary because the Ubuntu Server installer will have set
+          it up to use DHCP, which is appropriate. You can adjust it if
+          necessary, though.
 
-   -  This guide assumes use of ``eth0`` and a static IP address of
-      172.16.0.1/22 on this port; however, your actual port name is likely
-      to be ``enp0s1``, ``p4p1``, or something else.
+        - If you intend to use WiFi for your external network, you may be
+          best served by installing NetworkManager, which NetPlan can use
+          to manage the WiFi link. See
+          https://djanotes.blogspot.com/2018/03/connecting-to-wifi-network-with-netplan.html
+          for an example.
 
-   -  If possible, configure the computer's built-in Ethernet port, rather
-      than a plug-in dongle, as the internal port.
+      - Configure your *internal* network port:
 
-   -  You can either edit ``/etc/network/interfaces`` or use the GUI
-      Network tool in the System Settings panel to configure the internal
-      port. An example ``/etc/network/interfaces`` configuration resembles
-      the following::
+        - If possible, configure the computer's built-in Ethernet port,
+          rather than a plug-in dongle, as the internal port.
 
-         auto eth0
-         iface eth0 inet static
-             address 172.16.0.1
-             broadcast 172.16.3.255
-             netmask 255.255.252.0
+        - This guide assumes use of a static IP address of
+          172.24.124.1/22 on this port; however, you can use a different
+          network address, if desired or necessary.
 
-   -  If necessary or desired, you may use a different IP address on the
-      *internal* port. (Be sure to use an address within the MAAS server's
-      reserved range, as described shortly!) If your portable computer will
-      move from one *external* network to another, be sure to consider all
-      its likely *external* addresses when deciding on its *internal*
-      address and netmask.
+        - Using a /22 or wider network is advisable for the internal
+          network, for reasons described in `Appendix C: MAAS Network
+          Ranges`_.
 
-   -  Avoid the 10.0.3.0/24 address range, because Ubuntu 16.04 server uses
-      this address range for its LXC container tool.
+        - If your portable computer will move from one *external* network
+          to another, be sure to consider all its likely *external*
+          addresses when deciding on its *internal* address and netmask.
 
-   -  Do not specify a gateway for the private internal LAN; doing so will
-      create confusion when trying to access the Internet via the external
-      port.
+        - Avoid the 10.0.3.0/24 address range, because Ubuntu server
+          uses this address range for its LXC container tool.
 
-   -  If you have issues installing packages, check ``route -n`` and make
-      sure you don't have a gateway route to the private LAN.
+        - *Do not* set a gateway or DNS server on the *internal* network
+          port.
 
-   -  Using a /22 or wider network is advisable for the internal network,
-      for reasons described in `Appendix C: MAAS Network Ranges`_.
+      - If you can't easily differentiate the two ports during
+        installation, you can configure one or both of them after
+        completing the Ubuntu installation. Note that Ubuntu 17.10 and
+        later use NetPlan for network configuration; see
+        https://wiki.ubuntu.com/Netplan/Design and https://netplan.io for
+        details.
 
-   -  Once you've finished configuring this network port, be sure to
-      activate it. If you configured it by editing
-      ``/etc/network/interfaces``, type ``sudo ifup eth0`` to activate it.
-      (Depending on your starting configuration, you might need to type
-      ``sudo ifdown eth0`` or bring it down via your GUI tools before
-      bringing it up with its changed configuration.)
+      - The network configuration screen resembles Figure 2. In this
+        example, ``enp0s8`` is the internal port and ``enp0s3`` is the
+        external port.
 
-#. If you plan to mirror the Ubuntu archives locally, ensure you have
-   enough space in the ``/srv`` directory to hold your mirrors. As a
-   general rule of thumb, you should set aside about 150 GiB per release. If
-   necessary, mount an extra disk at ``/srv`` to hold your repository
-   mirror.
+        .. figure:: images/server-network-config.png
+           :alt: The network can be configured during installation.
+           :width: 100%
+
+           Figure 1: The network can be configured during installation.
+
+      - Configure the disk storage and other options as you see fit.
+
+      - If you plan to mirror the Ubuntu archives locally, ensure you have
+        enough space in the ``/srv`` directory to hold your mirrors. As a
+        general rule of thumb, you should set aside about 200 GiB per
+        release. In most cases, a 1 TB disk dedicated to this task works
+        well. If necessary, mount an extra disk at ``/srv`` to hold your
+        repository mirror. (You can do this after installing Ubuntu, if you
+        like.)
+
+#. When the installation is complete, boot the portable computer and log
+   in.
+
+#. Type ``ifconfig`` to verify your network configuration. If either
+   network port is not properly configured, edit the configuration file in
+   ``/etc/netplan/``. This file may be called ``50-cloud-init.yaml``,
+   ``01-netcfg.yaml``, or something else; the name depends on the
+   installation method. A typical configuration should look like this,
+   although likely with different network device names (``enp0s3`` and
+   ``enp0s8`` here) and possibly different IP addresses::
+
+    network:
+      version: 2
+      ethernets:
+        enp0s8:
+          addresses:
+          - 172.24.124.1/22
+          nameservers:
+            search: [ ]
+            addresses: [ ]
+          optional: true
+        enp0s3:
+          addresses: [ ]
+          dhcp4: true
+          optional: true
+
+   If you need to change the network configuration, type ``sudo netplan
+   apply`` or reboot the computer to apply the changes.
 
 #. Update the software on your system to the latest versions available::
 
-    $ sudo apt-get update
-    $ sudo apt-get dist-upgrade
+    $ sudo apt update
+    $ sudo apt dist-upgrade
+
+#. If desired, install X11 and your preferred desktop environment. This
+   will enable you to use the portable computer itself to access the MAAS
+   web UI. You can skip this step if your MAAS server will be accessed
+   remotely. If in doubt, don't install X11 and a desktop environment. You
+   can always install it later if you discover it's necessary. In most
+   cases, you can install X11 and the desktop environment with a single
+   command, such as the following to install Ubuntu 18.04's GNOME::
+
+    sudo apt install ubuntu-gnome-desktop
 
 #. Reboot the computer. This enables you to begin using your updated kernel
    (if it was updated) and ensures that your network settings will survive a
@@ -274,19 +324,13 @@ The more specific procedure for using MAAS in certification testing is:
    install the scripts and configuration files as follows::
 
       $ sudo apt-add-repository ppa:hardware-certification/public
-      $ sudo apt-get update
-      $ sudo apt-get install maas-cert-server
+      $ sudo apt install maas-cert-server
 
    The ``maas-cert-server`` package includes a
    dependency on MAAS, so installing ``maas-cert-server`` will also install
    MAAS, as well as all of MAAS's dependencies.
 
-   Most of the ``maas-cert-server`` files will be installed in
-   subdirectories of  ``/usr/share/maas-cert-server``, although a few
-   appear outside of that directory tree. (Subsequent steps describe how to
-   use these files.)
-
-#. Verify that you've installed MAAS 2.3.0 or later, rather than some
+#. Verify that you've installed MAAS 2.4.0-beta2 or later, rather than some
    earlier version::
 
       $ dpkg -s maas | grep Version
@@ -300,11 +344,10 @@ The more specific procedure for using MAAS in certification testing is:
    variables it contains are correct. Specifically:
 
    - ``INTERNAL_NET`` must point to your *internal* network device
-     (``eth0`` in this document).
+     (``eth0`` in the below examples).
 
    - ``EXTERNAL_NET`` must point to your *external* network device
-     (``eth1`` in this document, but this is likely to be some other value
-     for you).
+     (``eth1`` in the below examples).
 
    - Do not adjust other values without consulting with the Server
      Certification Team.
@@ -341,7 +384,7 @@ will also ask you a few questions along the way::
     
     ***************************************************************************
     * Identified networks:
-    *   INTERNAL: 172.16.0.1 on eth0
+    *   INTERNAL: 172.24.124.1 on eth0
     *   EXTERNAL: 192.168.1.27 on eth1
     *
     * Is this correct (Y/n)?
@@ -362,8 +405,8 @@ the script's output.
 Note that at all prompts for a "Y/N" response, the default value is
 capitalized; if you press Enter, that default will be used.
 
-The next question acquires a password for the administrative account, which
-will have the same name as your default login name::
+The next question acquires a password for the MAAS administrative account,
+which will have the same name as your default login name::
 
     ***************************************************************************
     * A MAAS administrative account with a name of ubuntu is being
@@ -381,29 +424,39 @@ of NAT, you may opt to leave it disabled::
     * for direct downloads of package updates and to submit certification results
     * to C3.
     *
-    * You can configure this computer to automatically start NAT. If you do so, you
-    * can disable it temporarily by using the 'flushnat.sh' script or permanently
-    * by removing the reference to /usr/sbin/startnat.sh from /etc/rc.local.
+    * You can configure this computer to automatically start NAT. The following
+    * commands can start or stop NAT:
+    *  sudo systemctl enable certification-nat -- Start NAT on the next reboot
+    *  sudo systemctl disable certification-nat -- Stop NAT on the next reboot
+    *  sudo service certification-nat start -- Start NAT until the next reboot
+    *  sudo service certification-nat stop -- Stop NAT until the next reboot
     *
     * Do you want to set up this computer to automatically enable NAT (Y/n)?
 
-Note that you can enable NAT on a one-time basis by running the
-``startnat.sh`` script and disable it by running the ``flushnat.sh``
-script. Both of these scripts come with the ``maas-cert-server`` package.
+The ``service certification-nat start`` and ``service certification-nat
+stop`` commands run the ``startnat.sh`` and ``flushnat.sh`` scripts,
+respectively. Both of these scripts come with the ``maas-cert-server``
+package. The ``systemctl`` commands set up or remove symbolic links in the
+systemd configuration directories to enable (or not) NAT when the computer
+boots. You can check whether NAT is running by typing ``sudo iptables -L``,
+which should show a pair of ``ACCEPT`` rules in the ``FORWARD`` chain if
+NAT is enabled and no such rules if it's not running; and by typing ``cat
+/proc/sys/net/ipv4/ip_forward``, which should return ``1`` if NAT is
+enabled and ``0`` if it's not enabled.
 
 If your work site has poor Internet connectivity or forbids outgoing
 connections, you must create a local mirror of the Ubuntu archives on your
-MAAS server. These archives will be stored in the ``/srv`` directory, but
-creating them takes a long time because of the amount of data to be
-downloaded -- about 150 GiB per release. For comparison, HD video consumes
-1-8 GiB per hour -- usually on the low end of that range for video streaming
-services. As should be clear, the result will be significant network demand
-that will degrade a typical residential DSL or cable connection for hours,
-and possibly exceed your monthly bandwidth allocation. If you want to defer
-creating a mirror, you should respond ``N`` to the following prompt, then
-re-launch ``maniacs-setup`` with the ``\-\-mirror-archives`` (or ``-m``)
-option later. In any event, you make your selection at the following
-prompt::
+MAAS server. These archives will be stored in the ``/srv/mirrors/``
+directory, but creating them takes a long time because of the amount of
+data to be downloaded -- about 200 GiB per release. For comparison, HD
+video consumes 1-8 GiB per hour -- usually on the low end of that range for
+video streaming services. As should be clear, the result will be
+significant network demand that will degrade a typical residential DSL or
+cable connection for hours, and possibly exceed your monthly bandwidth
+allocation. If you want to defer creating a mirror, you should respond
+``N`` to the following prompt, then re-launch ``maniacs-setup`` with the
+``\-\-mirror-archives`` (or ``-m``) option later. In any event, you make
+your selection at the following prompt::
 
     ***************************************************************************
     * Mirroring an archive site is necessary if you'll be doing testing while
@@ -428,9 +481,9 @@ mirror::
 
     * Do you want to mirror trusty (Y/n)? y
     * Do you want to mirror xenial (Y/n)? y
-    * Do you want to mirror zesty (Y/n)? y
-    * Do you want to mirror artful (Y/n)? y
-    * Do you want to mirror bionic (Y/n)? n
+    * Do you want to mirror artful (Y/n)? n
+    * Do you want to mirror bionic (Y/n)? y
+    * Do you want to mirror cosmic (Y/n)? n
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -457,7 +510,7 @@ computer to use its own local mirror, if you like::
 
     * Adjust this computer to use the local mirror (Y/n)? y
 
-The script then gives you the option to retrieve a images used for
+The script then gives you the option to retrieve images used for
 virtualization testing. If your site has good Internet connectivity, you
 may not need these images; but it's not a bad idea to have them on hand
 just in case. Although downloading the cloud images isn't nearly as
@@ -485,9 +538,9 @@ Ubuntu versions and architectures to download::
     * Cloud Mirror does not exist. Creating.
     * Do you want to get images for trusty release (y/N)? n
     * Do you want to get images for xenial release (Y/n)? y
-    * Do you want to get images for zesty release (y/N)? y
     * Do you want to get images for artful release (y/N)? n
-    * Do you want to get images for bionic release (y/N)? n
+    * Do you want to get images for bionic release (y/N)? y
+    * Do you want to get images for cosmic release (y/N)? n
     *
     * Do you want to get images for amd64 architecture (Y/n)? y
     * Do you want to get images for i386 architecture (y/N)? n
@@ -509,13 +562,13 @@ the default or enter a new value::
     ***************************************************************************
     * MAAS tells nodes to look to an Ubuntu repository on the Internet. You
     * can customize that site by entering it here, or leave this field blank
-    * to use the default value of http://172.16.0.1/ubuntu.
+    * to use the default value of http://172.24.124.1/ubuntu.
     *
     * Type your repository's URL, or press the Enter key:
 
 At this point, the script gives you the option of telling MAAS to begin
 importing its boot resources -- images it uses to enlist, commission, and
-start nodes. This process can take several minutes to over an hour to
+deploy nodes. This process can take several minutes to over an hour to
 complete, so the script gives you the option of deferring this process::
 
     ***************************************************************************
@@ -594,11 +647,15 @@ to modify a few settings. To do so, follow these steps:
 
 #. Verify you can access the MAAS web UI:
 
-   -  Launch a browser and point it to \http://172.16.0.1/MAAS (your
-      internal port).
+   -  Launch a browser and point it to \http://172.24.124.1:5240/MAAS
+      (changing the IP address as necessary).
 
-   -  You should also be able to access this by default on the
-      external port.
+   -  Note that MAAS 2.3 and earlier accepted connections on port 80,
+      but starting with MAAS 2.4, you *must* use port 5240.
+
+   -  You should be able to access the server on either its internal or
+      external network address, although at this point, the only computer
+      on the internal network may be the portable computer itself.
 
    -  If you provide the computer with a hostname in DNS or ``/etc/hosts``,
       you should be able to access it via that name, as well.
@@ -623,23 +680,11 @@ to modify a few settings. To do so, follow these steps:
       When you're done adding SSH keys, click Go to Dashboard at the bottom
       of the page.
 
-#. On the Dashboard page (aka Getting Started), you may optionally want to
-   disable the Device Discovery feature. In theory, this feature should
-   passively detect devices and should cause no problems. In practice, it
-   may detect devices on your external network interface that shouldn't
-   interact with MAAS.
-
-#. Click Images near the top of the MAAS web page. This page will show the
-   Ubuntu images that are available on the server. The setup script imports
-   a 16.04 image for AMD64 but you may need to take additional actions in
-   some cases:
-
-   - If you see a blue circle next to an image, it did not import
-     correctly, or it is still importing.
-
-   - If you need to support an architecture other than AMD64, you must check
-     that architecture and click Apply Changes. This process will probably
-     take several minutes to complete.
+#. On the Network Discovery page, you may want to disable the Device
+   Discovery feature; you can do this with the slider near the top right of
+   the page. In theory, this feature should passively detect devices and
+   should cause no problems. In practice, it may trigger security alerts on
+   the external network.
 
 #. Click the Subnets link near the top of the web page so you can review
    the DHCP options:
@@ -669,24 +714,23 @@ to modify a few settings. To do so, follow these steps:
    #.  If the various ranges (reserved, dynamic, or the implicit available
        addresses) are not appropriate, you can edit them as follows:
 
-       #. Click the three horizontal lines on the right side of the screen
-          in the row for the range you want to delete or modify.
+       - Click the edit icon near the right side of the page in the row for
+         the range you want to delete or modify. You can then change the
+         start and end addresses, and then click Save to save your changes.
 
-       #. If you want to completely delete the range, click Remove Range in the
-          resulting pop-up menu; otherwise, click Edit.
-
-       #. If you click Edit, you can change the start and end addresses,
-          then click Save to save your changes.
+       - If you want to completely delete the range, click the trash can
+         icon instead of the edit icon.
 
    #.  You can optionally reserve additional ranges for machines not
        managed by MAAS (using the Reserve Range button) or for DHCP
        addresses (using the Reserve Dynamic Range button).
 
 #. Click Settings near the top of the page to load the MAAS Settings page,
-   where you review several miscellaneous MAAS details. If you change any
+   where you review several miscellaneous MAAS details. This page is broken
+   into several subsections, each of which has a tab near the top of the
+   page -- Users, General, User Scripts, and so on. If you change any
    settings, be sure to click the associated "Save" button within that
-   section. Unfortunately, each save button is section-specific and won't
-   save changes made in other sections of that page.
+   section.
 
 Testing the MAAS Server
 =======================
@@ -709,8 +753,9 @@ To test it, follow these steps:
      some very basic information to the MAAS server.
    
    - Once the node powers itself off you should see it listed in the MAAS
-     nodes list (\http://localhost/MAAS/#/nodes/) with a Status field of
-     "New." If it doesn't appear, try refreshing the page.
+     machines list (\http://172.24.124.1:5240/MAAS/#/machines/) with a Status
+     field of "New." If it doesn't appear, try refreshing the page. Also,
+     be sure you check the *Machines* tab, not the *Devices* tab.
 
 #. Click on the node's hostname to view the node's summary page.
 
@@ -719,18 +764,22 @@ To test it, follow these steps:
    descriptive, such as the computer's model number. Click "Save" when
    you've made your changes.
 
-#. If necessary, click "Edit" in the Machine Summary section to change the
-   architecture of the machine. Click "Save Changes" when you're done.
+#. You may need to make a few changes in the Configuration area:
 
-#. If necessary, click Power to open the Power tab to change the Power
-   Type. (You must click Edit to make any actual changes.) This may
-   necessitate setting an IP address, MAC address, password, or other
-   information, depending on the power control technology in use. Click
-   "Save Changes" when you're done.
+   - If necessary, click "Edit" in the Machine Configuration section to
+     change the architecture of the machine. Click "Save Changes" when
+     you're done.
+
+   - For non-IPMI machines, you
+     will most likely have to enter power control details by clicking Edit
+     next to the Power Configuration heading. This may necessitate setting
+     an IP address, MAC address, password, or other information, depending
+     on the power control technology in use. Click "Save Changes" when
+     you're done.
 
 #. Click "Take Action" near the top-right corner of the page, followed by
-   "Commission Node" from the resulting drop-down menu. You must then click
-   "Go."
+   "Commission" from the resulting drop-down menu. You must then click
+   "Commission machine."
 
    - The node should power on again. This time you'll see it PXE-boot the
      commissioning image. Note that if your test system lacks a BMC or
@@ -743,7 +792,8 @@ To test it, follow these steps:
    - Once it's done, the UI will show a Status of "Ready."
 
 #. Once the system powers off after commissioning, click "Take Action"
-   followed by "Deploy." You must then click "Go" to confirm this action.
+   followed by "Deploy." You must then click "Deploy machine" to confirm
+   this action.
 
    - The node should power on again (or you will have to control it
      manually if it lacks a BMC). This time it will take longer to finish
@@ -755,17 +805,22 @@ To test it, follow these steps:
    - Log into the node from the MAAS server by using SSH, as in ``ssh
      testnode`` if you've given the node the name ``testnode``.
 
-   - In the node, type ``canonical-certification-server``. The
-     certification suite software should run. You can type Ctrl+C to exit;
-     at this point, it's sufficient to know that it installed correctly.
+   - In the node, type ``canonical-certification-precheck``. The
+     certification suite's precheck script should run to verify that the
+     system is ready for testing. Don't be too concerned with the results;
+     the point of this operation is to check that the certification suite
+     was properly installed, and at this point, additional steps are needed
+     for the precheck script to say the node's ready for testing. These
+     details are described in the Self-Testing Guide, which is available
+     from your MAAS server itself, such as \http://172.24.124.1.
 
 If any of these steps fail, you may have run into a MAAS bug; your test
 computer may have a buggy PXE, IPMI, or other subsystem; or you may have
 misconfigured something in the MAAS setup. You may want to review the
 preceding sections to verify that you configured everything correctly.
-To help in debugging problems, the node status page includes a section
-entitled Latest Node Events with a summary of the last few events
-related to the node. (You may have to refresh the page to see new events.)
+To help in debugging problems, the node status page includes sections
+entitled Commissioning, Logs, and Events with various pieces of diagnostic
+information related to commissioning and deployment.
 
 .. raw:: pdf
 
@@ -802,20 +857,15 @@ Appendix B: Network Testing Options
 A key part of certification is testing your SUT's network cards. This
 document is written with the assumption of a fairly basic configuration;
 however, some labs may have more advanced needs. Differences also exist
-between Ubuntu 14.04 and 16.04 testing. Important variables include:
-
-* **Network test software** -- The certification suite for Ubuntu 14.04
-  relies on ``iperf`` (version 2), but this has changed to ``iperf3`` for
-  Ubuntu 16.04. Thus, you may need to be prepared to run both programs.
+between network configuration
+on Ubuntu 18.04 and earlier LTS releases. Important variables include:
 
 * **Multiple simultaneous network tests** -- A single server takes about 60
   minutes per network port to run its network tests -- long enough that
   testing multiple SUTs simultaneously is likely to result in contention
-  for access to the ``iperf`` (2) or ``iperf3`` server. This is especially
+  for access to the ``iperf3`` server. This is especially
   true if SUTs have multiple network ports -- a server with four ports will
-  tie up an ``iperf`` server for four hours. An ``iperf`` 2 server will
-  permit multiple connections, which will result in failed tests if the
-  server's network hardware is not fast enough to handle the connections.
+  tie up an ``iperf3`` server for four hours.
   An ``iperf3`` server will refuse multiple connections, which should at
   least enable one SUT's network tests to pass; but if the ``iperf3``
   server has a sufficiently fast NIC, it will then be under-utilized.
@@ -823,40 +873,94 @@ between Ubuntu 14.04 and 16.04 testing. Important variables include:
 * **Advanced network interfaces** -- A portable computer configured as
   described here will likely have a 1 Gbps link to the internal LAN. If
   you're testing systems with faster interfaces, you will need a separate
-  computer to function as an ``iperf`` or ``iperf3`` server.
+  computer to function as an ``iperf3`` server.
 
-If you have a fast (10 Gbps or faster) NIC and want to test multiple slower
-(say, 1 Gbps) SUTs, you can configure the fast NIC with multiple IP
-addresses. An ``/etc/network/interfaces`` entry to do this might look like
-this::
+* **Network configuration methods** -- Two network configuration tools
+  have been used in recent versions of Ubuntu Server:
+
+  * Versions through 17.04 used a system built around the
+    ``/etc/network/interfaces`` file and the ``ifup`` and ``ifdown``
+    commands.
+
+  * Versions starting with 17.10 use the new NetPlan system
+    (https://netplan.io).
+
+  Deploying a SUT via MAAS automatically configures its network ports --
+  or at least, those ports that are configured via the MAAS web UI. Thus,
+  you needn't be concerned with these differences on your SUTs. You may
+  need to learn the new NetPlan tools for advanced configuration of your
+  MAAS server, though.
+
+If your ``iperf3`` target system has a fast NIC and want to test multiple
+slower SUTs, you can configure the fast NIC with multiple IP addresses. An
+``/etc/network/interfaces`` entry for Ubuntu 17.04 or earlier to do this
+might look like this::
 
   # The 10Gbps network interface
-  auto eth2
-  iface eth2 inet static
-	address 172.16.0.2
+  auto eno2
+  iface eno2 inet static
+	address 172.24.124.2
 	netmask 255.255.252.0
-	broadcast 172.16.3.255
-  auto eth2:1
-  iface eth2:1 inet static
-	address 172.16.0.3
+	broadcast 172.24.127.255
+  auto eno2:1
+  iface eno2:1 inet static
+	address 172.24.124.3
 	netmask 255.255.252.0
-	broadcast 172.16.3.255
-  auto eth2:2
-  iface eth2:2 inet static
-	address 172.16.0.4
+	broadcast 172.24.127.255
+  auto eno2:2
+  iface eno2:2 inet static
+	address 172.24.124.4
 	netmask 255.255.252.0
-	broadcast 172.16.3.255
+	broadcast 172.24.127.255
 
-This example configures the ``iperf3`` server with three addresses. You can
-enter them all in ``/etc/maas-cert-server/iperf.conf``::
+An equivalent NetPlan entry, for Ubuntu 17.10 or later, is simpler; you can
+specify multiple IP addresses, rather than just one, in
+``/etc/netplan/50-cloud-init.yaml`` (or another file; the name varies
+depending on how the system was installed). For example::
 
-  172.16.0.2,172.16.0.3,172.16.0.4
+  eno2:
+      addresses:
+      - 172.24.124.2/22
+      - 172.24.124.3/22
+      - 172.24.124.4/22
+
+Note that you do not explicitly set separate names for each interface, as
+in the ``eno2:1`` of the ``/etc/network/interfaces`` example.
+
+In either case, you must activate the changes after making them. In theory,
+you can do this without rebooting by using commands such as ``sudo ifup
+eno2:1`` or ``sudo netplan apply``; however, you may find it's necessary to
+reboot to reliably apply an advanced configuration like this one. With
+either network configuration system, you can verify the network settings
+with ``ip addr show eno2`` (changing the interface name as necessary)::
+
+  $ ip addr show eno2
+  3: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state
+     UNKNOWN group default qlen 1000
+    link/ether 08:00:27:90:0e:07 brd ff:ff:ff:ff:ff:ff
+    inet 172.24.124.2/22 brd 172.24.127.255 scope global eno2
+       valid_lft forever preferred_lft forever
+    inet 172.24.124.3/22 brd 172.24.127.255 scope global secondary eno2
+       valid_lft forever preferred_lft forever
+    inet 172.24.124.4/22 brd 172.24.127.255 scope global secondary eno2
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:fe90:e07/64 scope link 
+       valid_lft forever preferred_lft forever
+
+This example shows ``eno2`` up with all three of its IP addresses. Note
+that the older ``ifconfig`` tool will show only the first IP address for
+any device configured via NetPlan.
 
 You would then launch ``iperf3`` separately on each IP address::
 
-  iperf3 -sD -B 172.16.0.2
-  iperf3 -sD -B 172.16.0.3
-  iperf3 -sD -B 172.16.0.4
+  iperf3 -sD -B 172.24.124.2
+  iperf3 -sD -B 172.24.124.3
+  iperf3 -sD -B 172.24.124.4
+
+On the MAAS server, you can enter all of the
+``iperf3`` target addresses in ``/etc/maas-cert-server/iperf.conf``::
+
+  172.24.124.2,172.24.124.3,172.24.124.4
 
 The result should be that each of your SUTs will detect an open port on the
 ``iperf3`` server and use it without conflict, up to the number of ports
@@ -881,8 +985,8 @@ solutions to this problem exist:
   high-speed tests.
 
 * You can configure the high-speed and low-speed NICs to use different
-  address ranges -- for instance, 172.16.0.0/22 for the low-speed NICs and
-  172.16.4.0/22 for the high-speed NICs. This approach will require
+  address ranges -- for instance, 172.24.124.0/22 for the low-speed NICs and
+  172.24.128.0/22 for the high-speed NICs. This approach will require
   additional MAAS configuration not described here. To minimize DHCP
   hassles, it's best to keep the networks on separate physical switches or
   VLANs, too.
@@ -896,10 +1000,10 @@ multiple network segments or bonding NICs together may work around this
 problem, at the cost of increased configuration complexity.
 
 If your lab uses separate LANs for different network speeds, you can list
-IP addresses on separate LANs in ``/etc/maas-cert-server/iperf.conf`` or on
-SUTs in ``/etc/xdg/canonical-certification.conf``. The SUT will try each IP
-address in turn until a test passes or until all the addresses are
-exhausted.
+IP addresses on separate LANs in ``/etc/maas-cert-server/iperf.conf`` on the
+MAAS server or in ``/etc/xdg/canonical-certification.conf`` on SUTs. The
+SUT will try each IP address in turn until a test passes or until all the
+addresses are exhausted.
 
 If you want to test multiple SUTs but your network lacks a high-speed NIC
 or a system with multiple NICs, you can do so by splitting your SUTs into
@@ -935,28 +1039,33 @@ Specifically, MAAS splits the internal network into three parts:
   block entirely.
 
 - A DHCP space, which MAAS manages so that it can temporarily address
-  servers when enlisting and commissioning them, as explained later.
+  servers when enlisting and commissioning them.
   Depending on your needs, your BMCs and even deployed nodes may be
   assigned via DHCP, too.
 
-- A range of addresses that MAAS assigns to servers once they've been
-  deployed in the default manner. (You can reconfigure nodes to use
-  DHCP once deployed, if you prefer.)
+- An automatic space, which is a range of addresses that MAAS assigns to
+  servers once they've been deployed in the default manner. (You can
+  reconfigure nodes to use DHCP once deployed, if you prefer.)
 
-The following table shows how the `maniacs-setup` script described in this
-document splits up a /22, a /23, and a /24 network, starting with
-172.16.0.1, between these three purposes. You can adjust the ranges after
-they've been set up by using the MAAS web UI, should the need arise. If you
-use a network block starting at something other than 172.16.0.1, the exact
-IP addresses shown in the table will be adjusted appropriately.
+In the MAAS subnet configuration page, the reserved and DHCP spaces are
+explicitly defined. Any address that does not fall into either of those
+spaces is part of the automatic space.
 
-======================  =========================  ==========================  ===========================
-*Purpose*               */22 network*              */23 network*               */24 network*
-======================  =========================  ==========================  ===========================
-Reserved                172.16.0.1 - 172.16.0.255  172.16.0.1 - 172.16.0.50    172.16.0.1 - 172.16.0.9
-DHCP                    172.16.1.0 - 172.16.1.255  172.16.0.51 - 172.16.0.255  172.16.0.10 - 172.16.0.127
-Assigned Automatically  172.16.2.0 - 172.16.3.254  172.16.1.0 - 172.16.1.254   172.16.0.128 - 172.16.0.254
-======================  =========================  ==========================  ===========================
+The following table shows how the ``maniacs-setup`` script described in
+this document splits up a /22, a /23, and a /24 network, starting with
+172.24.124.1, between these three purposes. You can adjust the ranges after
+they've been set up by using the MAAS web UI, as described earlier, in
+`Checking the MAAS Configuration`_, should the need arise. If you use a
+network block starting at something other than 172.24.124.1, the exact IP
+addresses shown in the table will be adjusted appropriately.
+
+======================  =============================  ==============================  ===============================
+*Purpose*               */22 network*                  */23 network*                   */24 network*
+======================  =============================  ==============================  ===============================
+Reserved                172.24.124.1 - 172.24.124.255  172.24.124.1 - 172.24.124.50    172.24.124.1 - 172.24.124.9
+Assigned via DHCP       172.24.125.0 - 172.24.125.255  172.24.124.51 - 172.24.124.255  172.24.124.10 - 172.24.124.127
+Assigned Automatically  172.24.126.0 - 172.24.127.254  172.24.125.0 - 172.24.125.254   172.24.124.128 - 172.24.124.254
+======================  =============================  ==============================  ===============================
 
 .. raw:: pdf
 
