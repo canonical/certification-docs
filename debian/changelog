@@ -1,3 +1,10 @@
+certification-docs (0.2.2-0ppa1) bionic; urgency=medium
+
+  * Update to MANIACS to match maniacs-setup script changes for download
+    of large images in the background
+
+ -- Rod Smith <rod.smith@canonical.com>  Tue, 05 Jun 2018 15:34:16 -0700
+
 certification-docs (0.2.1-0ppa1) bionic; urgency=medium
 
   * Changes to MANIACS for deploying MAAS 2.4 on Ubuntu 18.04.
