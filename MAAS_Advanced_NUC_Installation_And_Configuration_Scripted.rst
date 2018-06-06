@@ -453,10 +453,12 @@ video consumes 1-8 GiB per hour -- usually on the low end of that range for
 video streaming services. As should be clear, the result will be
 significant network demand that will degrade a typical residential DSL or
 cable connection for hours, and possibly exceed your monthly bandwidth
-allocation. If you want to defer creating a mirror, you should respond
-``N`` to the following prompt, then re-launch ``maniacs-setup`` with the
-``\-\-mirror-archives`` (or ``-m``) option later. In any event, you make
-your selection at the following prompt::
+allocation. The download will occur in the background, though, so you can
+continue with MAAS setup as the download proceeds. If you want to defer
+creating a mirror, you should respond ``N`` to the following prompt, then
+re-launch ``maniacs-setup`` with the ``\-\-mirror-archives`` (or ``-m``)
+option later. In any event, you make your selection at the following
+prompt::
 
     ***************************************************************************
     * Mirroring an archive site is necessary if you'll be doing testing while
@@ -501,7 +503,7 @@ apt-mirror``.
     * You can adjust /etc/cron.d/apt-mirror manually, if you like.
 
 Note that ``maniacs-setup`` configures the system to mirror AMD64, i386,
-and source repositories because all three are required by the default APT
+and source repositories because all three are required by the default MAAS
 configuration. If you want to tweak the mirror configuration, you can do so
 by editing the ``/etc/apt/mirror.list`` file -- but do so *after* finishing
 with the ``maniacs-setup`` script, and then type ``sudo apt-mirror`` to
@@ -525,7 +527,9 @@ launching ``maniacs-setup`` with the ``\-\-download-virtualization-image``
     * An Ubuntu cloud image is required for virtualization tests. Having such
     * an image on your MAAS server can be convenient, but downloading it can
     * take a while (each image is about 250MiB). This process will import cloud
-    * images for whatever releases and architectures you specify.
+    * images for whatever releases and architectures you specify. If you select
+    * 'Y', logs will be stored at $MCS_DATA/cloudimg-*-dl-*.log;
+    * monitor them if you suspect download problems.
     *
     * To defer this task, respond 'N' to the following question.
     *
@@ -550,7 +554,12 @@ Ubuntu versions and architectures to download::
     * Do you want to get images for s390x architecture (y/N)? n
     * Downloading cloud images. This may take some tiime.
     *
-    * Downloading image for xenial on amd64....
+    * Downloading image for xenial on amd64 in the background....
+
+These downloads proceed in the background, with logs stored in
+``~/.maas-cert-server``, so you can check there if you suspect problems. To
+monitor the downloads, use ``top`` or ``ps`` to look for instances of
+``wget``.
 
 You can customize the site that MAAS tells nodes to use for their
 repositories. If you mirrored a repository, the script points nodes to
@@ -572,22 +581,20 @@ deploy nodes. This process can take several minutes to over an hour to
 complete, so the script gives you the option of deferring this process::
 
     ***************************************************************************
-    * MAAS requires boot resource images to be useful; however, importing them
-    * can take a LONG time. You can perform this task now or defer it until
-    * later (or do it manually with the MAAS web UI).
-    *
-    * Do you want to import boot resources now? (Y/n)
+    * MAAS requires boot resource images to be useful, and they will now be
+    * imported in the background. This can take a LONG time, but will not
+    * significantly slow down subsequent configuration steps.
+    * Beginning import of boot resources
 
-If you choose to defer this process, MAAS may begin it automatically in the
-background. If this fails and you want to initiate it manually later, you
-can use the MAAS web UI or launch ``maniacs-setup`` with the
-``\-\-import-boot-resources`` (or ``-i``) option.
+If the download of boot resources fails and you want to initiate it
+manually later, you can use the MAAS web UI or launch ``maniacs-setup``
+with the ``\-\-import-boot-resources`` (or ``-i``) option.
 
 Sometimes this process hangs. Typically, the boot images end up available
 in MAAS, but the script doesn't move on. If this happens, you can kill the
 script and, if desired, re-launch it to finish the installation.
 
-After boot resources are set up, the script configures personal package
+After the download of boot resources is begun, the script configures personal package
 archives (PPAs), in which the latest certification software is stored.
 You'll want to configure PPAs for whatever architectures you intend to test::
 
