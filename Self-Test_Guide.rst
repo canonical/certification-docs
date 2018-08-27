@@ -1321,8 +1321,14 @@ network devices; however, some servers require a little tweaking of
 settings to perform adequately at higher speeds. The following procedure
 was used to tune a system with a 100Gbps NIC, and may be used as a starting
 point for tweaking other systems; however, details may need to be adjusted
-for specific SUTs. Note that similar steps may be needed on both the SUT
-and the ``iperf3`` server.
+for specific SUTs. Please note that similar steps may be needed on both the SUT
+and the ``iperf3`` server.  Additionally, some steps may not work on all
+devices or systems; for example, not all systems support NUMA, and the
+"MaxReadReq" parameter is specific to Mellanox devices and is not supported on
+cards from other vendors.  
+
+It is best to perform the following steps either via sudo or by switching to
+the root account before proceeding.
 
 #. Find the device's NUMA node::
 
