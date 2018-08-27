@@ -1,3 +1,9 @@
+certification-docs (0.2.3-0ppa1) bionic; urgency=medium
+
+  * Update Network Tuning steps to clarify a few points of confusion
+
+ -- Jeff Lane <jeff@ubuntu.com>  Mon, 27 Aug 2018 13:35:55 -0400
+
 certification-docs (0.2.2-0ppa1) bionic; urgency=medium
 
   * Update to MANIACS to match maniacs-setup script changes for download
