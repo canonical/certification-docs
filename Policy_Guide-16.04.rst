@@ -449,7 +449,7 @@ certificates.
 
 People with access must have an account on Launchpad (https://launchpad.net)
 and their account must be added to the appropriate access group by the
-Partner's TPM or a member of the Certification team.
+Partner's PE or a member of the Certification team.
 
 Documentation
 -------------
@@ -670,8 +670,8 @@ discretion, and thus could cause a certification to be significantly delayed.
 
 OS Bugs
 '''''''
-Bugs found in the OS will be filed by either the TPM or the Certification team.
-It is up to the TPM and Partner to work together to get any bugs filed against
+Bugs found in the OS will be filed by either the PE or the Certification team.
+It is up to the PE and Partner to work together to get any bugs filed against
 the OS resolved in a timely manner.  Note that OS bugs could result in
 certification being delayed until the OS SRU process is completed and any fix
 has been introduced to the OS via the Updates repository.

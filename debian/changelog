@@ -1,3 +1,13 @@
+certification-docs (0.2.4-0ppa1) bionic; urgency=medium
+
+  * De-versioned Programme Overview Guide
+  * Removed older Trusty and Xenial Programme guides
+  * Removed older images used in Trusty and Xenial programme guides
+  * Scrubbed other doc sources to replace references to TPP and TPMs
+  * Updated some images that referred to TPMs (now refer to PEs)
+
+ -- Jeff Lane <jeff@ubuntu.com>  Mon, 27 Aug 2018 16:56:53 -0400
+
 certification-docs (0.2.3-0ppa1) bionic; urgency=medium
 
   * Update Network Tuning steps to clarify a few points of confusion

@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 RST2PDF=rst2pdf
 RST2HTML=rst2html
-DOC_NAMES=Test_Case_Guide-16.04 Test_Case_Guide-18.04 Programme_Guide-16.04 Programme_Guide-18.04 Coverage_Guide-18.04 Coverage_Guide-16.04 Self-Test_Guide MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration_Scripted Policy_Guide-16.04 Policy_Guide-18.04
+DOC_NAMES=Test_Case_Guide-16.04 Test_Case_Guide-18.04 Programme_Guide Coverage_Guide-18.04 Coverage_Guide-16.04 Self-Test_Guide MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration_Scripted Policy_Guide-16.04 Policy_Guide-18.04
 HTML_NAMES=$(DOC_NAMES:=.html)
 PDF_NAMES=$(DOC_NAMES:=.pdf)
 
@@ -27,7 +27,7 @@ coverage: Coverage_Guide-16.04.pdf Coverage_Guide-18.04.pdf
 
 policy: Policy_Guide-16.04.pdf Policy_Guide-18.04.pdf
 
-programme: Programme_Guide-16.04.pdf Programme_Guide-18.04.pdf
+programme: Programme_Guide.pdf
 
 testcase: Test_Case_Guide-16.04.pdf Test_Case_Guide-18.04.pdf
 
@@ -41,7 +41,7 @@ coverageh: Coverage_Guide-16.04.html Coverage_Guide-18.04.html
 
 policyh: Policy_Guide-16.04.html Policy_Guide-18.04.html
 
-programmeh: Programme_Guide-16.04.html Programme_Guide-18.04.html
+programmeh: Programme_Guide.html
 
 testcaseh: Test_Case_Guide-16.04.html Test_Case_guide-18.04.html
 

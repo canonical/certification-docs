@@ -248,9 +248,9 @@ usage vary by vendors and platforms but is expected functionality of end
 users.  This testing is not done by the Ubuntu Server testing tools and and
 should be tested by the Partner on a regular basis.
 
-Because of this, please work with your Technical Partner Manager to outline
+Because of this, please work with your Partner Engineer to outline
 and document those tests that are not covered by the standard tooling. 
 Partners are strongly encouraged to integrate the Ubuntu test tools and
 Ubuntu OS into their own processes for OS and Hardware Validation.  Your
-Technical Partner Manager will gladly help assist you in any way to make
+Partner Engineer will gladly help assist you in any way to make
 this possible.

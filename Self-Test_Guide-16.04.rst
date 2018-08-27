@@ -158,7 +158,7 @@ You can run certification tests without submitting them to C3; however, if
 you want to certify the system, you need a C3 account. *If
 you do not have an account for your company on the private certification
 web site, or if you do not have access to your company's account, please
-contact your Technical Partner Manager, who will work with the Server
+contact your Partner Engineer, who will work with the Server
 Certification Team to establish the account.*
 
 Additionally, anyone who needs to access the account on C3 will need their own
@@ -1113,7 +1113,7 @@ version of Ubuntu.
 If a server fails certification with a more recent kernel but works
 with an earlier one, this situation is treated as a regression; a bug
 report should be filed and note made of the problem in the certificate
-request. Please notify your TPM about such problems to facilitate their
+request. Please notify your PE about such problems to facilitate their
 resolution.
 
 Because Ubuntu 16.04.1 uses the same 4.4.0 kernel series as 16.04 GA,

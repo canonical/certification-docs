@@ -1195,7 +1195,7 @@ version of Ubuntu.
 If a server fails certification with a more recent release but works
 with an earlier one, this situation is treated as a regression; a bug
 report should be filed and note made of the problem in the certificate
-request. Please notify your TPM about such problems to facilitate their
+request. Please notify your PE about such problems to facilitate their
 resolution.
 
 Because Ubuntu 14.04.1 uses the same 3.13 kernel series as 14.04 GA,

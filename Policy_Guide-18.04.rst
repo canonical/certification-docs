@@ -94,8 +94,8 @@ Partner
     is engaged in Certification efforts.
 
 Partner Engineer
-    The Partner's technical contact within Canonical. Formerly known as a TPM
-    or Technical Partner Manager.
+    The Partner's technical contact within Canonical. Formerly known as a PE
+    or Partner Engineer.
 
 Self-Testing
     The Partner is allowed to perform certification testing on their
