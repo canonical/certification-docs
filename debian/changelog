@@ -5,6 +5,9 @@ certification-docs (0.2.4-0ppa1) bionic; urgency=medium
   * Removed older images used in Trusty and Xenial programme guides
   * Scrubbed other doc sources to replace references to TPP and TPMs
   * Updated some images that referred to TPMs (now refer to PEs)
+  * De-versioned Policy Guide
+  * Removed older versions of versioned Policy Guide
+  * Added Server Cert Lifecycle Chart
 
  -- Jeff Lane <jeff@ubuntu.com>  Mon, 27 Aug 2018 16:56:53 -0400
 

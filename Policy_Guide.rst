@@ -1,6 +1,6 @@
-===========================================================
- Ubuntu Server Hardware Certification Policies (16.04 LTS)
-===========================================================
+===============================================
+ Ubuntu Server Hardware Certification Policies
+===============================================
 
 .. include:: <isonum.txt>
 
@@ -26,6 +26,19 @@
 
 .. role:: green-text
 
+Attention
+=========
+As of 18.04 LTS the Ubuntu Server Certification programme has moved from the
+previous SKU / Config based methodology to a component coverage based
+methodology referred to as "Comprehensive Server Certification".
+
+Under this new way of doing Ubuntu Certification, our Partners will need to
+certify user orderable component options for each model of Server to be
+certified.
+
+Please refer to the section `Comprehensive Server Certification`_ for more
+infromation.
+
 Introduction
 ============
 This guide will provide a reference to the general policies of Ubuntu Server
@@ -39,8 +52,9 @@ provided to anyone involved in this effort from engineering to management.
 
 Definitions
 -----------
-Blacklist Test
-    Tests or areas that are not tested and not required for Certification.
+Blocking Test
+    Tests or coverage areas that are required to be tested and  required to pass
+    for Certification.
 
 Certificate
     An indicator that a system has been tested and is considered fully
@@ -50,7 +64,7 @@ Certification
     The process by which a system is tested and deemed "Ubuntu Server
     Certified."
 
-Greylist Test
+Non-Blocking Test
     Tests or areas that are tested but do not block Certification if they fail.
 
 IHV
@@ -79,6 +93,10 @@ Partner
     The OEM, ODM, IHV or System Builder who has joined the Programme and
     is engaged in Certification efforts.
 
+Partner Engineer
+    The Partner's technical contact within Canonical. Formerly known as a TPM
+    or Technical Partner Manager.
+
 Self-Testing
     The Partner is allowed to perform certification testing on their
     own, using their own lab and engineering resources with Canonical providing
@@ -98,9 +116,9 @@ Variant
     A subclass of a Model, for example, a Model may have two variants that
     feature different network devices.
 
-Whitelist Test
-    Tests or coverage areas that are required to be tested and  required to pass
-    for Certification.
+Vendor Approved Option
+    Any device that can be ordered by the customer for a given Server Model.
+    This includes Network devices, HBAs, RAID controllers, and so forth.
 
 Services Provided
 =================
@@ -113,7 +131,7 @@ Certification Testing
 In-House
 ''''''''
 We will, at the request of the client, perform certification testing in our lab
-in Lexington, MA, USA on hardware sent from the partner to our Lab.
+in the Boston, MA, USA area  on hardware sent from the partner to our Lab.
 
 On-Site
 '''''''
@@ -130,7 +148,7 @@ Certification Review
 --------------------
 We will review submissions from our partners from Self-Testing efforts.  We
 will work with the partner to ensure all coverage areas are tested and all
-whitelist tests are passed.
+required tests are passed.
 
 Certificate Issuance and Publication
 ''''''''''''''''''''''''''''''''''''
@@ -143,17 +161,26 @@ not yet been made Generally Available to the public.  In those cases, we will
 reserve the certificate until such time as the SUT has been made GA and the
 Partner has notified us that it's OK to publish the certificate.
 
+In addition to publishing basic information about Server Models that are
+certified, we will publish the test and support status of any Vendor Approved
+Options that are applicable to that Server Model.
+
 Test Tool Development
 ---------------------
 We will develop and maintain the Suite for all testing situations.
 We will make available the Suite in a publicly facing repository along with any
 necessary dependency packages.
 
+All test scripts and tools will be completely open source software where
+possible. Proprietary tools are generally not acceptable for official Ubuntu
+Server Certification Testing. Any exceptions to this rule will be decided on
+a case by case basis by the Certification Team.
+
 Test Tool Maintenance and Bug Fixing
 ''''''''''''''''''''''''''''''''''''
 We will investigate and resolve reported bugs in the Suite.
-We will maintain the Suite code to ensure it runs reliably on all current
-Ubuntu LTS versions.
+We will maintain the Suite code to ensure it runs reliably on the two most
+recent Ubuntu LTS versions.
 
 Website Maintenance and Bug Fixes
 '''''''''''''''''''''''''''''''''
@@ -201,19 +228,106 @@ Certification Team (server-certification@canonical.com)
 General Policies
 ================
 
+Comprehensive Server Certification
+----------------------------------
+The Ubuntu Server Certification Programme has moved from the previous
+SKU/Config based testing model to a component focused testing model. This new
+model requires that Vendor Approved Options for each Model to be certified must
+also be tested.
+
+These Rules are required for 18.04 LTS and later.  They are optional for 16.04
+certifications.
+
+Devices Specific Information
+''''''''''''''''''''''''''''
+CPUs and RAM
+````````````
+CPUs and RAM will be tested as before.
+
+Any CPU from a given CPU Family (e.g. Broadwell, Skylake, Kabylake) will count
+for the entire CPU family. You do not need to re-test for each CPU unless the
+CPU is from a different family.
+
+Any DIMM size may be tested, though we strongly encourage you to use the
+largest DIMM size available.
+
+Jumps in DIMM size do not require additional testing.
+
+HDD, SSD, NVMe, NVDIMM
+``````````````````````
+For HDDs and SSDs, only one of each supported interface type needs to be
+tested. Yous hould use the largest HDD or SDD of each type where possible.
+
+ALL NVMe models must be tested.
+
+ALL NVDIMM models must be tested in Storage Mode.
+Canonical reserves the right to also require NVDIMMs to be tested in RAM mode
+as well.
+
+RAID Controllers
+````````````````
+ALL RAID controllers must be tested. Exceptions can be made to this for very
+minor variances in RAID Controller Models.
+
+An example of this exception would be two SAS RAID Controllers where they are
+essentially identical except for the addtion or deletion of a Cache Battery.
+
+Your Partner Engineer or the Certification Team will work with you to determine
+if a RAID Controller is exempt from testing.
+
+HBA
+```
+All HBAs must be tested.
+
+CNA and Network Devices
+```````````````````````
+CNAs and NICs must be tested, CNAs should be tested in Network mode.  Canonical
+reserves the right to require further CNA testing in other modes as necessary
+(for instance a CNA may need to be tested as an iSCSI initiator as well as a
+Network card).
+
+Anything Else
+`````````````
+Any device not explicitly outlined above must be tested.
+
+Application of Test Results
+'''''''''''''''''''''''''''
+Once a Vendor Approved Option has been tested in ANY Model of a Partner's
+Server Line, that Vendor Approved Option will be considered certified for the
+full Server Line.
+
+Thus, if a Server Line has 10 Models, and the Vendor sells 1 (one) model of
+100Gb Network Controller, once that controller has been validated in Model 1,
+it will also be automatically conisidered certified for Models 2 - 10.
+
+Display of Status of Vendor Approved Options
+''''''''''''''''''''''''''''''''''''''''''''
+Once a Model is certified it will be publicly listed on the Ubuntu Certifiation
+Website described later in this document.  In addition to the Model, all Vendor
+Approved Options that apply to the Certified Model will be listed alongside
+that Model.  Each Vendor Approved Option will show it's status (e.g. Certified,
+Untested, Unsupported, etc) and at least the Ubuntu Version or Kernel Version
+that the Option was tested against.
+
+This will give customers a more complete view of what Models and Options are
+supported by Ubuntu Server.
+
+This will also make creating BOMs for projects easier as there will no longer
+be any question if the components in a given BOM have been certified.
+
 OS Versions
 -----------
 Certifications are available for the two most recent LTS versions of Ubuntu
-Server.  At this time, this includes 14.04 LTS and 16.04 LTS
+Server.  At this time, this includes 16.04 LTS and 18.04 LTS
 
 Certification is never granted for Interim releases of Ubuntu Server (non-LTS
-versions such as 15.04, 15.10 or 16.10).
+versions such as 18.10, 19.04 or 19.10).
 
 Certification Testing is performed on the following LTS releases:
 
-* LTS GA - ex. 14.04 LTS GA as released in April 2014
+* LTS GA - ex. 18.04 LTS GA as released in April 2018
 
-* Current LTS Point Release - ex 14.04.3 as released in August 2015
+* Current LTS Point Release - ex 16.04.5 as released in August 2018
 
 Package Versions
 ----------------
@@ -224,30 +338,53 @@ https://maas.io
 Deployed OSs for Certification should *not* be updated with current package
 versions unless explicitly instructed to by the Server Certification Team.
 
+Testing should always start with the GA version of Ubuntu unless the HWE kernel
+is necessary to provide support for newer hardware.  Doing certification
+primarily on the GA release will ensure the longest support lifetime for
+customers, while the HWE release will ensure customers are able to use the
+newest hardware.
+
 Certification should always be performed using the most recent version of the
 Certification Suite. This is installed separately after the OS Vesrion has been
-installed on the SUT.
+installed on the SUT. Installation is usually performed automatically as part
+of the deployment process.
 
 Certification Lifetime
 ----------------------
+
+   .. figure:: images/LTS_Certification_Schedule.png
+      :alt: This image shows a graphical representation of the typical
+            Certification support schedule from one LTS to another.
+      :width: 100%
+
+   Figure 1: The typical Ubuntu Server Certification LTS Support Schedule. This
+   is also available for download and closer examination from the Certification
+   Portal: https://certification.canonical.com/server/lifecycle/
+
+
 Certifications are valid from the point release they are issued against until
 the end of the lifetime for that LTS.  For example, a system certified on
-Ubuntu 14.04.2 LTS will be considered certified for 14.04.2, 14.04.3, 14.04.4
-and any subsequent 14.04 point release but will *not* be considered certified
-for 16.04 or subsequent LTS releases.
+Ubuntu 16.04.2 LTS will be considered certified for 16.04.2, 16.04.3, 16.04.4
+and 16.04.5 but will *not* be considered certified for 18.04 or subsequent LTS
+releases.
+
+Those subsequent LTS releases will constitute a new LTS release family and will
+require separate certification of each Model and Vendor Approved Option.
 
 Models
 ------
-For the purpose of Ubuntu Server Certification, only specific configurations
-are considered certified.  This is due to the vast array of optional components
-available on CTO server systems that may or may not have been tested with
-Ubuntu Server.  
+For the purpose of Ubuntu Server Certification, we encourage the testing and
+certification of a Partner's entire server line, including user selectable
+Vendor Approved Options. This is part of the move to Comprehensive Server
+Certification.
 
-For each Certificate, we list the specific components that were tested and the
-sum of those parts is considered the Certified System.  In order to ensure
-coverage of as many component options as possible, the Certification team will
-work with the Partner to decide on a test plan to cover a model and its full
-breadth of component options.
+For each Server Model, we will list all Vendor Approved Components that were 
+tested. We will also list the supported/certified status of each of those 
+components and that information will be plainly visible on the public
+certification website for each model the Vendor Approved Components are
+applicable. In order to ensure coverage of as many component options as
+possible, the Certification team will work with the Partner to decide on a test
+lan to cover a model and its full breadth of component options.
 
 Changes to the Test Suite
 -------------------------
@@ -275,7 +412,7 @@ Test Requirements Changes
 The requirements for Certification are considered fluid up to the day the LTS
 is released.  At that point, certification requirements are locked in and will
 not change for the life of that LTS.  Any new test cases will be introduced as
-Greylist items and will not gate certifications.  
+Non-Blocking items and will not gate certifications.  
 
 Note that this only applies to additions to the requirements.  Requirements can
 be eased (tests removed) at any time and *will* be applicable to all
@@ -287,31 +424,31 @@ Progression of New Tests
 As the Suite *is* constantly evolving, there is a natural progression for tests
 that is applied throughout the development cycle.  
 
-Any new test is introduced as a Greylist item.  This implies that the test must
+Any new test is introduced as a Non-Blocking item.  This implies that the test must
 be run, but will *not* gate the certification effort for the current LTS.  As we
-approach the next LTS, Greylist tests are re-evaluated for promotion to
-Whitelist (Required) tests and likewise, Whitelist tests are evaluated for
-demotion to Greylist or removal altogether.
+approach the next LTS, Non-Blocking tests are re-evaluated for promotion to
+Blocking (Required) tests and likewise, Blocking tests are evaluated for
+demotion to Non-Blocking or removal altogether.
 
 As a more concrete example, let's suppose a new Storage I/O stress test is
-introduced after 14.04 LTS is released but before 16.04 LTS.  That new test
-would be introduced as a Greylist test, thus any failures would *not* gate 14.04
-certifications.  This "Break-In" period is a chance to review and improve the
+introduced after 18.04 LTS is released but before 20.04 LTS.  That new test
+would be introduced as a Non-Blocking test, thus any failures would *not* gate 18.04
+certifications. This "Break-In" period is a chance to review and improve the
 test as well as gather data from various testing scenarios to determine its
 viability later on.
 
-As we approach 16.04, we would re-evaluate this new Storage Stress test.  If it
-is seen as important and reliable enough, then it will be promoted to Whitelist
-for 16.04 and be required to pass for all 16.04 certifications.  
+As we approach 20.04, we would re-evaluate this new Storage Stress test.  If it
+is seen as important and reliable enough, then it will be promoted to Blocking
+for 20.04 and be required to pass for all 20.04 certifications.  
 
-Also keep in mind that even though this test would now be required for 16.04,
-it will still remain a Greylist item for 14.04 certifications. 
+Also keep in mind that even though this test would now be required for 20.04,
+it will still remain a Non-Blocking item for 18.04 certifications. 
 
 Changes to Certification Policies
 '''''''''''''''''''''''''''''''''
 
 The policies for Certification are subject to change at any time for any
-reason.  That said, we make every effort to minimize policy changes and make
+reason. That said, we make every effort to minimize policy changes and make
 modifications only where necessary for changing business needs.
 
 Virtualization
@@ -319,16 +456,16 @@ Virtualization
 
 Ubuntu as Host
 ''''''''''''''
-For all Servers that support virtualization, the KVM tests must be run with
-Ubuntu as the host OS.  This will launch an Ubuntu guest and validate that
-virtualization functions.  Certification does not install or apply to other
+For all Servers that support virtualization, the KVM and LXD tests must be
+run with Ubuntu as the host OS. This will launch an Ubuntu guest and validate
+that virtualization functions. Certification does not install or apply to other
 operating systems as guests.
 
 Ubuntu as Guest
 '''''''''''''''
 In special situations, we will provide Certification of Ubuntu as a guest OS on
-a different host OS.  These certifications are provided on a case-by-case basis
-and must be agreed upon by both Canonical and the Partner.  Please discuss this
+a different host OS. These certifications are provided on a case-by-case basis
+and must be agreed upon by both Canonical and the Partner. Please discuss this
 with your Account Manager if you need to certify Ubuntu as a guest on your
 hypervisor.
 
@@ -342,9 +479,9 @@ of disk space to ensure the tests run successfully.
 Guests should also have at least one virtual NIC that can successfully ping the
 MAAS server / ``iperf`` Target.
 
-Certifications of this type will use the "virtual-machine-full" whitelist,
-which is a subset of the full server suite defined by the "server-full
-whitelist.
+Certifications of this type will use the "virtual-machine-full" testplan,
+which is a subset of the full server suite defined by the "server-full"
+testplan.
 
 KVM testing is generally not required for certification of Ubuntu as Guest
 scenarios as nested virtualization (e.g. running KVM inside a VM) is considered
@@ -423,11 +560,12 @@ Public Web Site
 All published Certificates are accessible via our public certification website
 found at
 
-        http://www.ubuntu.com/certification/server
-        http://www.ubuntu.com/certification/soc
+        http://certification.ubuntu.com/server
+        http://certification.ubuntu.com/soc
 
 Public certificates will include Make/Model, release and pertinent hardware
-information including the exact configuration that was used for Certification.
+information including certification/supported status of any Vendor Approved
+Options applicable to the certified Make/Model.
 
 Public certificates will *not* include any Pass/Fail test information, private
 system data or other details that are not meant to be publicly accessible.
@@ -499,7 +637,7 @@ Depending on the activity, the following should apply as far as time estimates:
 * Hardware enablement or bug fixing has no set timeframe due to the nature
   of those issues.  Bugs will be resolved as quickly as we can; however,
   due to the variations in severity, complexity, and impact on other
-  releases and systems, the actual time to fix and SRU a bug fix can vary
+  releases and systems, the actual time to fix and SRU a bug  fix can vary
   from a few days to several weeks.  Additionally, hardware enablement
   requires hardware access in our labs and may take several weeks to
   develop, push into MAAS and then find its way into a MAAS update.
@@ -528,32 +666,19 @@ Certification requires MAAS to be used to deploy all test systems.
 
 Hardware
 --------
-Servers to be Certified should be GA level samples, *not* development level,
-SDV, BBVT, FVT or any other non-ready-for-production level.  The hardware
-should be the same hardware that customers are able to purchase.
-
-The one exception to this is for pre-release systems where the Partner and
-Canonical have agreed to certification and co-marketing to ensure a SUT
-certification coincides with the SUT's release announcement. This exception is
-granted on a case by case basis.
-
-CPUs
-''''
-CPUs must be production level chips.  This means that ES and QS level chips do
-not qualify for certification.  All CPUs must be GA level chips at test time.
-Pre-testing can be conducted on pre-GA CPUs, but the final, official
-certificatiuon test run must be performed using GA CPUs.
+Hardware to be Certified should be GA level hardware, *not* development level
+hardware, SDV, BBVT, FVT or any other non-ready-for-production level.  The
+hardware should be the same hardware that customers are able to purchase.
 
 Firmware
-''''''''
+--------
 Firmware should be GA or similar level.  In all cases, firmware should be GA
 level, with the only exception being the need to use unsigned versions in order
 to maintain the ability to flash revisions up or down as needed.  
 
-Firmware should be available somewhere online and accessible to users and not
-a secret location that is only available internally to the Partner or Canonical.
-The only exception here is for initial release firmware that comes on a newly
-released system and may not be downloadable directly.
+Firmware should be available somewhere online and not a secret build that is
+only available internally to the Partner or Canonical.  The only exception here
+is for initial release firmware that comes on a newly released system.
 
 System Identification
 ---------------------
@@ -600,19 +725,20 @@ The standard Ubuntu Kernel includes the GA kernel or any released HWE kernel.
 
 The exception to this involves kernel modules as outlined below.
 
+Modules injected via DKMS generally are not allowed.
+
 Third Party / Proprietary Drivers
 '''''''''''''''''''''''''''''''''
-Hardware that requires a third party driver must meet the following
-requirements:
+Hardware should be tested and certified using in-band drivers provided by the
+Ubuntu kernel.  In cases where hardware is not supported by the current Ubuntu
+kernel, testing should then focus on the current HWE kernel.
 
-* Driver must be packaged in the proper format
+Partners should work with their IHV upstreams to ensure necessary driver
+support is present in the Linux Kernel and will thus land naturally in the
+Ubuntu kernel.
 
-* Driver must be accessible to a MAAS server
-
-* Instructions must be clearly provided to users that explain how to add that
-  driver to MAAS
-
-* The driver must be tested.
+Out-of-Band (Proprietary) drivers may be considered for use in Certification
+but that must be approved by the Canonical Hardware Certification Team.
 
 For more information, please contact your account representative.
 
@@ -623,7 +749,17 @@ Thus if a system supports JBOD and onboard RAID plus an optional PCIe add-in
 RAID card (that controls onboard disks), the storage tests should be run
 against all three configurations.
 
-The Server Test Suite provides a ``storage-only`` whitelist for this purpose.
+The Server Test Suite provides a ``storage-only`` testplan for this purpose.
+
+Storage Management Software
+'''''''''''''''''''''''''''
+Any storage management software meant to manage, modify, monitor storage
+devices including internal and/or external arrays, JBODs, or other storage
+subsystems should be provided to Ubuntu users in a manner equal to the way it
+is presented to users of other operating systems. The preferred method is via
+a Debian package provided via download from the Partner's website, or as a Snap
+package available via the Snap Store. The package should be presented equally
+with the same software packaged for other Operating Systems.
 
 USB Testing
 -----------
@@ -676,6 +812,12 @@ the OS resolved in a timely manner.  Note that OS bugs could result in
 certification being delayed until the OS SRU process is completed and any fix
 has been introduced to the OS via the Updates repository.
 
+Additionally, membership in the Canonical OEM Partner Programme does not imply
+any sort of special handling of OS bugs.  We will make a best effort to
+escalate bugs from our Partners, but Canonical's engineering teams are under no
+obligation to accept that escalation outside of a special engineering
+engagement.
+
 Regression Bugs
 '''''''''''''''
 Bugs found in the OS during re-certification, or during regression testing, will
@@ -687,6 +829,18 @@ original 16.04 certification will not be affected, and the regression
 introduced in version between version 1.01 and 1.10 of package X will be
 treated with higher priority as a regression in the OS.
 
+Enablement Bugs
+'''''''''''''''
+Bugs determined to require hardware enablement for a Model to pass
+Certification will need to be examined and discussed with the Partner Engineer
+and Canonical to determine the best course of action.  This may require a paid
+Non-Recurring Engineering engagement with Canonical to perform the enablement
+work necessary.
+
+Examples of Enablement NRE would include a new server management engine that
+requires use of a special API for hardware management or the inclusion of a new
+driver that is not supported by the current HWE kernel.
+
 Submission of Results
 ---------------------
 Results should be submitted using the process outlined in the Self-Testing
@@ -694,25 +848,17 @@ Guide.
 
 Requesting Certificates
 -----------------------
-As of February, 2016, any system proposed for certification must also have a
-matching Server Certification Intake Form completed and submitted.  This form is
-available at 
-
-        https://certification.canonical.com/server-intake
-
-Certificates will not be reviewed until this step is complete.
-
 Certificates should only need to be requested *one* time per System per Release.  
 
 If re-tests are needed to satisfy testing requirements, do *not* create separate
 certificates.
 
 Certificates are not necessary for subsequent point releases.  If a system is
-certified already on 14.04.2, you do *not* need a new certificate for 14.04.3 and
-14.04.4.
+certified already on 16.04.2, you do *not* need a new certificate for 16.04.3 and
+16.04.4.
 
 Certificates *are* necessary for each LTS family.  If a system is certified
-for 14.04.3, it *does* need a new certificate for 16.04 LTS.
+for 16.04.3, it *does* need a new certificate for 18.04 LTS.
 
 Private Certificates
 --------------------
@@ -720,13 +866,13 @@ Private certifications are available but are only allowed on a case-by-case
 basis.  Private certifications are generally used for pending tenders that the
 Partner wishes to participate in, or for certification on a pre-GA system with
 the expectation that such certification will be made public after the system
-GAs.  If you need a private certification, please contact your account manager
+GAs.  If you need a private certification, please contact your Partner Engineer
 for more information.
 
 Zero-Day Certification
 ----------------------
-We will allow for "Zero-Day Certification" for a new LTS release.  This allows
-our Partners to advertise certified status on the latest LTS release of Ubuntu
+We encourage "Zero-Day Certification" for a new LTS release.  This allows our
+Partners to advertise certified status on the latest LTS release of Ubuntu
 Server on the day it is released.  In order to participate in Zero-Day
 Certification, the following applies:
 
@@ -797,9 +943,6 @@ The following are examples of things that do not require re-certification
 * Memory amount changes (e.g. 4 GiB to 16 GiB) *unless* that includes an
   increase in the number of memory slots physically on the board.
 
-* Adding or removing a PCI optional device such as a RAID or external
-  network controller
-
 Whenever a question of re-certification comes up, the Certification Team will
 investigate the situation and make a decision on a case-by-case basis.
 
@@ -810,6 +953,8 @@ is considered the "Certificate"; however, on occasion where a PDF certificate
 is needed, such as for a tender or business case, we will create and provide
 an official PDF Certificate for your system.
 
+To request a physical certificate, please contact your Partner Engineer.
+
 Sending Canonical Hardware
 --------------------------
 As a condition of Certification, a sample of each certified system must be
@@ -817,22 +962,6 @@ made available to Canonical engineers whenever needed for bug fixes, support
 escalations and for other similar reasons.
 
 This does not mandate that hardware is required to be sent to Canonical;
-*however*, partners are not prohibited from sending sample hardware to
+*however*, partners are encouraged to send representative sample hardware to
 Canonical on a loan or permanent basis to be placed into our labs for ongoing
 testing or support or other related work.
-
-OpenStack Interoperability Labs
--------------------------------
-Canonical offers Partners the option of participating in our OpenStack
-Interoperability Lab (http://partners.ubuntu.com/programmes/openstack).  
-
-Participation in OIL does not automatically grant certified status; however,
-any server that is placed into OIL must be certified before it can be
-placed in OIL.
-
-The typical workflow looks like this:
-
-1. Hardware sent to Canonical Lab
-2. Certification Team tests and certifies
-3. Hardware transferred to OIL
-4. Interoperability testing begins.
