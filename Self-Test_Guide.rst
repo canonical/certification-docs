@@ -158,7 +158,7 @@ You can run certification tests without submitting them to C3; however, if
 you want to certify the system, you need a C3 account. *If
 you do not have an account for your company on the private certification
 web site, or if you do not have access to your company's account, please
-contact your Technical Partner Manager, who will work with the Server
+contact your Partner Engineer, who will work with the Server
 Certification Team to establish the account.*
 
 Additionally, anyone who needs to access the account on C3 will need their own
@@ -1046,7 +1046,7 @@ provided with the Server Test Suite:
   LXD) tests.
 
 If you're testing Ubuntu 16.04, change the version number in commands that
-include it. Consult your Technical Partner Manager if you need help
+include it. Consult your Partner Engineer if you need help
 deciding which of these tests to run.
 
 When the test run completes, submit the test result in the same way you
@@ -1176,7 +1176,7 @@ so as to determine the earliest working version of Ubuntu.
 If a server fails certification with a more recent kernel but works
 with an earlier one, this situation is treated as a regression; a bug
 report should be filed and note made of the problem in the certificate
-request. Please notify your TPM about such problems to facilitate their
+request. Please notify your PE about such problems to facilitate their
 resolution.
 
 Because x.04.1 releases use the same kernel series as their corresponding
