@@ -1,3 +1,10 @@
+certification-docs (0.2.5-0ppa1) bionic; urgency=medium
+
+  * Updated MANIACS and STG to mention need for outgoing access to
+    repository, PPA, and key server systems.
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 12 Oct 2018 13:43:25 -0400
+
 certification-docs (0.2.4-0ppa1) bionic; urgency=medium
 
   * De-versioned Programme Overview Guide
