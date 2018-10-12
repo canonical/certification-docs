@@ -1279,11 +1279,11 @@ tests. Specific suggestions for fixing these problems include:
    network testing. Simplifying the network in whatever way is practical
    can improve matters.
 
--  **Check firewall settings** -- Successful deployments require access to
-   several network sites. These include repositories at
+-  **Check firewall settings** -- Successful deployments may require access
+   to several network sites. These include repositories at
    ``archive.ubuntu.com`` (or a regional mirror), Ubuntu's PPA site at
    ``ppa.launchpad.net``, and Ubuntu's key server at
-   ``keyserver.canonical.com``. (You may instead use local mirrors of the
+   ``keyserver.ubuntu.com``. (You may instead use local mirrors of the
    archive and PPA sites.) If your site implements strict outgoing firewall
    rules, you may need to open access to these sites on ports 80 and/or
    443.

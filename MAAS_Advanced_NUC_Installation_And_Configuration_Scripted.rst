@@ -154,10 +154,10 @@ up its most basic network settings:
    -  The version of Ubuntu Server 18.04 described here can be
       obtained from https://www.ubuntu.com/download/server.
 
-   -  Ubuntu will need access to several network sites in order to function
+   -  Ubuntu may need access to several network sites in order to function
       properly. These include repositories at ``archive.ubuntu.com`` (or a
       regional mirror), Ubuntu's PPA site at ``ppa.launchpad.net``, and
-      Ubuntu's key server at ``keyserver.canonical.com``. (You may instead
+      Ubuntu's key server at ``keyserver.ubuntu.com``. (You may instead
       use local mirrors of the archive and PPA sites.) If your site
       implements strict outgoing firewall rules, you may need to open
       access to these sites on ports 80 and/or 443.
