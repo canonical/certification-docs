@@ -1,3 +1,10 @@
+certification-docs (0.2.6-0ppa1) bionic; urgency=medium
+
+  * Updated mk_test_case_guide to work with new units dir hierarchy
+  * mk_test_case_guide pep8 fixes 
+
+ -- Jeff Lane <jeff@ubuntu.com>  Tue, 16 Oct 2018 14:46:51 -0400
+
 certification-docs (0.2.5-0ppa1) bionic; urgency=medium
 
   * Updated MANIACS and STG to mention need for outgoing access to
