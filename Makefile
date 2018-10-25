@@ -43,7 +43,7 @@ policyh: Policy_Guide.html
 
 programmeh: Programme_Guide.html
 
-testcaseh: Test_Case_Guide-16.04.html Test_Case_guide-18.04.html
+testcaseh: Test_Case_Guide-16.04.html Test_Case_Guide-18.04.html
 
 clean:
 	rm -rf *.pdf *.html debian/files debian/certification-docs* 

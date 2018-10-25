@@ -36,7 +36,7 @@
 """Create a rudimentary Test Case Guide .rst file."""
 
 import re
-from os import listdir
+from os import listdir, scandir
 from guacamole import Command
 
 
@@ -51,8 +51,8 @@ class make_guide(Command):
         :param parser:
             Argument parser (from :mod:`argparse`) specific to this command.
         """
-        tpfile = '/usr/share/plainbox-provider-certification-server/units/server-full-14.04.pxu'
-        jdir = '/usr/share/2013.com.canonical.certification:checkbox/jobs/'
+        tpfile = '/usr/share/plainbox-provider-certification-server/units/server-full-18.04.pxu'
+        jdir = '/usr/share/plainbox-provider-checkbox/units'
         parser.add_argument('--whitelist', '-w', help='the whitelist file',
                             default=tpfile)
         parser.add_argument('--jobs', '-j', help='the jobs directory',
@@ -87,7 +87,7 @@ class make_guide(Command):
         try:
             with open(whitelist_file) as f:
                 for line in f:
-                    if not 'certification-status' in line:
+                    if 'certification-status' not in line:
                         line = ''.join(line.split())
                     if line.endswith('include:'):
                         search = True
@@ -98,7 +98,7 @@ class make_guide(Command):
                        search is True:
                         testname = line.split()[0]
                         if testname.endswith(('.*', '.*.txt')):
-                            testname = re.sub('\.\S+','',testname)
+                            testname = re.sub('\.\S+', '', testname)
                             print('NAMECHANGE %s' % testname)
                         test_list.append(dict([('category', category),
                                                ('test', testname)]))
@@ -162,13 +162,13 @@ class make_guide(Command):
             breakpoint = last_breakpoint + 75
         test['description'] = description
 
-    def add_descriptions(test_list, jobs_directory):
+    def add_descriptions(test_list, unit_directory):
         """
         Add descriptions for all the tests.
 
         :test_list:
             List of tests (each of which is a dictionary).
-        :jobs_directory:
+        :unit_directory:
             Directory in which jobs files are located.
 
         Loop through ALL the files in the jobs_directory to find matches for
@@ -177,15 +177,28 @@ class make_guide(Command):
         add_one_description() is called to add it to the test's dictionary.
         """
         try:
-            job_files = listdir(jobs_directory)
+            job_dirs = listdir(unit_directory)
         except FileNotFoundError:
             print('Could not open jobs directory ({})!'.format(jobs_directory))
             print('Aborting!')
             exit(1)
+
+        # LP: 1798173
+        # Changes in the job folder hierachry make this necessary to now first
+        # grab a list of job dirs (above) and then a list of pxu files to parse
+        # for job descriptions.
+        avoid_these = ['manifest.pxu', 'packaging.pxu', 'test-plan.pxu']
+        job_files = list()
+        for job_dir in job_dirs:
+            full_path = unit_directory + "/" + job_dir
+            with scandir(full_path) as file_list:
+                for file in file_list:
+                    if file.name not in avoid_these:
+                        job_files.append(file.path)
+
         for file in job_files:
-            fullpath = jobs_directory + "/" + file
             try:
-                contents = open(fullpath).read()
+                contents = open(file).read()
                 for test in test_list:
                     if 'description' not in test or test['description'] == '':
                         matchname = 'id: ' + test['test']
