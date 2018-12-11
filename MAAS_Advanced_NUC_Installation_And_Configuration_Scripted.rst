@@ -280,6 +280,12 @@ up its most basic network settings:
           dhcp4: true
           optional: true
 
+   If your network includes any high-speed network devices (above 10Gbps),
+   you may need to add ``mtu: 9000`` to that device's configuration.
+   Additional information on testing with such devices is in Appendix D of
+   the Ubuntu Certified Hardware Self-Testing Guide (available from
+   https://certification.canonical.com).
+
    If you need to change the network configuration, type ``sudo netplan
    apply`` or reboot the computer to apply the changes.
 
@@ -1029,6 +1035,11 @@ roles -- run ``iperf3`` as a server on Group B and run the certification
 suite on Group A. You'll need to adjust the
 ``/etc/xdg/canonical-certification.conf`` file on each SUT to point it to
 its own matched server.
+
+Testing high-speed network devices (above 10Gbps) requires changing some
+network configuration options. Appendix D of the Ubuntu Server Certified
+Hardware Self-Testing Guide covers how to configure both the SUT and the
+``iperf3`` Target system for such testing.
 
 You may find the ``iftop`` utility helpful on the ``iperf3`` server system.
 This tool enables you to monitor network connections, which can help you to

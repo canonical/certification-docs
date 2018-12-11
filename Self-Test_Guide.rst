@@ -492,6 +492,10 @@ install Ubuntu on the SUT as follows:
    -  On some systems, it is necessary to remove the smartctl-validate
       option under Hardware Tests before clicking Commission Machine.
 
+   -  It's best to remove any USB flash drives from the machine before
+      commissioning. If a drive is left plugged in, MAAS may detect it
+      and delete its partitions when you deploy the node.
+
    -  If the SUT has a BMC, the computer should power up, pass more
       information about itself to the MAAS server, and then power down
       again.
@@ -566,7 +570,7 @@ install Ubuntu on the SUT as follows:
       This process can take several minutes.
 
 If MAAS has problems in any of the preceding steps, you should first check
-`Appendix D - Troubleshooting`_ for suggestions. If that doesn't help,
+`Appendix E - Troubleshooting`_ for suggestions. If that doesn't help,
 the SUT might not pass certification. For instance, certification requires
 that MAAS be able to detect the SUT and, in most cases, set its power type
 information automatically. If you have problems with any of these steps,
@@ -1190,7 +1194,120 @@ Team.
 
    PageBreak
 
-Appendix D - Troubleshooting
+Appendix D - Network Performance Tuning
+=======================================
+
+Ubuntu's default network configuration works fine for most 1Gbps and 10Gbps
+network devices; however, most servers require a little tweaking of
+settings to perform adequately at higher speeds. The following procedure
+configures both the SUT and the ``iperf3`` Target for optimal performance:
+
+#. On the ``iperf3`` Target, install the ``certification-tools`` package
+   from the certification PPA. (This package should be installed by default
+   when you install ``maas-cert-server`` version 0.3.7 or later; but you
+   may need to install it manually if you're using another computer as your
+   ``iperf3`` Target.)
+
+#. On the ``iperf3`` Target, ensure that jumbo frames are configured. You
+   can do this either temporarily or permanently:
+
+   - To make a temporary change, type ``sudo ip link set ens1f1 mtu 9000``,
+     changing ``ens1f1`` to your high-speed network interface's name.
+
+   - With recent versions of Ubuntu, a permanent change is done by editing
+     the configuration file in ``/etc/netplan`` (such as
+     ``/etc/netplan/01-netcfg.yaml``, although the exact name may differ).
+     Locate the section for the high-speed network interface and add the
+     line ``mtu: 9000``. The result might look something like this,
+     although several options may be different depending on your network
+     configuration::
+
+      ens1f1:
+        addresses: [ 172.24.124.1/22 ]
+        dhcp4: false
+        mtu: 9000
+        optional: true
+
+   - Note that setting jumbo frames is not normally necessary on low-speed
+     network interfaces, and in some cases jumbo frames can cause problems.
+     Specifically, some EFI-based computers can't PXE-boot from a MAAS
+     server's interface that's configured to use jumbo frames. Thus, you
+     should restrict this procedure to interfaces from which servers do
+     *not* PXE-boot, if possible. If this is not possible and if you have
+     problems PXE-booting computers, you may need to enable jumbo frames
+     manually only when performing network tests that require this feature.
+
+#. If ``iperf3`` is already running on the ``iperf3`` server, kill it.
+
+#. On the ``iperf3`` server, type ``start-iperf3 -a 172.24.124.1 -n 10``,
+   changing the IP address to the ``iperf3`` Target system's high-speed
+   interface and setting the ``-n`` option to the number of ``iperf3``
+   instances you want to run. The ``network`` test in Checkbox defaults to
+   using one instance for every 10Gbps of network throughput being tested,
+   so you'll need at least ``-n 4`` to test a 40Gbps NIC and ``-n 10`` to
+   test a 100Gbps NIC. You may find you'll need another value, though, as
+   described shortly. If in doubt, run more ``iperf3`` instances than you
+   think you'll need; the cost of running too many instances is very low.
+   You can configure ``iperf3`` to start automatically by editing a startup
+   script, such as ``/etc/rc.local``.
+
+#. Repeat the preceding step for every other network interface that may be
+   receiving ``iperf3`` connections.
+
+#. You may need to enable jumbo frames on any switch(es) between the
+   ``iperf3`` Target and the SUT. How to do this varies from one switch to
+   another, so you must consult the switch's documentation.
+
+#. Repeat steps 1 and 2 on the SUT.
+
+These steps are sufficient to produce passing test results on many
+high-speed networks; however, sometimes you may need to tweak the settings.
+The reason for using multiple ``iperf3`` instances is that a single
+``iperf3`` thread tends to max out the CPU at some level of throughput --
+somewhere between 10Gbps and 20Gbps using the servers in our test lab. This
+value may be different on other hardware, though. If either an ``iperf3``
+server or a SUT has less-powerful CPUs, more ``iperf3`` instances may be
+required; and fewer may be optimal if a CPU is more powerful. If you
+suspect your network tests are failing for this reason, you can adjust the
+``-n`` value in your ``start-iperf3`` command and then run the ``network``
+script manually on the SUT, specifying the number of ``iperf3`` instances
+it launches via the ``--num-threads`` option, as in::
+
+ sudo /usr/lib/plainbox-provider-checkbox/bin/network test -i ens1f1 \
+  -t iperf --iperf3 --scan-timeout 3600 --fail-threshold 80 \
+  --cpu-load-fail-threshold 90 --runtime 900 --num_runs 4 --num-threads 20 \
+  --target 172.24.124.1
+
+This example sets the number of ``iperf3`` instances to 20. You must adjust
+the ``-i`` option for the SUT's interface and the ``--target`` value to
+point to the ``iperf3`` Target. Of course, the ``iperf3`` Target must also
+be running at least the specified number of instances. If this procedure
+produces acceptable results, you will need to append the *exact* command
+you used and the output of the run to the test result submission in a note.
+
+If you can't get adequate performance by setting jumbo frames and using
+multiple ``iperf3`` instances, you may need to tweak additional network
+settings. This can be done with the ``optimize-network`` script, which is
+provided by the ``certification-tools`` package. This script takes the name
+of the network interface as a required argument, using ``-i`` or
+``\-\-interfaces``, as in::
+
+ sudo optimize-network -i ens1f1
+
+You may need to run this script on the ``iperf3`` Target, on the SUT, or
+both. Be sure you do *not* reboot between running the script and running
+your network tests, since the configuration changes will not survive a
+reboot.
+
+In extreme cases, additional configuration tweaks may be required. The full
+procedure is documented at
+https://certification.canonical.com/cert-notes/network-tuning/.
+
+.. raw:: pdf
+
+   PageBreak
+
+Appendix E - Troubleshooting
 ============================
 
 Fixing Deployment Problems
@@ -1322,213 +1439,6 @@ If you end up having to re-run the network tests, you can do so as
 described earlier, in `Appendix B - Re-Testing and Installing Updated
 Tests`_.
 
-Network Performance Tuning
---------------------------
-
-Ubuntu's default network configuration works fine for most 1Gbps and 10Gbps
-network devices; however, some servers require a little tweaking of
-settings to perform adequately at higher speeds. The following procedure
-was used to tune a system with a 100Gbps NIC, and may be used as a starting
-point for tweaking other systems; however, details may need to be adjusted
-for specific SUTs. Please note that similar steps may be needed on both the SUT
-and the ``iperf3`` server.  Additionally, some steps may not work on all
-devices or systems; for example, not all systems support NUMA, and the
-"MaxReadReq" parameter is specific to Mellanox devices and is not supported on
-cards from other vendors.  
-
-It is best to perform the following steps either via sudo or by switching to
-the root account before proceeding.
-
-#. Find the device's NUMA node::
-
-    # cat /sys/class/net/enp94s0f0/device/numa_node 
-    0
-    # cat /sys/class/net/enp94s0f1/device/numa_node 
-    0
-
-#. Find with which CPU(s) the nodes are associated::
-
-    # lscpu |grep NUMA
-    NUMA node(s):          2
-    NUMA node0 CPU(s):     0-17,36-53
-    NUMA node1 CPU(s):     18-35,54-71
-
-   This lets us set affinity to keep the iperf processes close to the CPU
-
-#. Check current CPU frequencies::
-
-    # grep -E '^cpu MHz' /proc/cpuinfo
-    cpu MHz         : 1000.000
-
-#. Set governor on all CPUs (Requires install of ``cpufrequtils``)::
-
-    for x in `seq 0 71`;do
-	    cpufreq-set -r -g performance -c $x
-    done
-
-#. Check frequencies again::
-
-    # grep -E '^cpu MHz' /proc/cpuinfo
-    cpu MHz         : 2301.000
-
-   Note they should now be at or above the CPU max.
-
-#. Make sure the card is in the right slot (100Gb cards should show speed
-   of 8GT/s and Width of 16x otherwise the PCIe slot it’s in can’t
-   handle the throughput)::
-
-    # lspci -s 04:00.0 -vvv | grep Speed
-    LnkCap: Port #0, Speed 8GT/s, Width x16, ASPM not supported,
-      Exit Latency L0s unlimited, L1 unlimited
-    LnkSta: Speed 8GT/s, Width x16, TrErr- Train- SlotClk+ DLActive-
-      BWMgmt- ABWMgmt-
-
-#. Check the ``MaxReadRequest`` using the PCI address of each port (you
-   have to set this per port)::
-
-    # lspci -s 04:00.0 -vvv | grep MaxReadReq
-    MaxPayload 256 bytes, MaxReadReq 512 bytes
-    # setpci -s 04:00.0 68.w
-    2936
-
-#. Set Max Read Request to the upper limit::
-
-    # setpci -s 04:00.0 68.w=5936
-    # lspci -s 04:00.0 -vvv | grep MaxReadReq
-    MaxPayload 256 bytes, MaxReadReq 4096 bytes
-
-#. Set buffer to 512M Buffers::
-
-    # sysctl net.core.rmem_max=563870912
-    net.core.rmem_max = 563870912
-    # sysctl net.core.wmem_max=563870912
-    net.core.wmem_max = 563870912
-
-#. Increase Linux autotuning TCP Buffer limits to 256MB::
-
-    # sysctl net.ipv4.tcp_rmem="4096 87380 268435456"
-    net.ipv4.tcp_rmem = 4096 87380 268435456
-    # sysctl net.ipv4.tcp_wmem="4096 87380 268435456"
-    net.ipv4.tcp_wmem = 4096 87380 268435456
-
-#. Set max_backlog to 300K::
-
-    # sysctl net.core.netdev_max_backlog=300000
-    net.core.netdev_max_backlog = 300000
-
-#. Don't cache ``ssthresh`` from previous connection::
-
-    # sysctl net.ipv4.tcp_no_metrics_save=1
-    net.ipv4.tcp_no_metrics_save = 1
-
-#. Explicitly set ``htcp`` as the congestion control. You could also set
-   this to ``bbr``::
-
-    # sysctl net.ipv4.tcp_congestion_control=htcp
-    net.ipv4.tcp_congestion_control = htcp
-
-#. If you are using jumbo frames, also set this::
-
-    # sysctl net.ipv4.tcp_mtu_probing=1
-    net.ipv4.tcp_mtu_probing = 1
-
-#. Set default ``qdisc`` to ``fq``::
-
-    # sysctl net.core.default_qdisc=fq
-    net.core.default_qdisc = fq
-
-#. NIC tweaks:
-
-   - Turn on Large Receive Offload::
-
-      # ethtool -K enp216s0f0 lro on
-      # ethtool -K enp216s0f1 lro on
-
-   - Set ``txqueuelen`` buffer higher::
-
-      # ifconfig enp216s0f0 txqueuelen 20000
-      # ifconfig enp216s0f1 txqueuelen 20000
-
-   - Enable jumbo frames::
-
-      # ip link set enp216s0f0 mtu 9000
-      # ip link set enp216s0f1 mtu 9000
-
-   - Turn off ``irqbalance``::
-
-      # systemctl stop irqbalance
-      # systemctl status irqbalance |grep Active
-         Active: inactive (dead) since Tue 2018-04-17 20:58:16 UTC; 23s ago
-
-For testing with ``iperf3``: On the ``iperf3`` target server, start 4
-``iperf3`` daemons on different ports, pinned to NUMA Node 0 cores (see #2
-above)::
-
- # iperf3 -sD -B 172.16.21.2 -p5101 -A0
- # iperf3 -sD -B 172.16.21.2 -p5102 -A14
- # iperf3 -sD -B 172.16.21.2 -p5103 -A36
- # iperf3 -sD -B 172.16.21.2 -p5104 -A52
-
-Note we're using ``-A`` to ensure each process is on a CPU core on the same
-NUMA node to which our 100Gbps NIC is attached. On the SUT, kick off four
-``iperf3`` processes, one for each remote port::
-
- $ iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5101 -R -i 60 -T s1 & \
-   iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5102 -R -i 60 -T s2 & \
-   iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5103 -R -i 60 -T s3 & \
-   iperf3 -c 172.16.21.1 -O 15 -t 60 -p 5104 -R -i 60 -T s4 &
-
-This is abbreviated output::
-
- s4:  [ ID] Interval           Transfer     Bandwidth       Retr
- s4:  [  4]   0.00-60.00  sec   161 GBytes  23.1 Gbits/sec  18726             sender
- s4:  [  4]   0.00-60.00  sec   161 GBytes  23.1 Gbits/sec                  receiver
- s4:  
- s4:  iperf Done.
- s3:  [ ID] Interval           Transfer     Bandwidth
- s3:  [  4]   0.00-60.00  sec   160 GBytes  22.9 Gbits/sec                  
- s3:  - - - - - - - - - - - - - - - - - - - - - - - - -
- s3:  [ ID] Interval           Transfer     Bandwidth       Retr
- s3:  [  4]   0.00-60.00  sec   160 GBytes  22.9 Gbits/sec  16953             sender
- s3:  [  4]   0.00-60.00  sec   160 GBytes  22.9 Gbits/sec                  receiver
- s3:  
- s3:  iperf Done.
- s2:  [ ID] Interval           Transfer     Bandwidth
- s2:  [  4]   0.00-60.00  sec   163 GBytes  23.3 Gbits/sec                  
- s2:  - - - - - - - - - - - - - - - - - - - - - - - - -
- s2:  [ ID] Interval           Transfer     Bandwidth       Retr
- s2:  [  4]   0.00-60.00  sec   163 GBytes  23.3 Gbits/sec  17582             sender
- s2:  [  4]   0.00-60.00  sec   163 GBytes  23.3 Gbits/sec                  receiver
- s1:  [ ID] Interval           Transfer     Bandwidth
- s2:  
- s2:  iperf Done.
- s1:  [  4]   0.00-60.00  sec   159 GBytes  22.7 Gbits/sec                  
- s1:  - - - - - - - - - - - - - - - - - - - - - - - - -
- s1:  [ ID] Interval           Transfer     Bandwidth       Retr
- s1:  [  4]   0.00-60.00  sec   159 GBytes  22.7 Gbits/sec  17869             sender
- s1:  [  4]   0.00-60.00  sec   159 GBytes  22.7 Gbits/sec                  receiver
-
-The average bandwidth over 60 seconds for all four threads adds up to
-92Gb/s. Note that you can run this via ``parallel`` (``apt install
-parallel``) as well.  Create a file that looks like this::
-
- # cat commands.txt 
- iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5101 -R -i 60 -T s1
- iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5102 -R -i 60 -T s2
- iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5103 -R -i 60 -T s3
- iperf3 -c 172.16.21.1 -O 15 -t 30 -p 5104 -R -i 60 -T s4
-
-Execute it like this::
-
- # parallel -a commands.txt |tee -a 100Gb-Port0.log
-
-References:
-
-- https://srcc.stanford.edu/100g-network-adapter-tuning
-- https://community.mellanox.com/docs/DOC-2496
-- https://linuxconfig.org/how-to-enable-jumbo-frames-in-linux
-- https://fasterdata.es.net/
-
 Handling Miscellaneous Issues During Testing
 --------------------------------------------
 
@@ -1549,7 +1459,7 @@ screen taken with a digital camera.)
 
    PageBreak
 
-Appendix E - Using SoL
+Appendix F - Using SoL
 ======================
 
 Many servers support *serial-over-LAN (SoL).* When configured in this way,
