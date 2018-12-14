@@ -1,3 +1,12 @@
+certification-docs (0.2.7-0ppa1) UNRELEASED; urgency=medium
+
+  * Updated MANIACS and STG for new high-speed network testing
+    procedures.
+  * Made note of the desirability of unplugging USB drives before
+    commissioning nodes to the STG.
+
+ -- Rod Smith <rod.smith@canonical.com>  Tue, 11 Dec 2018 12:28:39 -0500
+
 certification-docs (0.2.6-0ppa1) bionic; urgency=medium
 
   * Updated mk_test_case_guide to work with new units dir hierarchy
