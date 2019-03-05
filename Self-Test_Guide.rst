@@ -1218,11 +1218,15 @@ configures both the SUT and the ``iperf3`` Target for optimal performance:
      the configuration file in ``/etc/netplan`` (such as
      ``/etc/netplan/01-netcfg.yaml``, although the exact name may differ).
      Locate the section for the high-speed network interface and add the
-     line ``mtu: 9000``. The result might look something like this,
+     line ``mtu: 9000``. (Some versions of Ubuntu have a bug, #1724895,
+     which requires explicitly coding the interface's MAC address to set the
+     MTU, too.) The result might look something like this,
      although several options may be different depending on your network
      configuration::
 
       ens1f1:
+        match:
+          macaddress: 24:8a:07:a3:18:fc
         addresses: [ 172.24.124.1/22 ]
         dhcp4: false
         mtu: 9000

@@ -269,19 +269,24 @@ up its most basic network settings:
       version: 2
       ethernets:
         enp0s8:
+          match:
+            macaddress: 24:8a:07:a3:18:fc
           addresses:
           - 172.24.124.1/22
           nameservers:
             search: [ ]
             addresses: [ ]
           optional: true
+          mtu: 9000
         enp0s3:
           addresses: [ ]
           dhcp4: true
           optional: true
 
    If your network includes any high-speed network devices (above 10Gbps),
-   you may need to add ``mtu: 9000`` to that device's configuration.
+   you may need to add ``mtu: 9000`` to that device's configuration, and
+   possibly tie the definition to a specific MAC address, as shown in the
+   ``enp0s8`` definition.
    Additional information on testing with such devices is in Appendix D of
    the Ubuntu Certified Hardware Self-Testing Guide (available from
    https://certification.canonical.com).
