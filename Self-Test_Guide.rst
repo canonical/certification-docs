@@ -1042,6 +1042,10 @@ provided with the Server Test Suite:
 
 - The ``test-network-18.04`` command runs network tests.
 
+- The ``test-network-underspeed`` command runs the network tests with the speed
+  check disabled. This is helpful in situations where a network device reports
+  an incorrect max speed.
+
 - The ``test-storage`` command runs tests of storage devices.
 
 - The ``test-usb`` command runs tests of USB ports.
