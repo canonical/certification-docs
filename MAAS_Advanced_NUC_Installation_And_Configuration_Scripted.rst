@@ -1102,7 +1102,184 @@ Assigned Automatically  172.24.126.0 - 172.24.127.254  172.24.125.0 - 172.24.125
 
    PageBreak
 
-Appendix D: Glossary
+Appendix D: Installing MAAS in a LXD Container
+==============================================
+
+It is possible to install MAAS in a virtual machine or container. Doing so
+will help to isolate MAAS from the underlying OS and enable relatively easy
+backup and restoration of the complete MAAS environment. To facilitate this
+setup, the certification PPA includes a package, called ``maas-lxc-host``,
+which includes scripts and tools to run on the host system in order to
+install MAAS in a LXC/LXD container. Note, however, that *this procedure is
+still experimental!* Although it can be made to work, it is delicate, and
+can easily fail because of system-specific configuration issues or because
+of minor deviations from the specified procedure.
+
+If you want to run MAAS in this way, follow these steps:
+
+#. Install Ubuntu Server on the server you want to host the LXD container
+   and configure the server's network as described earlier, in `Installing
+   and Configuring Ubuntu`_.
+
+#. Type ``sudo apt-add-repository ppa:hardware-certification/public`` to
+   add the Hardware Certification PPA to the host server.
+
+#. Install the ``maas-lxc-host`` package by typing ``sudo apt install
+   maas-lxc-host``.
+
+#. If you're using a remote SSH session, type ``screen``. The setup process
+   will interrupt network connectivity, so you'll have to reconnect
+   mid-process. Better, use a physical console or remote KVM, which will
+   not be affected by this interruption.
+
+#. Type ``lxc-setup``. This runs the LXC/LXD setup script, which proceeds
+   to run through the setup steps, asking you some questions along the
+   way...
+
+   #. If you're running remotely, the script checks to see if ``screen`` is
+      in use. If so, you'll be asked to confirm that you want to continue.
+
+   #. The script tries to identify the internal and external network
+      devices on the host, and asks you to verify each identification. It
+      then tweaks the configuration to create network bridges for the
+      future container. Once this is done, the script gives you the option
+      to manually edit the NetPlan configuration file, in case you want to
+      make your own tweaks. Note that the script tries to configure the
+      external network interface (``br1``) using DHCP. This is likely to
+      result in the external network interface's IP address changing
+      compared to its original configuration unless you manually edit it to
+      use a static IP address; but specifying a static IP address may be
+      unreliable.
+
+   #. After configuring the network, your remote network access is likely
+      to go down, if you're running remotely. You should be able to
+      reconnect (doing so via the internal network interface may be easier
+      than trying to find the new external IP address) and run ``screen -r``
+      to resume.
+
+   #. After configuring LXD, the script sets up the LXD container's network
+      options. As with the host's network configuration, the script gives
+      you the option of reviewing and editing the settings. By default, the
+      internal network (``eth0``) is given an address one higher than the
+      host (for instance, 172.24.124.2, to the host's 172.24.124.1), and
+      the external address is configured via DHCP.
+
+   #. At this point, the script asks if you want to set up MAAS in the LXD
+      container. If you respond by typing ``Y`` (which is the default), the
+      script installs ``maas-cert-server`` in the LXD container and then
+      runs ``maniacs-setup``, as described in `Running the Setup Script`_.
+      For the most part, you can configure the MAAS server in the LXD
+      container just as you would a MAAS server running directly on a
+      server; however....
+
+   #. When the setup script asks if you want to configure the server as a
+      NAT router, you may want to answer ``N``. The NAT control scripts are
+      installed on both the host and the container, but using the host as a
+      NAT router provides a more direct route to the outside world than
+      would be the case if you used the LXD container for this purpose.
+      Typing ``sudo systemctl enable certification-nat`` on the host will
+      configure it to enable NAT on the next reboot, and typing ``sudo
+      service certification-nat start`` will start NAT immediately. Note
+      that if you use the host as the NAT router, you must edit the subnet
+      definition in MAAS (from the "Subnets" link near the top of the MAAS
+      web UI) so that its gateway is the IP address of the host.
+
+#. If the ``lxc-setup`` script fails at some point, you can try fixing
+   whatever problem is reported and re-running the script; however, some
+   steps relating to LXC setup may fail when re-run. You can copy the
+   ``/usr/sbin/lxc-setup`` script and comment out the offending lines,
+   which are likely to be the ``sudo lxd init``, ``lxc profile copy``, and
+   ``edit_lxd_profile`` lines in the ``setup_lxd()`` function.
+
+The result of this configuration is that the computer will have at least
+four IP addresses: Internal and external for the host computer itself and
+for the LXD container. The latter will run MAAS and an SSH server, but the
+latter may not be usable until you import your SSH public keys into the LXD
+container's ``ubuntu`` account. You can do this from the host by typing::
+
+  lxc exec lxc-maas bash
+  su ubuntu
+  ssh-import-id lp:username
+  exit
+  exit
+
+Change ``username`` to your Launchpad username. Alternatively, you can add
+SSH public keys in any way you like, such as by editing
+``~.ssh/authorized_keys``.
+
+If you prefer, you can access the LXD container from the host by typing
+``lxc exec lxc-maas bash`` every time; however, this is likely to be more
+awkward than enabling direct SSH access to the container.
+
+In either case, the LXD container shares the ``/home/username`` and
+``/srv`` directories with the host, where ``username`` is your username on
+the host. The former enables you to easily share arbitrary files between the
+host and its container; and the latter is intended to simplify
+configuration of Apache to deliver virtualization files needed by the
+virtualization tests. Because ``maniacs-setup`` configures Apache on the
+LXD container and optionally downloads virtualization files, it's easy to
+set up the container as the server for these files; however, storing these
+large files outside of the container may be desirable. You can also install
+Apache on the host and deliver these files from that location, if you
+prefer.
+
+The ``iperf3`` server is installed on both the host and the LXD container
+at the end of this process, but it's not configured to launch automatically
+from either location. In theory, network tests can use either location as a
+target, once you launch ``iperf3`` in the correct environment; however,
+running ``iperf3`` on the host is less likely to cause performance problems
+and is therefore recommended. If you run ``iperf3`` on the LXD container
+and encounter network test failures, you should try running ``iperf3`` on
+the host and using it as a target instead. Note that network performance
+will be limited by the capabilities of the host; you can't run full-speed
+tests against both the host and the LXD container and expect to get twice
+the host's native network speed!
+
+A fresh installation of MAAS in a LXC/LXD container will consume about 4.7
+GiB of disk space in the ``/var/lib/lxd/storage-pools/default/containers/``
+directory. This space is likely to grow over time, especially if you add
+support for multiple Ubuntu versions and CPU architectures to your MAAS
+configuration. (Each new version requires ``cloud-init`` files that consume
+some space.)
+
+You can use numerous commands to manage your MAAS container. These include,
+but are not limited to:
+
+* ``lxc list`` -- Show a list of containers and some summary information
+  about them, including their IP addresses and whether or not they're
+  running.
+
+* ``lxc info`` -- Displays summary information about a specified container
+  (more than is shown by ``lxc list``.
+
+* ``lxc exec`` -- Runs a command in a container. In particular, ``lxc exec
+  lxc-maas bash`` runs ``bash`` in the ``lxc-maas`` container (the name of
+  the container created by ``lxc-setup``).
+
+* ``lxc stop`` -- Stops a specified container.
+
+* ``lxc start`` -- Starts a specified container. Note that the container
+  created by ``lxc-setup`` should start up automatically when the host
+  boots.
+
+* ``lxc restart`` -- Restarts a specified container.
+
+* ``lxc snapshot`` -- Creates a snapshot of a specified container.
+
+* ``lxc restore`` -- Restores a snapshot of a specified container.
+
+This documentation can provide only a brief summary of LXC/LXD commands and
+tools. For more information, see the official Linux containers
+documentation at https://linuxcontainers.org. You can also type ``lxc``
+with no options to see a summary of sub-commands, or type ``lxc`` with a
+subcommand to see a summary of how to use it, if the subcommand requires
+additional subcommands.
+
+.. raw:: pdf
+
+   PageBreak
+
+Appendix E: Glossary
 ====================
 
 The following definitions apply to terms used in this document.

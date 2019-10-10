@@ -1,3 +1,10 @@
+certification-docs (0.3.0-0ppa1) bionic; urgency=medium
+
+  * New appendix (D) in MANIACS documenting the lxd-setup script in the
+    maas-lxc-host package.
+
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 10 Oct 2019 15:29:02 -0400
+
 certification-docs (0.2.8-0ppa1) bionic; urgency=medium
 
   * Updated MANIACS and STG for new high-speed network testing
