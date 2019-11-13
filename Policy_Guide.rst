@@ -97,6 +97,11 @@ Partner Engineer
     The Partner's technical contact within Canonical. Formerly known as a TPM
     or Technical Partner Manager.
 
+SOA
+    Standard OEM Agreement. This is the agreement that defines the Hardware
+    Partner and Canonical relationship with regard to our Partner Engineering
+    team and Server Hardware Certification.
+
 Self-Testing
     The Partner is allowed to perform certification testing on their
     own, using their own lab and engineering resources with Canonical providing
@@ -181,6 +186,8 @@ Test Tool Maintenance and Bug Fixing
 We will investigate and resolve reported bugs in the Suite.
 We will maintain the Suite code to ensure it runs reliably on the two most
 recent Ubuntu LTS versions.
+We will not maintain or update the Suite code for anything older than the two
+most recent Ubuntu LTS versions.
 
 Website Maintenance and Bug Fixes
 '''''''''''''''''''''''''''''''''
@@ -192,8 +199,8 @@ Participation
 To participate in the Ubuntu Server Certification Programme, the partner will
 need to meet one of the two following conditions:
 
-* Has an active OEM Partner Agreement in place with Canonical.
-  (http://partners.ubuntu.com/programmes/hardware).
+* Has engaged with Canonical in our OEM partner program with an active SOA in
+  place.  (http://partners.ubuntu.com/programmes/hardware).
 
 * Has an existing or pending Ubuntu Advantage agreement for an existing or
   in-development deployment that needs Certification services to
@@ -253,12 +260,19 @@ largest DIMM size available.
 
 Jumps in DIMM size do not require additional testing.
 
-Intel Optane DCPMM (NVDIMM) Devices
-```````````````````````````````````
-All Optane DCPMM devices must currently be tested.  These will need to be
-tested in both Memory and AppDirect modes.  It is suggested that testers use
-Mixed Mode (e.g. 25% Memory Mode and 75% AppDirect mode) configuration to avoid
-reconfiguration and re-testing.
+DCPMMs (NVDIMM devices)
+```````````````````````
+Systems that support Intel's Optane DataCenter Persistent Memory Modules must
+include those DCPMM devices.  Devices should be configired in mixed mode where
+supported in a mix of at least 30% RAM and 70% Storage.
+
+Where Mixed Mode is not supported, then testers will need to test the DCPMM
+devices in both Memory Mode and App Direct (Storage) Mode, which requires
+reconfiguring the DCPMM devices, then recommissioning in MAAS and re-running
+the aproproate test command (one of test-memory or test-storage).
+
+When configuring the DCPMMs for storage a percentage should be dedicated to all
+block store modes: fsdax, devdax, sector.
 
 HDD, SSD, NVMe
 ``````````````
@@ -266,6 +280,8 @@ For HDDs and SSDs, only one of each supported interface type needs to be
 tested. Yous hould use the largest HDD or SSD of each type where possible.
 
 ALL NVMe models must be tested.
+=======
+The largest NVMe models should be tested.
 
 RAID Controllers
 ````````````````
@@ -289,6 +305,18 @@ reserves the right to require further CNA testing in other modes as necessary
 (for instance a CNA may need to be tested as an iSCSI initiator as well as a
 Network card).
 
+For Network Devices, all ports must be configured and tested on appropriate
+network segments (e.g. a 40Gb port must be connected to a network segment that
+is at least 40Gb and the iperf target must also be at least 40Gb).
+
+GPGPUs
+``````
+GPGPU testing is now supported for nVidia GPGPUs.  This is a separate test and
+requires the installation of nVidia's CUDA libraries and drivers, a system
+reboot, and running a separate test suite.  All GPGPU models should be tested,
+at this time there is no allowance for "representative" samples on GPGPU
+devices.
+
 Anything Else
 `````````````
 Any device not explicitly outlined above must be tested.
@@ -302,6 +330,10 @@ full Server Line.
 Thus, if a Server Line has 10 Models, and the Vendor sells 1 (one) model of
 100Gb Network Controller, once that controller has been validated in Model 1,
 it will also be automatically conisidered certified for Models 2 - 10.
+
+This does not apply to Blade systems.  A PCIe card tested in a rack or tower
+server chassis does not remove the need to test a Mezzanine card with the same
+chipset in a Blade or Compute Sled style system.
 
 Display of Status of Vendor Approved Options
 ''''''''''''''''''''''''''''''''''''''''''''
@@ -345,6 +377,9 @@ is valid from that HWE kernel version onward. Thus if the system was certified
 using 18.04 LTS and the 5.0 HWE kernel, the system is considered certified for
 the 18.04.3 LTS HWE Kernel version 5.0 and the 18.04.4 LTS HWE Kernel version
 5.4. 
+
+Any exceptions to this policy will be decided on a case by case basis before
+the certification can be accepted.
 
 Package Versions
 ----------------
@@ -483,7 +518,7 @@ Ubuntu as Guest
 In special situations, we will provide Certification of Ubuntu as a guest OS on
 a different host OS. These certifications are provided on a case-by-case basis
 and must be agreed upon by both Canonical and the Partner. Please discuss this
-with your Account Manager if you need to certify Ubuntu as a guest on your
+with your Partner Engineer if you need to certify Ubuntu as a guest on your
 hypervisor.
 
 Virtual Machine Requirements
@@ -501,7 +536,7 @@ which is a subset of the full server suite defined by the "server-full"
 testplan.
 
 KVM testing is generally not required for certification of Ubuntu as Guest
-scenarios as nested virtualization (e.g. running KVM inside a VM) is considered
+scenarios as nested virtualization (e.g. running KVM inside a VM is considered
 an advanced/non-standard configuration.) This exception may not apply to
 certain special situations that are business goal dependent.  That
 determination will be made by the Certification Team.
@@ -939,8 +974,8 @@ Re-Certification
 ----------------
 Re-Certification is necessary in certain circumstances.  Primarily, when a
 new LTS is released, certification from the previous LTS does not carry
-forward, thus any system that should be certified for the new LTS will need
-to be re-certified.
+forward, thus any currently certified system that should be certified for
+the new LTS will need to be re-certified on the new LTS version.
 
 Additionally, there are occasional changes that mandate re-certification.
 Anything that fundamentally alters a SUT's electronic profile requires
