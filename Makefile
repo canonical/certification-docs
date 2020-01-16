@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 RST2PDF=rst2pdf
 RST2HTML=rst2html
-DOC_NAMES=Test_Case_Guide-16.04 Test_Case_Guide-18.04 Programme_Guide Coverage_Guide-18.04 Coverage_Guide-16.04 Self-Test_Guide MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_NUC_Installation_And_Configuration_Scripted Policy_Guide
+DOC_NAMES=Test_Case_Guide-16.04 Test_Case_Guide-18.04 Programme_Guide Coverage_Guide-18.04 Coverage_Guide-16.04 Self-Test_Guide MAAS_Advanced_NUC_Installation_And_Configuration MAAS_Advanced_Network_Installation_And_Configuration_Scripted Policy_Guide
 HTML_NAMES=$(DOC_NAMES:=.html)
 PDF_NAMES=$(DOC_NAMES:=.pdf)
 
@@ -19,7 +19,7 @@ pdf:	$(PDF_NAMES)
 
 maniac: MAAS_Advanced_NUC_Installation_And_Configuration.pdf
 
-maniacs: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.pdf
+maniacs: MAAS_Advanced_Network_Installation_And_Configuration_Scripted.pdf
 
 stg: Self-Test_Guide.pdf Self-Test_Guide.pdf
 
@@ -33,7 +33,7 @@ testcase: Test_Case_Guide-16.04.pdf Test_Case_Guide-18.04.pdf
 
 maniach: MAAS_Advanced_NUC_Installation_And_Configuration.html
 
-maniacsh: MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.html
+maniacsh: MAAS_Advanced_Network_Installation_And_Configuration_Scripted.html
 
 stgh: Self-Test_Guide.html Self-Test_Guide.html
 
@@ -56,10 +56,10 @@ MAAS_Advanced_NUC_Installation_And_Configuration.*: images/logo-canonical_no-tm-
 MAAS_Advanced_NUC_Installation_And_Configuration.*: images/maniac-network.png
 MAAS_Advanced_NUC_Installation_And_Configuration.*: images/maas-dropdown.png
 MAAS_Advanced_NUC_Installation_And_Configuration.*: images/clusters-page.png
-MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/logo-ubuntu_su-white_orange-hex.png
-MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/logo-canonical_no-tm-white-hex.png
-MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/maniac-network.png
-MAAS_Advanced_NUC_Installation_And_Configuration_Scripted.*: images/clusters-page.png
+MAAS_Advanced_Network_Installation_And_Configuration_Scripted.*: images/logo-ubuntu_su-white_orange-hex.png
+MAAS_Advanced_Network_Installation_And_Configuration_Scripted.*: images/logo-canonical_no-tm-white-hex.png
+MAAS_Advanced_Network_Installation_And_Configuration_Scripted.*: images/maniac-network.png
+MAAS_Advanced_Network_Installation_And_Configuration_Scripted.*: images/clusters-page.png
 Self-Test_Guide-16.04.*: images/logo-ubuntu_su-white_orange-hex.png
 Self-Test_Guide-16.04.*: images/logo-canonical_no-tm-white-hex.png
 Self-Test_Guide-16.04.*: images/certification-process-flowchart-portrait.png

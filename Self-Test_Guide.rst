@@ -399,7 +399,7 @@ attention to the following:
    machine, which will run MAAS and an ``iperf3`` server; however, you may
    want to separate these two functions.
 
-   - The MAAS Advanced NUC Installation and Configuration -- Scripted
+   - The MAAS Advanced Network Installation and Configuration -- Scripted
      (MANIACS) document (available from
      https://certification.canonical.com) describes how to configure a MAAS
      server. This server may be a standard part of the testing network or
@@ -454,7 +454,7 @@ Installing Ubuntu on the System
 Server certification requires
 that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
-Advanced NUC Installation and Configuration -- Scripted (MANIACS) document
+Advanced Network Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
 This document describes use of MAAS 2.3.
 
@@ -578,7 +578,7 @@ contact the Canonical Server Certification Team to learn how to proceed;
 you might have run into a simple misconfiguration, or the server might need
 enablement work.
 
-If MAAS is fully configured as described in the `MAAS Advanced NUC
+If MAAS is fully configured as described in the `MAAS Advanced Network
 Installation and Configuration -- Scripted (MANIACS)` document, it should
 deploy the Server Test Suite automatically. If MAAS doesn't deploy the
 Server Test Suite properly, you can do so manually, as described in
