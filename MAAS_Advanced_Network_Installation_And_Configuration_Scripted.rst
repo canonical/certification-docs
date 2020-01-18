@@ -39,7 +39,7 @@ the certification tests themselves.
 
 A computer configured as described here is not intended for general
 Internet use. Some settings relax security in the interest of ease of use,
-so you should limit use of the MAAS server computer on the Internet at
+so you should limit use of the MAAS computer on the Internet at
 large.
 
 This document begins with information on the required hardware and then
@@ -48,14 +48,6 @@ install and configure MAAS, and how to test your MAAS installation.
 Appendixes cover more esoteric or specialized topics, including how to add
 support for i386 (32-bit) images and how to set up advanced network
 configurations.
-
-Although MAAS is generally installed on a conventional server computer, for
-Ubuntu certification purposes, it is sometimes desirable to install MAAS on
-a portable computer, such as a laptop or Intel NUC, for field deployments,
-and this document occasionally refers to WiFi connections, laptops'
-keyboards, and similar portable-computer hardware. Most standing
-certification labs will devote a conventional server computer to the MAAS
-server role, though.
 
 Figure 1 illustrates the overall configuration that this document will help
 you create. This document describes configuration of the MAAS server device
@@ -73,12 +65,12 @@ MAAS LAN at each site.
          subnet and connects to a wider network on another interface.
    :width: 100%
 
-   Figure 1: Network structure in which the MAAS server computer will reside
+   Figure 1: Network structure in which the MAAS server will reside
 
 **WARNING:** The configuration described in this document leaves several
-server programs running on the MAAS server computer, including a proxy server,
+server programs running on the MAAS computer, including a proxy server,
 a web server (that can control MAAS), and an SSH server. Thus, it is unwise
-to expose the MAAS server computer directly to the Internet. You should either
+to expose the MAAS computer directly to the Internet. You should either
 secure it with strict local firewall rules or place it behind a strong
 firewall running on a router between it and the Internet.
 
@@ -88,9 +80,9 @@ Hardware Required
 Before beginning, you should ensure that you have the following
 hardware:
 
-*  MAAS server computer
+*  MAAS server
 
-   -  Ensure that the MAAS server computer has two network interfaces.
+   -  Ensure that the MAAS server has two network interfaces.
       Ethernet works best for both connections, but a WiFi link for the
       external link can work in a pinch.
 
@@ -191,7 +183,7 @@ up its most basic network settings:
 
       - Configure your *external* network port:
 
-        - If your MAAS server computer's network devices vary in speed or
+        - If your MAAS server's network devices vary in speed or
           reliability, use the slower or less reliable device as the
           external port. This guide assumes this port will be called
           ``eth1``, but in practice it's likely to be something else.
@@ -215,7 +207,7 @@ up its most basic network settings:
 
       - Configure your *internal* network port:
 
-        - If your MAAS server computer's network devices vary in speed or
+        - If your MAAS server's network devices vary in speed or
           reliability, use the faster or more reliable device as the
           internal port. This guide assumes this port will be called
           ``eth0``, but in practice it's likely to be something else.
@@ -228,7 +220,7 @@ up its most basic network settings:
           network, for reasons described in `Appendix C: MAAS Network
           Ranges`_.
 
-        - If your MAAS server computer will move from one *external* network
+        - If your MAAS server will move from one *external* network
           to another, be sure to consider all its likely *external*
           addresses when deciding on its *internal* address and netmask.
 
@@ -265,7 +257,7 @@ up its most basic network settings:
         repository mirror. (You can do this after installing Ubuntu, if you
         like.)
 
-#. When the installation is complete, boot the MAAS server computer and log
+#. When the installation is complete, boot the MAAS computer and log
    in.
 
 #. Type ``ifconfig`` to verify your network configuration. If either
@@ -311,7 +303,7 @@ up its most basic network settings:
     $ sudo apt dist-upgrade
 
 #. If desired, install X11 and your preferred desktop environment. This
-   will enable you to use the MAAS server computer itself to access the MAAS
+   will enable you to use the MAAS computer itself to access the MAAS
    web UI. You can skip this step if your MAAS server will be accessed
    remotely. If in doubt, don't install X11 and a desktop environment. You
    can always install it later if you discover it's necessary. In most
@@ -666,7 +658,7 @@ adjusts some other details of which you should be aware:
 - Any keys in your ``~/.ssh/authorized_keys`` file on the MAAS server
   computer are also added to the MAAS setup. Again, this simplifies login.
 
-- The MAAS server computer's SSH server configuration is relaxed so that
+- The MAAS computer's SSH server configuration is relaxed so that
   changed host keys do not block outgoing connections. This change is
   *insecure*, but is a practical necessity because your internal network's
   nodes will be redeployed regularly. You should keep this setting in mind
@@ -697,7 +689,7 @@ to modify a few settings. To do so, follow these steps:
 
    -  You should be able to access the server on either its internal or
       external network address, although at this point, the only computer
-      on the internal network may be the MAAS server computer itself.
+      on the internal network may be the MAAS computer itself.
 
    -  If you provide the computer with a hostname in DNS or ``/etc/hosts``,
       you should be able to access it via that name, as well.
@@ -786,10 +778,10 @@ To test it, follow these steps:
    test system should provide IPMI or some other power-control tool that
    MAAS supports.
 
-#. Connect the test computer to the MAAS server computer's *internal* network
+#. Connect the test computer to the MAAS server's *internal* network
    and power it on.
 
-   - The test computer should PXE-boot from the MAAS server computer.
+   - The test computer should PXE-boot from the MAAS server.
 
    - This first boot should be to the enlistment image, which provides
      some very basic information to the MAAS server.
@@ -1330,9 +1322,6 @@ MAAS
 
 NIC
   Network Interface Card -- the network device(s).
-
-NUC
-  A small form-factor PC product from Intel.
 
 PXE
   Pre-boot Execution Environment -- A technology that allows you to
