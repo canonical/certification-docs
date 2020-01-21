@@ -1,3 +1,10 @@
+certification-docs (0.3.1-0ppa1) bionic; urgency=medium
+
+  * Updated MANIACS to remove most references to portable computers
+  * Minor additional tweaks to MANIACS
+
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 16 Jan 2020 09:33:28 -0500
+
 certification-docs (0.3.0-0ppa1) bionic; urgency=medium
 
   * New appendix (D) in MANIACS documenting the lxd-setup script in the

@@ -1,6 +1,6 @@
-================================================================
- MAAS 2 Advanced NUC Installation and Configuration -- Scripted
-================================================================
+==================================================================
+ MAAS Advanced Network Installation and Configuration -- Scripted
+==================================================================
 -----------------------
  (The MANIACS Document)
 -----------------------
@@ -37,14 +37,10 @@ Hardware Self-Testing Guide (available from
 https://certification.canonical.com) for detailed information on running
 the certification tests themselves.
 
-In this document, the MAAS server is referred to generically as a "portable
-computer" because the intent is that the MAAS server (such as an Intel NUC
-or laptop) be portable for field technicians; however, you can deploy a
-desktop computer or server in exactly the same way.
-
 A computer configured as described here is not intended for general
 Internet use. Some settings relax security in the interest of ease of use,
-so you should limit use of the portable computer on the Internet at large.
+so you should limit use of the MAAS computer on the Internet at
+large.
 
 This document begins with information on the required hardware and then
 moves on to a general description of Ubuntu installation, details on how to
@@ -53,28 +49,28 @@ Appendixes cover more esoteric or specialized topics, including how to add
 support for i386 (32-bit) images and how to set up advanced network
 configurations.
 
-Figure 1 illustrates the overall configuration that this document will
-help you create. This document describes configuration of the Portable
-Computer device in the figure. It presupposes the existence of a local
-LAN that the portable computer can use for external connections, as well
-as the availability of at least one SUT for testing at the end of the
-process. (Note that the Internet connection is required for initial
-setup, but a properly-configured MAAS server does not need this
-connection to bring up SUTs.) Once configured, you will be able to move
-the portable computer from one site to another, repopulating the MAAS
-LAN at each site.
+Figure 1 illustrates the overall configuration that this document will help
+you create. This document describes configuration of the MAAS server device
+in the figure. It presupposes the existence of a local LAN that the MAAS
+server can use for external connections, as well as the availability of at
+least one SUT for testing at the end of the process. (Note that the
+Internet connection is required for initial setup, but a
+properly-configured MAAS server, with local APT repository mirrors, does
+not need this connection to bring up SUTs.) Once configured, you will be
+able to move the MAAS server from one site to another, repopulating the
+MAAS LAN at each site.
 
 .. figure:: images/maniac-network.png
    :alt: This document describes configuring a server that manages its own
          subnet and connects to a wider network on another interface.
    :width: 100%
 
-   Figure 1: Network structure in which the portable computer will reside
+   Figure 1: Network structure in which the MAAS server will reside
 
 **WARNING:** The configuration described in this document leaves several
-server programs running on the portable computer, including a proxy server,
+server programs running on the MAAS computer, including a proxy server,
 a web server (that can control MAAS), and an SSH server. Thus, it is unwise
-to expose the portable computer directly to the Internet. You should either
+to expose the MAAS computer directly to the Internet. You should either
 secure it with strict local firewall rules or place it behind a strong
 firewall running on a router between it and the Internet.
 
@@ -84,14 +80,11 @@ Hardware Required
 Before beginning, you should ensure that you have the following
 hardware:
 
-*  Portable computer
+*  MAAS server
 
-   -  Ensure that the portable computer has two network interfaces. A
-      laptop with both Ethernet and wi-fi should suffice; or you can use a
-      USB network dongle to provide a second interface.
-
-   -  Because testing sessions can last for hours, ensure that you have a
-      power brick; you should *not* run on battery power!
+   -  Ensure that the MAAS server has two network interfaces.
+      Ethernet works best for both connections, but a WiFi link for the
+      external link can work in a pinch.
 
    -  You can install on a virtual machine in a more general-purpose
       computer, but you'll have to pay careful attention to the network and
@@ -101,6 +94,7 @@ hardware:
    MAAS supports:
 
    - American Power Conversion (APC) PDU
+   - Christmann RECS|Box Power Driver
    - Cisco UCS Manager 
    - Digital Loggers, Inc. PDU
    - Facebook's Wedge
@@ -110,8 +104,10 @@ hardware:
    - IPMI
    - Intel AMT
    - Microsoft OCS - Chassis Manager
+   - OpenBMC Power Driver
    - OpenStack Nova
    - Rack Scale Design
+   - Redfish
    - SeaMicro 15000
    - Sentry Switch CDU
    - VMWare
@@ -119,19 +115,23 @@ hardware:
 
 *  Gigabit or faster switch (we recommend 8 ports minimum)
 
-   -  For laptop with Wi-Fi: one Ethernet cable
+   -  Sufficient Ethernet cables
 
-   -  For NUC or laptop with dongle: two Ethernet cables
+      - For MAAS server: one cable for each port to be connected to a
+        switch (optionally including its BMC, if it is so equipped)
 
-   -  For each SUT: one Ethernet cable for each NIC port including the BMC
+      - For each SUT: one Ethernet cable for each NIC port including the BMC
+
+   -  Be sure cables and switches are capable of handling the fastest
+      network speeds being tested; for instance, if a SUT has a 100 Gbps
+      NIC, you'll need 100 Gbps cables and switches, not 40 Gbps devices.
 
    -  Please see the Self-Test Guide for further information on network
       requirements for certification testing.
 
 *  Monitor and keyboard for SUT (helpful, but not strictly required)
 
-*  Monitor, keyboard, and mouse for the MAAS system (a laptop's built-in
-   devices should be sufficient)
+*  Monitor, keyboard, and optionally a mouse for the MAAS system
 
 *  At least 1 TB of disk space with which to mirror the Ubuntu archives,
    if desired. (An external USB3 hard disk may be used for this, if
@@ -145,11 +145,11 @@ additional Ethernet ports and cables.
 Installing and Configuring Ubuntu
 =================================
 
-Once you've assembled the basic hardware for your portable system, you can
+Once you've assembled the basic hardware for your MAAS server system, you can
 begin preparing it. The initial steps involve installing Ubuntu and setting
 up its most basic network settings:
 
-1. Install Ubuntu 18.04 (Bionic Beaver) to the portable system.
+1. Install Ubuntu 18.04 (Bionic Beaver) to the MAAS server system.
 
    -  The version of Ubuntu Server 18.04 described here can be
       obtained from https://www.ubuntu.com/download/server.
@@ -183,9 +183,10 @@ up its most basic network settings:
 
       - Configure your *external* network port:
 
-        - If you need to use both a built-in Ethernet port and an
-          Ethernet dongle, it's best to use the latter as your external
-          port.
+        - If your MAAS server's network devices vary in speed or
+          reliability, use the slower or less reliable device as the
+          external port. This guide assumes this port will be called
+          ``eth1``, but in practice it's likely to be something else.
 
         - Use DHCP or a static IP address, as required by your
           environment.
@@ -206,8 +207,10 @@ up its most basic network settings:
 
       - Configure your *internal* network port:
 
-        - If possible, configure the computer's built-in Ethernet port,
-          rather than a plug-in dongle, as the internal port.
+        - If your MAAS server's network devices vary in speed or
+          reliability, use the faster or more reliable device as the
+          internal port. This guide assumes this port will be called
+          ``eth0``, but in practice it's likely to be something else.
 
         - This guide assumes use of a static IP address of
           172.24.124.1/22 on this port; however, you can use a different
@@ -217,7 +220,7 @@ up its most basic network settings:
           network, for reasons described in `Appendix C: MAAS Network
           Ranges`_.
 
-        - If your portable computer will move from one *external* network
+        - If your MAAS server will move from one *external* network
           to another, be sure to consider all its likely *external*
           addresses when deciding on its *internal* address and netmask.
 
@@ -254,7 +257,7 @@ up its most basic network settings:
         repository mirror. (You can do this after installing Ubuntu, if you
         like.)
 
-#. When the installation is complete, boot the portable computer and log
+#. When the installation is complete, boot the MAAS computer and log
    in.
 
 #. Type ``ifconfig`` to verify your network configuration. If either
@@ -262,13 +265,13 @@ up its most basic network settings:
    ``/etc/netplan/``. This file may be called ``50-cloud-init.yaml``,
    ``01-netcfg.yaml``, or something else; the name depends on the
    installation method. A typical configuration should look like this,
-   although likely with different network device names (``enp0s3`` and
-   ``enp0s8`` here) and possibly different IP addresses::
+   although likely with different network device names (``eth0`` and
+   ``eth1`` here) and possibly different IP addresses::
 
     network:
       version: 2
       ethernets:
-        enp0s8:
+        eth0:
           match:
             macaddress: 24:8a:07:a3:18:fc
           addresses:
@@ -278,15 +281,15 @@ up its most basic network settings:
             addresses: [ ]
           optional: true
           mtu: 9000
-        enp0s3:
+        eth1:
           addresses: [ ]
           dhcp4: true
           optional: true
 
-   If your network includes any high-speed network devices (above 10Gbps),
+   If your network includes any high-speed network devices (above 10 Gbps),
    you may need to add ``mtu: 9000`` to that device's configuration, and
    possibly tie the definition to a specific MAC address, as shown in the
-   ``enp0s8`` definition.
+   ``eth0`` definition.
    Additional information on testing with such devices is in Appendix D of
    the Ubuntu Certified Hardware Self-Testing Guide (available from
    https://certification.canonical.com).
@@ -300,7 +303,7 @@ up its most basic network settings:
     $ sudo apt dist-upgrade
 
 #. If desired, install X11 and your preferred desktop environment. This
-   will enable you to use the portable computer itself to access the MAAS
+   will enable you to use the MAAS computer itself to access the MAAS
    web UI. You can skip this step if your MAAS server will be accessed
    remotely. If in doubt, don't install X11 and a desktop environment. You
    can always install it later if you discover it's necessary. In most
@@ -349,7 +352,7 @@ The more specific procedure for using MAAS in certification testing is:
    dependency on MAAS, so installing ``maas-cert-server`` will also install
    MAAS, as well as all of MAAS's dependencies.
 
-#. Verify that you've installed MAAS 2.4.0-beta2 or later, rather than some
+#. Verify that you've installed MAAS 2.4.0 or later, rather than some
    earlier version::
 
       $ dpkg -s maas | grep Version
@@ -392,6 +395,11 @@ The more specific procedure for using MAAS in certification testing is:
 
 Running the Setup Script
 ------------------------
+
+This section describes setting up MAAS directly on the MAAS server
+computer's hardware. If you prefer to run MAAS within a LXD container for
+added flexibility, consult `Appendix D: Installing MAAS in a LXD
+Container`_.
 
 The MAAS configuration script is called ``maniacs-setup``, and was installed
 as part
@@ -470,8 +478,8 @@ directory, but creating them takes a long time because of the amount of
 data to be downloaded -- about 200 GiB per release. For comparison, HD
 video consumes 1-8 GiB per hour -- usually on the low end of that range for
 video streaming services. As should be clear, the result will be
-significant network demand that will degrade a typical residential DSL or
-cable connection for hours, and possibly exceed your monthly bandwidth
+significant network demand that will degrade a low-end
+connection for hours, and possibly exceed your monthly bandwidth
 allocation. The download will occur in the background, though, so you can
 continue with MAAS setup as the download proceeds. If you want to defer
 creating a mirror, you should respond ``N`` to the following prompt, then
@@ -500,11 +508,11 @@ If you respond ``n`` to this question, the script asks you to specify
 another archive site. The script then asks you which Ubuntu releases to
 mirror::
 
-    * Do you want to mirror trusty (Y/n)? y
     * Do you want to mirror xenial (Y/n)? y
-    * Do you want to mirror artful (Y/n)? n
     * Do you want to mirror bionic (Y/n)? y
-    * Do you want to mirror cosmic (Y/n)? n
+    * Do you want to mirror disco (Y/n)? n
+    * Do you want to mirror eoan (Y/n)? n
+    * Do you want to mirror focal (Y/n)? y
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -559,11 +567,11 @@ If you respond ``Y`` to this question, the script proceeds to ask you what
 Ubuntu versions and architectures to download::
 
     * Cloud Mirror does not exist. Creating.
-    * Do you want to get images for trusty release (y/N)? n
     * Do you want to get images for xenial release (Y/n)? y
-    * Do you want to get images for artful release (y/N)? n
     * Do you want to get images for bionic release (y/N)? y
-    * Do you want to get images for cosmic release (y/N)? n
+    * Do you want to get images for disco release (y/N)? n
+    * Do you want to get images for eoan release (y/N)? n
+    * Do you want to get images for focal release (y/N)? y
     *
     * Do you want to get images for amd64 architecture (Y/n)? y
     * Do you want to get images for i386 architecture (y/N)? n
@@ -571,7 +579,7 @@ Ubuntu versions and architectures to download::
     * Do you want to get images for armhf architecture (y/N)? n
     * Do you want to get images for ppc64el architecture (y/N)? n
     * Do you want to get images for s390x architecture (y/N)? n
-    * Downloading cloud images. This may take some tiime.
+    * Downloading cloud images. This may take some time.
     *
     * Downloading image for xenial on amd64 in the background....
 
@@ -647,10 +655,10 @@ adjusts some other details of which you should be aware:
   server. These keys enable you to log in to nodes that MAAS deploys from
   your regular account on the MAAS server.
 
-- Any keys in your ``~/.ssh/authorized_keys`` file on the portable computer
-  are also added to the MAAS setup. Again, this simplifies login.
+- Any keys in your ``~/.ssh/authorized_keys`` file on the MAAS server
+  computer are also added to the MAAS setup. Again, this simplifies login.
 
-- The portable computer's SSH server configuration is relaxed so that
+- The MAAS computer's SSH server configuration is relaxed so that
   changed host keys do not block outgoing connections. This change is
   *insecure*, but is a practical necessity because your internal network's
   nodes will be redeployed regularly. You should keep this setting in mind
@@ -681,7 +689,7 @@ to modify a few settings. To do so, follow these steps:
 
    -  You should be able to access the server on either its internal or
       external network address, although at this point, the only computer
-      on the internal network may be the portable computer itself.
+      on the internal network may be the MAAS computer itself.
 
    -  If you provide the computer with a hostname in DNS or ``/etc/hosts``,
       you should be able to access it via that name, as well.
@@ -770,10 +778,10 @@ To test it, follow these steps:
    test system should provide IPMI or some other power-control tool that
    MAAS supports.
 
-#. Connect the test computer to the portable computer's *internal* network
+#. Connect the test computer to the MAAS server's *internal* network
    and power it on.
 
-   - The test computer should PXE-boot from the portable MAAS computer.
+   - The test computer should PXE-boot from the MAAS server.
 
    - This first boot should be to the enlistment image, which provides
      some very basic information to the MAAS server.
@@ -870,8 +878,8 @@ add support for such systems in MAAS:
    Internet connection.
 
 That's it. You can add support for ppc64el, ARM64, or other architectures
-in a similar way these architectures. Please consult the Server Certification
-Team if you need to certify systems using these CPUs.
+in a similar way. Please consult the Server Certification Team if you need
+to certify systems using these CPUs.
 
 .. raw:: pdf
 
@@ -896,7 +904,7 @@ on Ubuntu 18.04 and earlier LTS releases. Important variables include:
   least enable one SUT's network tests to pass; but if the ``iperf3``
   server has a sufficiently fast NIC, it will then be under-utilized.
 
-* **Advanced network interfaces** -- A portable computer configured as
+* **Advanced network interfaces** -- A low-end computer configured as
   described here will likely have a 1 Gbps link to the internal LAN. If
   you're testing systems with faster interfaces, you will need a separate
   computer to function as an ``iperf3`` server.
@@ -917,7 +925,7 @@ on Ubuntu 18.04 and earlier LTS releases. Important variables include:
   need to learn the new NetPlan tools for advanced configuration of your
   MAAS server, though.
 
-If your ``iperf3`` target system has a fast NIC and want to test multiple
+If your ``iperf3`` target system has a fast NIC and you want to test multiple
 slower SUTs, you can configure the fast NIC with multiple IP addresses. An
 ``/etc/network/interfaces`` entry for Ubuntu 17.04 or earlier to do this
 might look like this::
@@ -1041,7 +1049,7 @@ suite on Group A. You'll need to adjust the
 ``/etc/xdg/canonical-certification.conf`` file on each SUT to point it to
 its own matched server.
 
-Testing high-speed network devices (above 10Gbps) requires changing some
+Testing high-speed network devices (above 10 Gbps) requires changing some
 network configuration options. Appendix D of the Ubuntu Server Certified
 Hardware Self-Testing Guide covers how to configure both the SUT and the
 ``iperf3`` Target system for such testing.
@@ -1075,8 +1083,9 @@ Specifically, MAAS splits the internal network into three parts:
   assigned via DHCP, too.
 
 - An automatic space, which is a range of addresses that MAAS assigns to
-  servers once they've been deployed in the default manner. (You can
-  reconfigure nodes to use DHCP once deployed, if you prefer.)
+  nodes. MAAS configures these nodes to use static addresses, not DHCP; but
+  although the static addresses will survive reboots, they are likely to
+  change between deployments.
 
 In the MAAS subnet configuration page, the reserved and DHCP spaces are
 explicitly defined. Any address that does not fall into either of those
@@ -1205,7 +1214,7 @@ container's ``ubuntu`` account. You can do this from the host by typing::
 
 Change ``username`` to your Launchpad username. Alternatively, you can add
 SSH public keys in any way you like, such as by editing
-``~.ssh/authorized_keys``.
+``~/.ssh/authorized_keys``.
 
 If you prefer, you can access the LXD container from the host by typing
 ``lxc exec lxc-maas bash`` every time; however, this is likely to be more
@@ -1250,7 +1259,7 @@ but are not limited to:
   running.
 
 * ``lxc info`` -- Displays summary information about a specified container
-  (more than is shown by ``lxc list``.
+  (more than is shown by ``lxc list``).
 
 * ``lxc exec`` -- Runs a command in a container. In particular, ``lxc exec
   lxc-maas bash`` runs ``bash`` in the ``lxc-maas`` container (the name of
@@ -1313,9 +1322,6 @@ MAAS
 
 NIC
   Network Interface Card -- the network device(s).
-
-NUC
-  A small form-factor PC product from Intel.
 
 PXE
   Pre-boot Execution Environment -- A technology that allows you to
