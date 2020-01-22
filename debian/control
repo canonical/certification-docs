@@ -14,5 +14,5 @@ Architecture: all
 Depends: ${misc:Depends}
 Description: Ubuntu certification documentation files
  Documentation for the Ubuntu Server Certification program,
- including MANIAC, MANIACS, the Self-Test Guide, the Program
- Guide, the Test Cases Guide, and the Coverage Guide
+ including MANIACS, the Self-Test Guide, the Program Guide,
+ the Test Cases Guide, and the Coverage Guide
