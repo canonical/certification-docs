@@ -1,7 +1,6 @@
 certification-docs (0.3.2-0ppa1) bionic; urgency=medium
 
   * Remove the old MANIAC (non-scripted version of MANIACS)
-  * Fix build problem with MANIACS
 
  -- Rod Smith <rod.smith@canonical.com>  Wed, 22 Jan 2020 10:20:55 -0500
 
