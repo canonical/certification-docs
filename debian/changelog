@@ -1,3 +1,9 @@
+certification-docs (0.3.2-0ppa1) bionic; urgency=medium
+
+  * Remove the old MANIAC (non-scripted version of MANIACS)
+
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 22 Jan 2020 10:20:55 -0500
+
 certification-docs (0.3.1-0ppa1) bionic; urgency=medium
 
   * Updated MANIACS to remove most references to portable computers
