@@ -1245,6 +1245,10 @@ configures both the SUT and the ``iperf3`` Target for optimal performance:
      problems PXE-booting computers, you may need to enable jumbo frames
      manually only when performing network tests that require this feature.
 
+   - It's possible to configure the MAAS server to enable jumbo frames
+     automatically on all nodes deployed on a particular network. Appendix
+     B of the MANIACS guide describes how to configure MAAS in this way.
+
 #. If ``iperf3`` is already running on the ``iperf3`` server, kill it.
 
 #. On the ``iperf3`` server, type ``start-iperf3 -a 172.24.124.1 -n 10``,
