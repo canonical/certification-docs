@@ -185,8 +185,8 @@ can go directly to:
 
 https://certification.canonical.com/hardware/create-system
 
-If you have problems accessing this site, contact your Technical Partner
-Manager.
+If you have problems accessing this site, contact your assigned Partner
+Engineer.
 
 .. image:: images/hardware-creation-flowchart-landscape.png
            :alt: This flowchart outlines the steps necessary to create
