@@ -1,3 +1,14 @@
+certification-docs (0.3.3-0ppa1) bionic; urgency=medium
+
+  * Removed old 14.04 versions of source code
+  * Policy Guide
+   * Added / Clarified DCPMM testing policiy
+   * Clarifications on kernel and OS versions used for testing
+  * Self Test Guide
+   * Added DCPMM configuration information
+
+ -- Jeff Lane <jeff@ubuntu.com>  Wed, 18 Mar 2020 12:12:34 -0400
+
 certification-docs (0.3.2-0ppa1) bionic; urgency=medium
 
   * Remove the old MANIAC (non-scripted version of MANIACS)
