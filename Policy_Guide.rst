@@ -74,6 +74,8 @@ IHV
 
 Make
     The OEM/ODM/IHV that makes the device or system (e.g. HP, Dell, Broadcom,
+    Intel)
+
 Model
     The Model of the hardware being tested, the Family.  For example, DL385.
     This is the superset of a "Model" that includes all the variants of that model.
