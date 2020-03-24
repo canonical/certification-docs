@@ -10,6 +10,11 @@ certification-docs (0.3.3-0ppa1) bionic; urgency=medium
 
  -- Jeff Lane <jeff@ubuntu.com>  Wed, 18 Mar 2020 12:12:34 -0400
 
+  * Update STG and MANIACS to describe setting SUTs' MTUs via MAAS
+    settings.
+
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 05 Mar 2020 12:59:22 -0500
+
 certification-docs (0.3.2-0ppa1) bionic; urgency=medium
 
   * Remove the old MANIAC (non-scripted version of MANIACS)

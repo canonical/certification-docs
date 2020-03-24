@@ -1052,7 +1052,42 @@ its own matched server.
 Testing high-speed network devices (above 10 Gbps) requires changing some
 network configuration options. Appendix D of the Ubuntu Server Certified
 Hardware Self-Testing Guide covers how to configure both the SUT and the
-``iperf3`` Target system for such testing.
+``iperf3`` Target system for such testing. Configuration of one feature in
+particular, though, can be facilitated via MAAS: jumbo frames. When testing
+servers with high-speed network interfaces (those over about 10Gbps), it's
+often necessary to set jumbo frames (an MTU significantly higher than 1500,
+and typically 9000) on the iperf3 server, the SUT, and any intervening
+switches. By default, MAAS configures SUTs with an MTU of 1500; however,
+you can change this detail by editing the MAAS settings:
+
+#. On any MAAS web UI screen, click Subnets.
+
+#. On the resulting page, locate the fabric corresponding to your
+   high-speed network and click the link under the VLAN column. (This is
+   usually entitled "untagged," unless you've configured VLAN tagging.)
+
+#. Under VLAN Summary, you'll probably see the MTU as set to 1500. If
+   it's already set to 9000, you don't need to make any changes. If it's
+   1500, though, click the Edit button near the top-right of this section.
+
+#. The resulting input fields enble you to change configuration details for
+   this network. Change the MTU field to 9000.
+
+#. Click Save Summary to save the changes.
+
+#. Perform a test deployment and verify that the node's MTU is set to
+   9000 for the interface(s) connected to the high-speed network.
+
+You can make this change even to lower-speed networks or to networks with
+mixed speeds; however, the change applies to *all* the computers on the
+associated fabric. Because jumbo frames create problems in some cases (such
+as PXE-booting some older UEFI-based computers), you should be cautious
+about applying this change too broadly. That said, if it works for your
+servers, there's little reason to *not* set jumbo frames universally. Note
+that this change will not automatically adjust your iperf3 servers' MTUs,
+so you may need to set them manually, as described in the Self-Test Guide.
+You may also need to adjust your switches, since they must support jumbo
+frames, too, in order to get their speed benefit.
 
 You may find the ``iftop`` utility helpful on the ``iperf3`` server system.
 This tool enables you to monitor network connections, which can help you to
