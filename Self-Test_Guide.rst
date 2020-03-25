@@ -607,14 +607,14 @@ different storage modes, three of which are currently tested using the **Disk**
 test cases:
 
  - fsdax -- Filesystem-DAX mode is the default mode of a namespace when
-   specifying ndctl create-namespace with no options. It creates a block device
-   (/dev/pmemX[.Y]) that supports the DAX capabilities of Linux filesystems
-   (XFS and ext4 to date). DAX removes the page cache from the I/O path and
-   allows mmap(2) to establish direct mappings to persistent memory media. The
-   DAX capability enables workloads / working-sets that would exceed the
-   capacity of the page cache to scale up to the capacity of persistent memory.
-   Workloads that fit in page cache or perform bulk data transfers may not see
-   benefit from DAX. When in doubt, pick this mode.
+   specifying ``ndctl create-namespace`` with no options. It creates a block
+   device (``/dev/pmemX[.Y]``) that supports the DAX capabilities of Linux
+   filesystems(XFS and ext4 to date). DAX removes the page cache from the I/O
+   path and allows ``mmap(2)`` to establish direct mappings to persistent memory
+   media. The DAX capability enables workloads / working-sets that would exceed
+   the capacity of the page cache to scale up to the capacity of persistent
+   memory. Workloads that fit in page cache or perform bulk data transfers may
+   not see benefit from DAX. When in doubt, pick this mode.
 
  - sector -- Use this mode to host legacy filesystems that do not checksum
    metadata or applications that are not prepared for torn sectors after a
@@ -627,10 +627,10 @@ test cases:
    mode namespace. This mode is compatible with other operating systems, but
    again, does not support DAX operation.
 
- - devdax -- Device-DAX mode enables similar mmap(2) DAX mapping capabilities
+ - devdax -- Device-DAX mode enables similar ``mmap(2)`` DAX mapping capabilities
    as Filesystem-DAX. However, instead of a block-device that can support a
    DAX-enabled filesystem, this mode emits a single character device file
-   (/dev/daxX.Y). Use this mode to assign persistent memory to a
+   (``/dev/daxX.Y``). Use this mode to assign persistent memory to a
    virtual-machine, register persistent memory for RDMA, or when gigantic
    mappings are needed.
 
@@ -645,14 +645,14 @@ ensure both modes have been tested.
 In **Mixed Mode** you will need to configure a mix of both **Memory** and
 **AppDirect** spaces using either the system configuration tools (e.g.
 Setup/BIOS) or userspace tools after installation, which requires a reboot
-afterwards.  If using userspace tools, you will need to use **ipmctl** for the
-initial configuration.  **ipmctl** is available in 18.04 LTS via the Hardware
+afterwards.  If using userspace tools, you will need to use ``ipmctl`` for the
+initial configuration.  ``ipmctl`` is available in 18.04 LTS via the Hardware
 Certification PPA that provides the Server Test Suite, and is available via the
-Universe repo in 20.04 LTS. Using **ipmctl** you should allocate at least 25%
+Universe repo in 20.04 LTS. Using ``ipmctl`` you should allocate at least 25%
 of the DCPMM space to **Memory Mode** and the remainder as **AppDirect Mode**.
 
-Once initial configuration is done using **ipmctl**, you will need to use
-**ndctl**, which is available from 18.04 LTS onward in the Universe repo, to do
+Once initial configuration is done using ``ipmctl``, you will need to use
+``ndctl``, which is available from 18.04 LTS onward in the Universe repo, to do
 the finial configuation.
 
 For this step, you should create a **fsdax** device, a **sector** device, and a
@@ -727,11 +727,11 @@ access the SUT:
    entire disk and that uses the ext4 filesystem.
 
 -  If the SUT has DCPMMs installed, you should configure them prior to running
-    the test suite. ***Note: This document assumes that the SUT will support
-    Mixed Mode operation. If the SUT only supports a single operating mode at a
-    time, you will need to configure DCPMMs in one mode, run tests, then
-    re-configure the DCPMMs into the remaining mode and run the appropriate
-    tests separately.***
+   the test suite. ***Note: This document assumes that the SUT will support
+   Mixed Mode operation. If the SUT only supports a single operating mode at a
+   time, you will need to configure DCPMMs in one mode, run tests, then
+   re-configure the DCPMMs into the remaining mode and run the appropriate
+   tests separately.***
 
 -  A MAAS installation configured for certification testing should
    provision the SUT with the Server Test Suite and related packages. If

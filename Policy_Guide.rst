@@ -263,7 +263,7 @@ reconfiguration and re-testing.
 HDD, SSD, NVMe
 ``````````````
 For HDDs and SSDs, only one of each supported interface type needs to be
-tested. Yous hould use the largest HDD or SDD of each type where possible.
+tested. Yous hould use the largest HDD or SSD of each type where possible.
 
 ALL NVMe models must be tested.
 
