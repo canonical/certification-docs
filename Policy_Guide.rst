@@ -192,7 +192,7 @@ Participation
 To participate in the Ubuntu Server Certification Programme, the partner will
 need to meet one of the two following conditions:
 
-* Has become a member of the Technical Partner Programme
+* Has an active OEM Partner Agreement in place with Canonical.
   (http://partners.ubuntu.com/programmes/hardware).
 
 * Has an existing or pending Ubuntu Advantage agreement for an existing or
@@ -253,16 +253,19 @@ largest DIMM size available.
 
 Jumps in DIMM size do not require additional testing.
 
-HDD, SSD, NVMe, NVDIMM
-``````````````````````
+Intel Optane DCPMM (NVDIMM) Devices
+```````````````````````````````````
+All Optane DCPMM devices must currently be tested.  These will need to be
+tested in both Memory and AppDirect modes.  It is suggested that testers use
+Mixed Mode (e.g. 25% Memory Mode and 75% AppDirect mode) configuration to avoid
+reconfiguration and re-testing.
+
+HDD, SSD, NVMe
+``````````````
 For HDDs and SSDs, only one of each supported interface type needs to be
-tested. Yous hould use the largest HDD or SDD of each type where possible.
+tested. Yous hould use the largest HDD or SSD of each type where possible.
 
 ALL NVMe models must be tested.
-
-ALL NVDIMM models must be tested in Storage Mode.
-Canonical reserves the right to also require NVDIMMs to be tested in RAM mode
-as well.
 
 RAID Controllers
 ````````````````
@@ -315,19 +318,33 @@ supported by Ubuntu Server.
 This will also make creating BOMs for projects easier as there will no longer
 be any question if the components in a given BOM have been certified.
 
-OS Versions
------------
+OS and Kernel Versions
+----------------------
 Certifications are available for the two most recent LTS versions of Ubuntu
 Server.  At this time, this includes 16.04 LTS and 18.04 LTS
 
 Certification is never granted for Interim releases of Ubuntu Server (non-LTS
 versions such as 18.10, 19.04 or 19.10).
 
-Certification Testing is performed on the following LTS releases:
+Certification Testing should be performed using the LTS and GA kernel initially
+(e.g. 18.04 LTS and GA kernel chosen via MAAS).  
 
-* LTS GA - ex. 18.04 LTS GA as released in April 2018
+When hardware cannot pass certification because of hardware support issues with
+the GA kernel, testers may use the most recent HWE kernel option (e.g. 18.04
+LTS and the HWE kernel option chosen via MAAS) to perform testing.
 
-* Current LTS Point Release - ex 16.04.5 as released in August 2018
+Certification is valid from the certified kernel onward including all
+subsequent kernel updates and HWE kernel releases for that LTS.
+
+In other words, if a system is certified using 18.04 and the 4.15 GA kernel,
+that system is certified for the 4.15, 4.18, 5.0 and currently 5.3 kernels that
+comprise the 18.04 LTS and LTS Point Release family.
+
+If a system is certified using 18.04 LTS and the HWE kernel, then the certification
+is valid from that HWE kernel version onward. Thus if the system was certified
+using 18.04 LTS and the 5.0 HWE kernel, the system is considered certified for
+the 18.04.3 LTS HWE Kernel version 5.0 and the 18.04.4 LTS HWE Kernel version
+5.4. 
 
 Package Versions
 ----------------

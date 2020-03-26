@@ -144,9 +144,9 @@ endeavor to take a system from Uncertified to Fully Certified within 10
 Business Days. This, however, is a best case scenario and assumes that
 there are no issues found that require hardware enablement or bug fixing. 
 In the event that blocking issues are discovered, the Server Certification
-Team will work with the Partner, the TPP team and other relevant teams
-within Canonical to help resolve blocking issues to move requested
-certification work along in a timely fashion.
+Team will work with the Partner, the Partner Engineering team and other
+relevant teams within Canonical to help resolve blocking issues to move
+requested certification work along in a timely fashion.
 
 We do **not** guarantee a timeframe for blocker resolution, or for
 certificate completion in such cases, as these cases can vary greatly on
@@ -222,4 +222,4 @@ Once registered, partners can access the certification program online at:
        https://certification.canonical.com/
 
 If you have questions about the Server Certification Programme or the OEM
-Partner Programme, please contact us directly at tpp@canonical.com.
+Partner Programme, please contact us directly at server-certification@canonical.com.
