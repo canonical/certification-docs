@@ -53,7 +53,7 @@ DHCP
   Dynamic Host Control Protocol -- A method for providing IP
   addresses to the SUT and Targets.
 
-Greylist test
+Non-blocking test
   A test that must be performed but will not affect the
   granting of a certified status.
 
@@ -110,7 +110,7 @@ Test case
   include things such as "stress test of system memory" and "test the CPU
   for clock jitter."
 
-Whitelist test
+Blocking test
   A test that *must* pass for the SUT to be granted a certified status.
 
 Understanding the Certification Process
@@ -884,12 +884,22 @@ You can initiate a testing session in a server as follows:
    and respond `y` when asked if you want to resume the previous session.
 
 #. If any tests fail or do not run, a screen will appear that summarizes
-   those tests that failed or did not run. You can use this opportunity to
+   those tests that failed or did not run. The summary screen separates
+   failures into two categories:
+
+   * **Failed Jobs** -- These failures *might* be serious, or they might
+     not be. (This issue is addressed in more detail shortly.)
+
+   * **Jobs with Failed Dependencies** -- Failures in this category are
+     *not* serious. A failed dependency means that a precondition for even
+     running the test did not exist. For instance, in the below screen
+     shot, a test intended for IBM Power-architecture (ppc64el) computers
+     was not run because the SUT used an x86-64 CPU.
+
+   You can use this opportunity to
    re-run a test if you believe it failed for a transient reason, such as
    if your ``iperf3`` server crashed or was unavailable or if you forgot to
-   insert a USB drive. Note that the presence of a test in this list does
-   not necessarily mean that the test failed; tests that were skipped for
-   harmless reasons can also appear in this list. To re-run tests, use the
+   insert a USB drive. To re-run tests, use the
    arrow keys to highlight each test you want to re-run, press Spacebar to
    select it, and then press the **R** key to re-run the selected tests.
    If you don't want to re-run any tests, press **F** to finish.
@@ -926,17 +936,22 @@ green color, with the word "passed." Note, however, that *a failed test
 does not necessarily denote a failed certification*. Reasons a test might
 fail but still enable a certification to pass include the following:
 
--  A test may be a greylist test, as described in the `Ubuntu Server
+-  A test may be a non-blocking test, as described in the `Ubuntu Server
    Hardware Certification Coverage` document, available from
-   https://certification.canonical.com.
+   https://certification.canonical.com. In the preceding screen shot,
+   the Test That System Booted with Secure Boot Active is such a test.
 
 -  Some tests are known to produce occasional false positives -- that
-   is, they claim that problems exist when in fact they don't.
+   is, they claim that problems exist when in fact they don't. In the
+   preceding screen shot, the Run FWTS Server Cert Selected Test failure is
+   an example of this condition.
 
 -  Some test environments are sub-optimal, necessitating that specific
    tests be re-run. This can happen with network tests or if the tester
    forgot to insert a removable medium. In such cases, the specific test
-   can be re-run rather than the entire test suite.
+   can be re-run rather than the entire test suite. In the preceding screen
+   shot, the failed USB tests are examples; the tests failed because no USB
+   devices were inserted, which is an easily-corrected oversight.
 
 Consult your account manager if you have questions about specific test
 results.

@@ -1,3 +1,11 @@
+certification-docs (0.3.4-0ppa1) bionic; urgency=medium
+
+  * Clarify failed jobs vs. jobs with failed dependencies in STG.
+  * Updated STG's use of greylist/whitelist to non-blocking/blocking
+    terminology.
+
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 26 Mar 2020 10:59:19 -0400
+
 certification-docs (0.3.3-0ppa1) bionic; urgency=medium
 
   * Removed old 14.04 versions of source code
