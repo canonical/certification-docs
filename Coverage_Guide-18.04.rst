@@ -39,13 +39,13 @@ its life cycle.
 The following test categories are specified: 
 
 Blocking
-  Features that are required for certification. If any of the tests in the
-  whitelist fails, the  certification will fail.
+  Features that are required for certification. If any of the blocking tests
+  fail, the certification will fail.
 
 Non-Blocking
   Features that are tested, but that don't block certification. If any of
-  the tests under the greylist fail, a note will be added to the
-  certificate to warn the potential customer or user.
+  the non-blocking tests fail, a note will be added to the certificate where
+  apropriate to warn the potential customer or user.
 
 Untested
   Features that are not currently tested. The items in the Untested
