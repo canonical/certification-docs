@@ -1611,6 +1611,10 @@ in to Ubuntu once deployment is complete. There are limitations to using
 SoL; for instance, you must use special escape key sequences to enter some
 keyboard characters. (See the ``ipmitool`` documentation for details.)
 
+.. raw:: pdf
+
+   PageBreak
+
 Appendix G - Setting Up and Testing a GPGPU
 ===========================================
 
@@ -1626,15 +1630,15 @@ Requirements for GPGPU testing
 - Internet connection
 
   - The SUT must be able to talk to the Internet in order to download a
-    significant amount of packages from the nVidia repos.
+    significant number of packages from the nVidia repos.
 
 
 Setting Up a GPGPU for Testing
 ------------------------------
 
-Recently, new tests cases have been added to test that nVidia GPGPUs work with
-Ubuntu.  With this addition, GPGPUs can be certified on any Ubuntu LTS Release
-or Point Release starting with Ubuntu 16.04 LTS using the 4.4 kernel.
+New tests cases have been added to test that nVidia GPGPUs work with Ubuntu.
+With this addition, GPGPUs can be certified on any Ubuntu LTS Release or Point
+Release starting with Ubuntu 18.04 LTS using the 4.15 kernel.
 
 The tool to set up the GPGPU environment for testing is included in the
 ``plainbox-provider-certification-server`` package and is installed any time the
@@ -1645,22 +1649,23 @@ To set up the GPGPU you simply need to do the following::
   sudo gpu-setup.sh
 
 This will add the nVidia repo and GPG key to the Ubuntu installation on the
-SUT, update apt and install the Cuda Toolkit and appropriate nVidia drivers for
-the GPGPUs installed in the SUT.  It will also download the git source for a
-tool called ``gpu-burn``, an open source stress test for nVidia GPGPUs.  Then
-the script will compile the ``gpu-burn`` tool and exit.
+SUT, update the Apt cache and install the Cuda Toolkit and appropriate nVidia
+drivers for the GPGPUs installed in the SUT.  It will also download the source
+for a tool called ``gpu-burn``, an open source stress test for nVidia GPGPUs.
+Then the script will compile the ``gpu-burn`` tool and exit.
 
 Once the script is complete, you must reboot the SUT to ensure the correct
 nVidia driver is loaded.
 
 GPGPUs that use NVLink
-++++++++++++++++++++++
+----------------------
 
 Some nVidia GPGPUs, such as the V100-SXM3, use NVLink for inter-device
 communication, rather than passing messages across the PCIe bus.  Devices that
 use NVLink require a little extra configuration before they can be properly
 tested. The following are the general steps to configure NVLink for nVidia
-GPGPUs. Please refer to nVidia's documentation for more detail.
+GPGPUs. Documentation and downloads for nVidia's Data Center GPU Manager can be
+found at https://developer.nvidia.com/dcgm/
 
 All steps below should be done as the root user.
 
@@ -1699,7 +1704,7 @@ All steps below should be done as the root user.
 
    # for x in `seq 0 15`; do nvidia-smi -i $x -pm 1; done
 
-#. Run diags to check::
+#. Run the ``diag`` to check::
 
    # dcgmi diag -g 2 -r 1
 
