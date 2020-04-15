@@ -5,7 +5,7 @@ certification-docs (0.3.4-0ppa1) bionic; urgency=medium
   * Updated STG's use of greylist/whitelist to non-blocking/blocking
     terminology.
 
- -- Jeff Lane <jeff@ubuntu.com>  Wed, 15 Apr 2020 17:07:06 -0400
+ -- Rod Smith <rod.smith@canonical.com>  Thu, 26 Mar 2020 10:59:19 -0400
 
 certification-docs (0.3.3-0ppa1) bionic; urgency=medium
 
