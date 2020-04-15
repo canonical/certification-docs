@@ -41,9 +41,9 @@ Canonical's Partner Engineers, Field Engineers and the Server Certification
 Team work closely with manufacturers to resolve test issues and assure that
 the testing is representative of in-field use.
 
-Installation and configuration of `Metal as a Service (MAAS)`_ tool,
-certification environment, and Server Test Suite can be found in otehr guides
-availabel on the Certification Portal (https://certification.canonical.com)
+Installation and configuration of Canonical's `Metal as a Service (MAAS)`_ tool,
+certification environment, and Server Test Suite can be found in other guides
+available on the Certification Portal (https://certification.canonical.com)
 
 .. _`Metal as a Service (MAAS)`:
   http://maas.io
@@ -78,10 +78,10 @@ Certification testing at the Partner's premesis can be conducted by the
 Partner's engineers or by Canonical Engineers.
 
 Once systems have passed testing and are to be listed as Ubuntu Server
-Certified, a representative sample of hardware must be kept and made available
-to Canonical for support needs and ongoing testing needs including, but not
-limited to Stable Release Update (SRU) testing, new release testing, debugging
-customer issues and other needs.
+Certified, Canonical will need the ability to purchase up to 2 of each
+certified model for support needs and ongoing testing needs including, but not
+limited to, Stable Release Update (SRU) testing, new release testing, debugging
+customer issues, and other needs.
 
 This hardware is an agreed-upon subset of the partner's product line that
 encompasses the most commonly ordered components (storage controllers, network
@@ -95,9 +95,9 @@ premises.
 
 Servers are tested using the initial GA release of an LTS or the latest LTS
 point release (if necessary due to hardware support issues). Although interim
-releases are tested, Ubuntu Server Certification does is not valid for non-LTS
-re releases. Interim release testing is part of the regression testing process
-as each Interim release forms the basis for the next LTS Point release.
+releases are tested for regressions, Ubuntu Server Certification is not valid
+for non-LTS releases. Interim release testing is part of the regression testing
+process as each Interim release forms the basis for the next LTS Point release.
 
 .. figure:: images/release_cadence.png
    :alt: Ubuntu LTS releases are supported for five years, whereas
@@ -120,16 +120,16 @@ testing performed.
 Service Level Agreement
 =======================
 
-The Server Certification Team will respond to any and all certificate
+The Server Certification Team will attempt to respond to any and all certificate
 requests within 3 Business Days. The Server Certification Team will also
-complete Certification requests within 10 Business Days. That is, we will
-endeavor to take a system from Uncertified to Fully Certified within 10
-Business Days. This, however, is a best case scenario and assumes that
-there are no issues found that require hardware enablement or bug fixing. 
-In the event that blocking issues are discovered, the Server Certification
-Team will work with the Partner, the Partner Engineering team and other
-relevant teams within Canonical to help resolve blocking issues to move
-requested certification work along in a timely fashion.
+attempt to complete Certification requests within 10 Business Days. That is, we
+will endeavor to take a system from Uncertified to Fully Certified within 10
+Business Days. This, however, is a best case scenario and assumes that there
+are no issues found that require hardware enablement or bug fixing. In the
+event that blocking issues are discovered, the Server Certification Team will
+work with the Partner, the Partner Engineering team and other relevant teams
+within Canonical to help resolve blocking issues to move requested certification
+work along in a timely fashion.
 
 We do **not** guarantee a timeframe for blocker resolution, or for
 certificate completion in such cases, as these cases can vary greatly on
