@@ -41,22 +41,12 @@ Canonical's Partner Engineers, Field Engineers and the Server Certification
 Team work closely with manufacturers to resolve test issues and assure that
 the testing is representative of in-field use.
 
-Since Ubuntu Server 14.04 LTS, MAAS has been used as part of the testing
-process for testing scale out deployment capabilities, which is a
-requirement for a system to be listed as Ubuntu Server Certified Hardware. 
-This means that a given server must be able to be automatically provisioned
-by Canonical's `Metal as a Service (MAAS)`_ tool, with no unnecessary manual
-intervention.
+Installation and configuration of Canonical's `Metal as a Service (MAAS)`_ tool,
+certification environment, and Server Test Suite can be found in other guides
+available on the Certification Portal (https://certification.canonical.com)
 
 .. _`Metal as a Service (MAAS)`:
   http://maas.io
-
-To meet this goal, the test environment requires a provisioning server
-running MAAS, which is used to deploy and test the hardware. MAAS currently
-supports the x86, amd64, arm64, and ppc64le architectures. Installation and 
-configuration of the MAAS environment for certification and the Server Test 
-Suite can be found in other guides available on the Certification Portal
-(http://certification.canonical.com).
 
 Certification Goals
 ===================
@@ -73,13 +63,13 @@ Certification Goals
   there is a commercial distribution model for Ubuntu and/or Ubuntu support.
 
 * Providing Ubuntu Server users with resources for determining which
-  systems to buy when deploying Ubuntu Server.
+  systems and options are supported when deploying Ubuntu Server.
 
 Scope of the Ubuntu Server Hardware Certification
 =================================================
 
 Certification is open to members of the Canonical OEM Partner Program
-(http://partners.ubuntu.com/programmes/hardware). Systems to be certified are 
+(https://partners.ubuntu.com/programmes/hardware). Systems to be certified are
 initially tested at the customer's premises or at Canonical's certification 
 labs, to ensure that hardware is fully compatible with Ubuntu Server and 
 Ubuntu deployment tools.
@@ -88,9 +78,10 @@ Certification testing at the Partner's premesis can be conducted by the
 Partner's engineers or by Canonical Engineers.
 
 Once systems have passed testing and are to be listed as Ubuntu Server
-Certified, a representative sample of hardware must be kept and made available
-to Canonical for support needs. This hardware may be maintained at the Parter's
-premesis or sent to Canonical's labs.
+Certified, Canonical will need the ability to purchase up to 2 of each
+certified model for support needs and ongoing testing needs including, but not
+limited to, Stable Release Update (SRU) testing, new release testing, debugging
+customer issues, and other needs.
 
 This hardware is an agreed-upon subset of the partner's product line that
 encompasses the most commonly ordered components (storage controllers, network
@@ -102,14 +93,11 @@ Additionally, in some situations it is possible for Canonical engineers to
 remotely perform certification testing on hardware located on a customer's
 premises.
 
-Servers are tested using the initial GA release of an LTS and the latest LTS
-point release (if necessary due to hardware support issues). Hardware sent to
-Canonical is also tested periodically with the latest LTS Point Releases (e.g.
-Ubuntu Server 16.04.5 LTS) and interim releases to find regressions. Although
-interim releases are tested, Ubuntu Server Certification does NOT include
-certification against non-LTS releases. Interim release testing is part of the
-regression testing process as each Interim release forms the basis for the
-next LTS Point release.
+Servers are tested using the initial GA release of an LTS or the latest LTS
+point release (if necessary due to hardware support issues). Although interim
+releases are tested for regressions, Ubuntu Server Certification is not valid
+for non-LTS releases. Interim release testing is part of the regression testing
+process as each Interim release forms the basis for the next LTS Point release.
 
 .. figure:: images/release_cadence.png
    :alt: Ubuntu LTS releases are supported for five years, whereas
@@ -129,24 +117,19 @@ Team and the Partner Engineers will work with you to determine a test matrix
 to ensure the widest breadth of test coverage with the least amount of actual
 testing performed.
 
-Servers that are determined to be Ubuntu Server Certified are listed
-publicly:
-
-        http://certification.ubuntu.com/server
-
 Service Level Agreement
 =======================
 
-The Server Certification Team will respond to any and all certificate
+The Server Certification Team will attempt to respond to any and all certificate
 requests within 3 Business Days. The Server Certification Team will also
-complete Certification requests within 10 Business Days. That is, we will
-endeavor to take a system from Uncertified to Fully Certified within 10
-Business Days. This, however, is a best case scenario and assumes that
-there are no issues found that require hardware enablement or bug fixing. 
-In the event that blocking issues are discovered, the Server Certification
-Team will work with the Partner, the Partner Engineering team and other
-relevant teams within Canonical to help resolve blocking issues to move
-requested certification work along in a timely fashion.
+attempt to complete Certification requests within 10 Business Days. That is, we
+will endeavor to take a system from Uncertified to Fully Certified within 10
+Business Days. This, however, is a best case scenario and assumes that there
+are no issues found that require hardware enablement or bug fixing. In the
+event that blocking issues are discovered, the Server Certification Team will
+work with the Partner, the Partner Engineering team and other relevant teams
+within Canonical to help resolve blocking issues to move requested certification
+work along in a timely fashion.
 
 We do **not** guarantee a timeframe for blocker resolution, or for
 certificate completion in such cases, as these cases can vary greatly on
@@ -161,7 +144,7 @@ server certification website.`_ Hardware Partners will have access to
 additional resources on `the private Canonical certification portal.`_
 
 .. _`a specific public server certification website.`:
-   http://certification.ubuntu.com/server/
+   https://certification.ubuntu.com/server/
 
 .. _`the private Canonical certification portal.`:
    https://certification.canonical.com
@@ -204,12 +187,9 @@ Programme Access
 
 System manufacturers and builders who want to have their servers designated
 as Ubuntu Server Certified Hardware shoud contact Canonical via the Partners
-contact form. Once the COPP agreement has been accpeted, partners will have
-access to the Partner Portal and the private Certification Portal. Gold and
-Platinum tier partners will also have access to a dedicated Partner Engineer
-and other Benefits.
-
-To apply for Canonical's OEM Partner Programme, use the online
+contact form. Once the OEM Partner Programme  agreement has been accepted,
+partners will have access to the Partner Portal and the private Certification
+Portal. To apply for Canonical's OEM Partner Programme, use the online
 Partner Registration form
 
      http://www.canonical.com/partners/contact-us

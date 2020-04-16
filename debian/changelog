@@ -1,3 +1,11 @@
+certification-docs (0.3.5-0ppa1) bionic; urgency=medium
+
+  * Update Programme Guide for 20.04 
+  * Add GPGPU instructions to Self-Test Guide
+  * Update Policy Guide for 20.04
+
+ -- Jeff Lane <jeff@ubuntu.com>  Wed, 15 Apr 2020 12:08:32 -0400
+
 certification-docs (0.3.4-0ppa1) bionic; urgency=medium
 
   * Clarify failed jobs vs. jobs with failed dependencies in STG.
