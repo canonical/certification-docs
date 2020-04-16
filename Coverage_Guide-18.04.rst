@@ -197,6 +197,11 @@ Blocking
     certification. Firmware must accurately reflect the Make/Model being
     certified.
 
+* GPGPU Devices
+
+  * Systems that are AI/ML focused MUST pass the GPGPU tests in addition to the
+    standard test plan for certification. These are systems that ship with
+    multiple GPGPUs and are marketed for AI/ML workloads.
 
 Non-Blocking
 ------------
@@ -233,10 +238,14 @@ Non-Blocking
 
   * External keyboard (basic functionality)
 
+* GPGPU devices
+
+  * Systems that include a GPGPU option but are not AI/ML focused (e.g. systems
+    that allow adding one or more GPGPUs into avaialable PCIe slots) will not
+    be gated if the GPGPU options have not been tested.
+
 Untested
 --------
-
-* GPU Coprocessors (for Compute, not Graphics Display)
 
 * Graphics Display Adapters
 

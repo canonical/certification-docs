@@ -739,6 +739,10 @@ access the SUT:
    certification software yourself, as described in `Appendix A -
    Installing the Server Test Suite Manually`_.
 
+-  If the SUT includes an nVidia GPGPU that is to be tested, please refer to
+   `Appendix G - Setting Up and Testing a GPGPU`_.
+
+
 Running the Certification Tests
 ===============================
 
@@ -1716,3 +1720,118 @@ in to Ubuntu once deployment is complete. There are limitations to using
 SoL; for instance, you must use special escape key sequences to enter some
 keyboard characters. (See the ``ipmitool`` documentation for details.)
 
+.. raw:: pdf
+
+   PageBreak
+
+Appendix G - Setting Up and Testing a GPGPU
+===========================================
+
+Requirements for GPGPU testing
+------------------------------
+
+- SUT prepared for testing as described in this document
+
+- nVidia GPGPU(s) installed in SUT
+
+  - At this time, only nVidia GPGPUs are supported for Certification Testing.
+
+- Internet connection
+
+  - The SUT must be able to talk to the Internet in order to download a
+    significant number of packages from the nVidia repos.
+
+
+Setting Up a GPGPU for Testing
+------------------------------
+
+New tests cases have been added to test that nVidia GPGPUs work with Ubuntu.
+With this addition, GPGPUs can be certified on any Ubuntu LTS Release or Point
+Release starting with Ubuntu 18.04 LTS using the 4.15 kernel.
+
+The tool to set up the GPGPU environment for testing is included in the
+``plainbox-provider-certification-server`` package and is installed any time the
+Server Certification suite is installed on a SUT for testing.
+
+To set up the GPGPU you simply need to do the following::
+
+  sudo gpu-setup.sh
+
+This will add the nVidia repo and GPG key to the Ubuntu installation on the
+SUT, update the Apt cache and install the Cuda Toolkit and appropriate nVidia
+drivers for the GPGPUs installed in the SUT.  It will also download the source
+for a tool called ``gpu-burn``, an open source stress test for nVidia GPGPUs.
+Then the script will compile the ``gpu-burn`` tool and exit.
+
+Once the script is complete, you must reboot the SUT to ensure the correct
+nVidia driver is loaded.
+
+GPGPUs that use NVLink
+----------------------
+
+Some nVidia GPGPUs, such as the V100-SXM3, use NVLink for inter-device
+communication, rather than passing messages across the PCIe bus.  Devices that
+use NVLink require a little extra configuration before they can be properly
+tested. The following are the general steps to configure NVLink for nVidia
+GPGPUs. Documentation and downloads for nVidia's Data Center GPU Manager can be
+found at https://developer.nvidia.com/dcgm/
+
+All steps below should be done as the root user.
+
+#. Install the correct management tooling (note the Version may be different
+   due to updates from nVidia)
+
+   - For stand-alone GPGPUs install
+     ``datacenter-gpu-manager_1.7.1_amd64.deb``
+
+   - For DGX-2 and HGX-2 systems, install
+     ``datacenter-gpu-manager-fabricmanager_1.7.1_amd64.deb``
+
+#. Set up persistence mode (this shows setting mode for 16 GPGPUs in a chassis)::
+
+   # for x in `seq 0 15`; do nvidia-smi -i $x -pm 1; done
+
+#. Set up a group::
+
+   # dcgmi group -c GPU_Group
+   # dcgmi group -l
+
+#. Discover GPUs::
+
+   # dcgmi discovery -l 
+
+#. Add GPUs to group::
+
+   # dcgmi group -g 1 -a 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+   # dcgmi group -g 2 -i
+
+#. Set up health montioring::
+
+   # dcgmi health -g 1 -s mpi  
+
+#. Set persistence for all GPUs::
+
+   # for x in `seq 0 15`; do nvidia-smi -i $x -pm 1; done
+
+#. Run the ``diag`` to check::
+
+   # dcgmi diag -g 2 -r 1
+
+At this point, NVLink should be configured and ready to go. You can also test this
+by quickly running one of the nVidia sample tests such as the one found in
+``/usr/local/cuda-10.2/samples/1_Utilities/p2pBandwidthLatencyTest``
+
+Testing the GPGPU(s)
+--------------------
+
+To test the GPGPU, you only need to run the ``test-gpgpu`` command as a normal
+user, much in the same manner as you run any of the ``certify-*`` or ``test-*``
+commands provided by the ``canonical-certification-server`` package.
+
+Running ``test-gpgpu`` will execute ``gpu-burn`` for approximately 30 minutes
+to 1 hour against all discovered GPGPUs in the SUT in parallel.  Once testing
+is complete, the tool will upload results to the SUT's Hardware Entry on the
+Certification Portal. You do not need to create a separate certificate request
+for GPGPU test results, simply add a note to the certificate created from the
+main test results with a link to the GPGPU submission and the certification
+team will review them together.
