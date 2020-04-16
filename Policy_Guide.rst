@@ -188,7 +188,7 @@ To participate in the Ubuntu Server Certification Programme, the partner will
 need to meet one of the two following conditions:
 
 * Has engaged with Canonical in our OEM partner program with an active SOA in
-  place.  (http://partners.ubuntu.com/programmes/hardware).
+  place.  (https://partners.ubuntu.com/programmes/hardware).
 
 * Has an existing or pending Ubuntu Advantage agreement for an existing or
   in-development deployment that needs Certification services to
@@ -886,7 +886,7 @@ and Canonical to determine the best course of action.  This may require a paid
 Non-Recurring Engineering engagement with Canonical to perform the enablement
 work necessary.
 
-Examples of Enablement NRE would include, but is not limited to,  a new server
+Examples of Enablement NRE would include, but are not limited to,  a new server
 management engine that requires use of a special API for hardware management or
 the inclusion of a new driver that is not supported by the current HWE kernel.
 
@@ -912,11 +912,10 @@ for 18.04.3, it *does* need a new certificate for 20.04 LTS.
 Verifying Results
 -----------------
 The Model certified should be maintained in the Partner's Lab for a period of
-not longer than 30 days (unless discussed with your Partner Engineer) and said
-lab should be made accessible via VPN to the Hardware Certification team,
-including access to the MAAS and iperf servers so that the Hardware
-Certification engineers can periodically validate the test results with spot
-checks.
+up to 30 days (unless discussed with your Partner Engineer) and said lab should
+be made accessible via VPN to the Hardware Certification team, including access
+to the MAAS and iperf servers so that the Hardware Certification engineers can
+periodically validate the test results with spot checks.
 
 This policy does not imply that validation will happen with every submission,
 but upon request.  If the hardware cannot be held for a reasonable period of
@@ -1016,7 +1015,7 @@ investigate the situation and make a decision on a case-by-case basis.
 Physical Certificates
 ---------------------
 Typically, the entry on the Ubuntu Certification Webiste
-(http://www.ubuntu.com/certification) is considered the "Certificate"; however,
+(https://www.ubuntu.com/certification) is considered the "Certificate"; however,
 on occasion where a PDF certificate is needed, such as for a tender or business
 case, we will create and provide an official PDF Certificate for your system.
 
