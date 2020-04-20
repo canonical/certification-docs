@@ -1,3 +1,9 @@
+certification-docs (0.3.5-1ppa1) UNRELEASED; urgency=medium
+
+  * Add 20.04 Test Case Guide
+
+ -- Jeff Lane <jeff@ubuntu.com>  Mon, 20 Apr 2020 12:00:32 -0400
+
 certification-docs (0.3.5-0ppa1) bionic; urgency=medium
 
   * Update Programme Guide for 20.04 
