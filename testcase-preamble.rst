@@ -53,7 +53,7 @@ bootstrap_include
 
 This guide is based on the `server-full-20.04.pxu` list used for full Server
 Certification. Other lists in the `canonical-certification-server` UI are
-either subsets of this list, or not applicable to 29.04 certification, such as
+either subsets of this list, or not applicable to 20.04 certification, such as
 the 18.04 lists.
 
 Tests

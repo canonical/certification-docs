@@ -53,7 +53,7 @@ bootstrap_include
 
 This guide is based on the `server-full-20.04.pxu` list used for full Server
 Certification. Other lists in the `canonical-certification-server` UI are
-either subsets of this list, or not applicable to 29.04 certification, such as
+either subsets of this list, or not applicable to 20.04 certification, such as
 the 18.04 lists.
 
 Tests
@@ -114,9 +114,7 @@ disk/smart_{name}
 disk/stats_{name}
  This test checks disk stats, generates some activity and rechecks stats to
  verify they've changed. It also verifies that disks appear in the various
- files they're supposed to. . This test will inspect the following disk: .
- product name: {product_slug} sysfs path: {path} device node path:
- /dev/{name}
+ files they're supposed to. 
 
 info/hdparm_{name}.txt
  Attaches the bootchart png file for bootchart runs
