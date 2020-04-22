@@ -36,6 +36,9 @@ Glossary
 
 The following definitions apply to terms used in this document.
 
+Blocking test
+  A test that *must* pass for the SUT to be granted a certified status.
+
 BMC
   Baseboard Management Controller -- A device in many server models
   that enables remote in- and out-of-band management of hardware.
@@ -53,14 +56,6 @@ DHCP
   Dynamic Host Control Protocol -- A method for providing IP
   addresses to the SUT and Targets.
 
-Non-blocking test
-  A test that must be performed but will not affect the
-  granting of a certified status.
-
-KVM
-  Kernel Virtual Machine -- A system for running virtual machines on
-  Ubuntu Server.
-
 IPMI
   Intelligent Platform Management Interface -- A BMC technology for
   remotely connecting to a computer to perform management functions.
@@ -68,18 +63,26 @@ IPMI
 JBOD
   Just a bunch of disks -- A non-RAID disk configuration.
 
-LAN
-  Local Area Network -- The network to which your SUT and Targets are
-  connected. The LAN does not need to be Internet accessible (though that
-  is preferable if possible).
+KVM
+  Kernel Virtual Machine -- A system for running virtual machines on
+  Ubuntu Server.
 
 .. raw:: pdf
 
    PageBreak
 
+LAN
+  Local Area Network -- The network to which your SUT and Targets are
+  connected. The LAN does not need to be Internet accessible (though that
+  is preferable if possible).
+
 MAAS
   Metal as a Service -- A Canonical product for provisioning systems
   quickly and easily.
+
+Non-blocking test
+  A test that must be performed but will not affect the
+  granting of a certified status.
 
 PXE
   Pre-boot Execution Environment -- A technology that enables you to
@@ -109,9 +112,6 @@ Test case
   A test to be executed as part of the certification test suite. Test cases
   include things such as "stress test of system memory" and "test the CPU
   for clock jitter."
-
-Blocking test
-  A test that *must* pass for the SUT to be granted a certified status.
 
 Understanding the Certification Process
 =======================================
@@ -202,11 +202,11 @@ When creating an entry, you must enter assorted pieces of information:
      or can't be set, please contact your account manager for assistance.
      This field is never published; it is for internal use only.
 
-   * **Make** -- The manufacturer of the system, e.g. Dell, HP, as you
+   * **Make** -- The manufacturer of the system, e.g. Dell, HPE, as you
      would like it to appear on the public web site.
 
-   * **Model** -- The name of the system itself, e.g ProLiant DL630 or
-     PowerEdge R210, as you would like it to appear on the public web site.
+   * **Model** -- The name of the system itself, e.g PowerEdge R7425 or
+     ProLiant DL380, as you would like it to appear on the public web site.
 
    * **Codename** -- This is for your internal reference and identifies
      the internal code name associated with the SUT. This data is
@@ -293,18 +293,18 @@ up the SUT and test environment:
 
    -  Minimum of 4 GiB RAM
 
-   -  1 HDD or SSD (2 with minimal RAID)
+   -  1 internal storage device (HDD, SSD, or NVMe); 2 with minimal RAID
 
    -  1 CPU of a supported type
 
 -  Recommended (preferred) loadout
 
-   -  Maximum supported number of HDDs or SSDs, especially if you can
+   -  Maximum supported number of internal storage devices, especially if you can
       configure multiple RAID levels (e.g. 2 for RAID 0, 3 for RAID 5, and
       6 for RAID 50)
 
    -  The largest disk capacity available from the OEM -- ideally, over
-      2 TiB on a single disk or RAID array.
+      2 TiB on a single disk or RAID array
 
    -  Maximum amount of supported RAM
 
@@ -325,7 +325,7 @@ up the SUT and test environment:
    installed.
 
    -  Note that systems that ship with processors from different families
-      (e.g Skylake vs. Kaby Lake) will require extra testing.
+      (e.g., Coffee Lake vs. Cascade Lake) will require extra testing.
 
    -  CPU speed bumps and die shrinks do not require extra testing.
 
@@ -410,7 +410,7 @@ attention to the following:
      server. This server may be a standard part of the testing network or
      something you bring with you for testing purposes alone. A laptop or a
      small portable computer such as an Intel NUC is sufficient. MAAS
-     version 2.0 or later is required for certification work.
+     version 2.4 or later is required for certification work.
 
   -  When testing multiple SUTs simultaneously, you will need multiple
      ``iperf3`` Targets, one for each SUT. If your ``iperf3`` Target has a
@@ -461,7 +461,7 @@ that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced Network Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 2.3.
+This document describes use of MAAS 2.6.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:
@@ -477,6 +477,12 @@ install Ubuntu on the SUT as follows:
    -  You should see the SUT appear as a newly-enlisted computer in your
       MAAS server's node list. (You may need to refresh your browser to see
       the new entry.)
+
+   -  MAAS 2.6 will automatically attempt to commission the node
+      immediately after enlisting it, thus skipping the next two steps. If
+      this fails or if you want to change the node's name, you can perform
+      the next two steps manually after the commissioning attempt. The next
+      two steps are also required if you're using an older version of MAAS.
 
 #. Check and verify the following items in the MAAS server's node details
    page:
@@ -543,23 +549,23 @@ install Ubuntu on the SUT as follows:
 #. Select the Ubuntu release you want to deploy:
 
    - Choose the Ubuntu version you wish to deploy from the list of available
-     Ubuntu releases. The options will appear similar to **Ubuntu 18.04 LTS
-     "Bionic Beaver"** in the middle drop-down box.
+     Ubuntu releases. The options will appear similar to **Ubuntu 20.04 LTS
+     "Focal Fossa"** in the middle drop-down box.
 
-   - Choose the kernel with which you wish to deploy.  The available kernels
-     are in the rightmost dropdown box. For 14.04 LTS (Trusty) they will have names
-     similar to **trusty (hwe-t)**.  For 16.04 LTS and later, they will be named
-     similar to **xenial (ga-16.04)**.
+   - Choose the kernel you wish to deploy. The available kernels are in the
+     dropdown box below the Ubuntu version. For recent versions of Ubuntu,
+     they will be named similar to **focal (ga-20.04)**.
 
      - When deploying the SUT for testing, you should always start out with
-       the original GA kernel.  For 18.04 LTS, the **bionic (ga-18.04)**
+       the original GA kernel.  For 20.04 LTS, the **focal (ga-20.04)**
        option is appropriate. If the sysetm is not deployable or fails
        certification using the GA kernel, you will then need to re-deploy
        the SUT choosing the correct HWE kernel option (if available). Note
        that an HWE kernel option becomes available only after the first
-       point release for an LTS version, such as 16.04.1 or 18.04.1.
+       point release for an LTS version, such as 18.04.1 or 20.04.1 (due
+       out in July of 2020).
 
-     - For 16.04 LTS and later, do not choose any of the **edge** or
+     - Do not choose any of the **edge** or
        **lowlatency** kernel options for official Certification testing.
 
    `Appendix C - Testing Point Releases`_, elaborates on the procedures for
@@ -597,75 +603,75 @@ release of the Intel Optane DCPMM devices. These are RAM devices that use
 the standard DIMM form factor and are populated alongside DDR4 DIMMs. These
 special devices can function in one of three different modes, described below.
 
-**Memory Mode** is a configuration where the DCPMMs are dedicated completely to
-the traditional volatile RAM role, like any other standard memory DIMM. In this
-mode, the cert suite will exercise the DCPMMs using the **Memory** test cases.
+* **Memory Mode** is a configuration where the DCPMMs are dedicated
+  completely to the traditional volatile RAM role, like any other standard
+  memory DIMM. In this mode, the certification suite will exercise the DCPMMs
+  using the Memory test cases.
 
-**AppDirect Mode** is a configuration where the DCPMMs are presented to the
-installed OS as persistent storage devices.  AppDirect allows for four
-different storage modes, three of which are currently tested using the **Disk**
-test cases:
+* **AppDirect Mode** is a configuration where the DCPMMs are presented to the
+  installed OS as persistent storage devices.  AppDirect allows for four
+  different storage modes, three of which are currently tested using the Disk
+  test cases:
 
- - fsdax -- Filesystem-DAX mode is the default mode of a namespace when
-   specifying ``ndctl create-namespace`` with no options. It creates a block
-   device (``/dev/pmemX[.Y]``) that supports the DAX capabilities of Linux
-   filesystems(XFS and ext4 to date). DAX removes the page cache from the I/O
-   path and allows ``mmap(2)`` to establish direct mappings to persistent memory
-   media. The DAX capability enables workloads / working-sets that would exceed
-   the capacity of the page cache to scale up to the capacity of persistent
-   memory. Workloads that fit in page cache or perform bulk data transfers may
-   not see benefit from DAX. When in doubt, pick this mode.
+  - fsdax -- Filesystem-DAX mode is the default mode of a namespace when
+    specifying ``ndctl create-namespace`` with no options. It creates a block
+    device (``/dev/pmemX[.Y]``) that supports the DAX capabilities of Linux
+    filesystems(XFS and ext4 to date). DAX removes the page cache from the I/O
+    path and allows ``mmap(2)`` to establish direct mappings to persistent memory
+    media. The DAX capability enables workloads / working-sets that would exceed
+    the capacity of the page cache to scale up to the capacity of persistent
+    memory. Workloads that fit in page cache or perform bulk data transfers may
+    not see benefit from DAX. When in doubt, pick this mode.
 
- - sector -- Use this mode to host legacy filesystems that do not checksum
-   metadata or applications that are not prepared for torn sectors after a
-   crash. Expected usage for this mode is for small boot volumes. This mode is
-   compatible with other operating systems.
+  - sector -- Use this mode to host legacy filesystems that do not checksum
+    metadata or applications that are not prepared for torn sectors after a
+    crash. Expected usage for this mode is for small boot volumes. This mode is
+    compatible with other operating systems.
 
- - raw -- Raw mode is effectively just a memory disk that does not support DAX.
-   Typically this indicates a namespace that was created by tooling or another
-   operating system that did not know how to create a Linux fsdax or devdax
-   mode namespace. This mode is compatible with other operating systems, but
-   again, does not support DAX operation.
+  - raw -- Raw mode is effectively just a memory disk that does not support DAX.
+    Typically this indicates a namespace that was created by tooling or another
+    operating system that did not know how to create a Linux fsdax or devdax
+    mode namespace. This mode is compatible with other operating systems, but
+    again, does not support DAX operation.
 
- - devdax -- Device-DAX mode enables similar ``mmap(2)`` DAX mapping capabilities
-   as Filesystem-DAX. However, instead of a block-device that can support a
-   DAX-enabled filesystem, this mode emits a single character device file
-   (``/dev/daxX.Y``). Use this mode to assign persistent memory to a
-   virtual-machine, register persistent memory for RDMA, or when gigantic
-   mappings are needed.
+  - devdax -- Device-DAX mode enables similar ``mmap(2)`` DAX mapping capabilities
+    as Filesystem-DAX. However, instead of a block-device that can support a
+    DAX-enabled filesystem, this mode emits a single character device file
+    (``/dev/daxX.Y``). Use this mode to assign persistent memory to a
+    virtual-machine, register persistent memory for RDMA, or when gigantic
+    mappings are needed. *As of this writing, devdax is not yet supported by tests in Checkbox*
 
-*As of this writing, devdax is not yet supported by tests in Checkbox*
+* **Mixed Mode** enables configuring a mix of both Memory and AppDirect
+  spaces using either the system configuration tools (e.g. Setup/BIOS) or
+  userspace tools after installation, which requires a reboot afterwards. 
+  If using userspace tools, you will need to use ``ipmctl`` for the initial
+  configuration.  ``ipmctl`` is available in 18.04 LTS via the Hardware
+  Certification PPA that provides the Server Test Suite, and is available
+  via the Universe repo in 20.04 LTS. Using ``ipmctl`` you should allocate
+  at least 25% of the DCPMM space to Memory Mode and the remainder as
+  AppDirect Mode.
 
-This guide provides one path to configuration using **Mixed Mode** to reduce
+This guide provides one path to configuration using Mixed Mode to reduce
 the amount of retests necessary to complete certification. Some OEMs may only
 support operation of DCPMMs in Memory or AppDirect only. If that applies to
 your SUT, you will need to configure each mode separately and run retests to
 ensure both modes have been tested. 
 
-In **Mixed Mode** you will need to configure a mix of both **Memory** and
-**AppDirect** spaces using either the system configuration tools (e.g.
-Setup/BIOS) or userspace tools after installation, which requires a reboot
-afterwards.  If using userspace tools, you will need to use ``ipmctl`` for the
-initial configuration.  ``ipmctl`` is available in 18.04 LTS via the Hardware
-Certification PPA that provides the Server Test Suite, and is available via the
-Universe repo in 20.04 LTS. Using ``ipmctl`` you should allocate at least 25%
-of the DCPMM space to **Memory Mode** and the remainder as **AppDirect Mode**.
-
 Once initial configuration is done using ``ipmctl``, you will need to use
 ``ndctl``, which is available from 18.04 LTS onward in the Universe repo, to do
-the finial configuation.
+the final configuation.
 
-For this step, you should create a **fsdax** device, a **sector** device, and a
-**raw** device of more or less equal size.  
+For this step, you should create a fsdax device, a sector device, and a
+raw device of more or less equal size.  
 
 Once you have configured this, you will need to reboot the SUT to ensure the
 configuration is performed.  Once you have rebooted the server, you will need
-to add a partition table and a partition to each **AppDirect** device, and
+to add a partition table and a partition to each AppDirect device, and
 format them appropriately using a supported filesystem (such as ext4).
 
-From this point onward, the Server Test Suite will treat the **AppDirect**
+From this point onward, the Server Test Suite will treat the AppDirect
 devices as any other block device and test them accordingly using the various
-**Disk** test cases.
+Disk test cases.
 
 Performing Final Pre-Testing SUT Configuration
 ----------------------------------------------
@@ -694,8 +700,9 @@ access the SUT:
    applied.
 
 -  You should verify your SUT's kernel version by typing ``uname -r``.
-   Ubuntu 18.04 GA ships with a 4.15.0-series kernel. Note that,
-   although updated kernels ship with most
+   Ubuntu 18.04 GA ships with a 4.15.0-series kernel and Ubuntu 20.04 GA
+   ships with a 5.4.0-series kernel. Note that, although updated kernels
+   ship with most
    point-release versions, if you use the standard MAAS images,
    ``lsb_release -a`` will show that you have the latest point-release
    version even if you're using the GA kernel. It's the kernel version
@@ -716,22 +723,22 @@ access the SUT:
      - For Ubuntu 16.04 and earlier, edit ``/etc/network/interfaces`` and
        activate the interfaces with ``sudo ifup``.
 
-     - For Ubuntu 18.04, edit ``/etc/netplan/50-cloud-init.yaml`` and
-       activate the changes with ``sudo netplan apply``. (NetPlan
+     - For Ubuntu 18.04 and later, edit ``/etc/netplan/50-cloud-init.yaml``
+       and activate the changes with ``sudo netplan apply``. (NetPlan
        configuration is described in more detail at
        https://wiki.ubuntu.com/Netplan/Design.)
 
--  If the SUT has more than one HDD, all but the first disk must be
-   partitioned and mounted prior to testing. Partitions on those
-   additional HDDs should preferably be a single partition that spans the
-   entire disk and that uses the ext4 filesystem.
+-  All disk devices (HDDs, SSDs, NVMes, and DCPMMs) must be partitioned and
+   mounted prior to testing. Each disk beyond the first one should ideally
+   be configured with a single partition that spans the entire disk and
+   that uses the ext4 filesystem.
 
 -  If the SUT has DCPMMs installed, you should configure them prior to running
-   the test suite. ***Note: This document assumes that the SUT will support
+   the test suite. **Note: This document assumes that the SUT will support
    Mixed Mode operation. If the SUT only supports a single operating mode at a
    time, you will need to configure DCPMMs in one mode, run tests, then
    re-configure the DCPMMs into the remaining mode and run the appropriate
-   tests separately.***
+   tests separately.**
 
 -  A MAAS installation configured for certification testing should
    provision the SUT with the Server Test Suite and related packages. If
@@ -836,10 +843,10 @@ You can initiate a testing session in a server as follows:
 
        #. On a computer with better Internet access, download KVM and LXD
           cloud image files from
-          http://cloud-images.ubuntu.com/bionic/current/. In particular,
-          obtain the ``bionic-server-cloudimg-amd64.img``,
-          ``bionic-server-cloudimg-amd64.squashfs``, and
-          ``bionic-server-cloudimg-amd64-lxd.tar.xz`` files, or the
+          http://cloud-images.ubuntu.com/focal/current/. In particular,
+          obtain the ``focal-server-cloudimg-amd64.img``,
+          ``focal-server-cloudimg-amd64.squashfs``, and
+          ``focal-server-cloudimg-amd64-lxd.tar.xz`` files, or the
           equivalent for your CPU architecture.
 
        #. Copy those images to any convenient directory on the SUT.
@@ -849,9 +856,9 @@ You can initiate a testing session in a server as follows:
 
             [environment]
             KVM_TIMEOUT = 300
-            KVM_IMAGE = /home/ubuntu/bionic-server-cloudimg-amd64.img
-            LXD_ROOTFS = /home/ubuntu/bionic-server-cloudimg-amd64.squashfs
-            LXD_TEMPLATE = /home/ubuntu/bionic-server-cloudimg-amd64-lxd.tar.xz
+            KVM_IMAGE = /home/ubuntu/focal-server-cloudimg-amd64.img
+            LXD_ROOTFS = /home/ubuntu/focal-server-cloudimg-amd64.squashfs
+            LXD_TEMPLATE = /home/ubuntu/focal-server-cloudimg-amd64-lxd.tar.xz
 
           Note that the KVM and LXD configurations are separated by
           several lines of comments in the configuration file.
@@ -865,12 +872,12 @@ You can initiate a testing session in a server as follows:
 
 #. Run the certification tests by typing an appropriate command, such as::
 
-    $ certify-18.04
+    $ certify-20.04
 
    In some cases, though, another command may be necessary:
 
-   - If you're testing an Ubuntu 16.04 installation, you must change the
-     version number.
+   - If you're testing another Ubuntu version, you must change the version
+     number.
 
    - More exotic options, including running a limited set of tests, are
      described in `Appendix B - Re-Testing and Installing Updated Tests`_.
@@ -884,7 +891,7 @@ You can initiate a testing session in a server as follows:
 
 #. If at any time during the execution you are *sure* the computer has
    crashed (or it reboots spontaneously) then after the system comes back
-   up you should run the ``certify-18.04`` command again
+   up you should run the ``certify-20.04`` command again
    and respond `y` when asked if you want to resume the previous session.
 
 #. If any tests fail or do not run, a screen will appear that summarizes
@@ -968,9 +975,8 @@ certification program itself, you must do so manually, perhaps from
 another computer that runs Ubuntu. At this time, there is no
 mechanism for submitting results from an OS other than Ubuntu.
 
-To add the Hardware Certification PPA, install
-``canonical-certification-submit``, and submit the results, follow these
-instructions:
+To add the Hardware Certification PPA, install the ``checkbox-ng`` package,
+and submit the results, follow these instructions:
 
 #. Add the Hardware Certification PPA::
 
@@ -1009,7 +1015,7 @@ instructions:
 You should see output similar to the following for a successful
 submission::
 
-  $ canonical-certification-submit --secure_id a00D000000XndQJIAZ \
+  $ checkbox-cli submit a00D000000XndQJIAZ \
     ~/.local/share/checkbox_ng/submission_2016-03-23T19\:06\:18.244727.xml 
   Successfully sent, submission status at
   https://certification.canonical.com/submissions/status/28d85e09-11d4
@@ -1045,7 +1051,7 @@ problems, you can request a certificate:
 
       -  Certified Pre-install is for hardware that  ships with a (possibly
          customized) version of Ubuntu. This option is used almost exclusively
-         for Client hardware such as desktops, laptops and tablets that 
+         for Client hardware such as desktops and laptops that 
          typically ship with a pre-installed operating system.
 
    -  Is Private should be checked if the certification should be kept
@@ -1136,24 +1142,30 @@ also need to install updated test scripts in some cases.
 Running a Limited Test Script
 -----------------------------
 
-In addition to the ``certify-18.04`` test script, several others are
+In addition to the ``certify-20.04`` test script, several others are
 provided with the Server Test Suite:
 
 - If you're testing a System-on-Chip (SoC) rather than a production
-  server, you should run ``certify-soc-18.04``.
+  server, you should run ``certify-soc-20.04``.
 
 - If you're testing a virtual machine, you should run
-  ``certify-vm-18.04``.
+  ``certify-vm-20.04``.
 
 - The ``test-firmware`` command runs firmware tests.
 
-- The ``test-functional-18.04`` command runs functional tests.
+- The ``test-functional-20.04`` command runs functional tests.
 
-- The ``test-network-18.04`` command runs network tests.
+- The ``test-gpgpu`` command runs tests on nVidia GPGPUs. (See
+  `Appendix G - Setting Up and Testing a GPGPU`_ for important information
+  related to GPGPU testing.)
+
+- The ``test-memory`` command runs memory tests.
+
+- The ``test-network`` command runs network tests.
 
 - The ``test-network-underspeed`` command runs the network tests with the speed
   check disabled. This is helpful in situations where a network device reports
-  an incorrect max speed.
+  an incorrect maximum speed.
 
 - The ``test-storage`` command runs tests of storage devices.
 
@@ -1162,7 +1174,7 @@ provided with the Server Test Suite:
 - The ``test-virtualization`` command runs virtualization (KVM and
   LXD) tests.
 
-If you're testing Ubuntu 16.04, change the version number in commands that
+If you're testing Ubuntu 18.04, change the version number in commands that
 include it. Consult your Partner Engineer if you need help
 deciding which of these tests to run.
 
@@ -1185,15 +1197,15 @@ If you need to run a mish-mash of different tests, you can do so via the
 #. Press the Enter key. The system will display a Suite Selection
    screen:
 
-   .. figure:: images/suite-selection-bionic.png
+   .. figure:: images/suite-selection-focal.png
       :alt: The Select Test Plan screen enables you to pick which
             tests to run
       :width: 100%
 
-#. Select the *18.04 Server Certification Full* item by using the arrow
+#. Select the *20.04 Server Certification Full* item by using the arrow
    keys and then pressing Spacebar. (In some cases, another selection may
    be appropriate. For instance, if you need to re-run a single network
-   test, you might select *18.04 Network Only Test Plan*.)
+   test, you might select *20.04 Network Only Test Plan*.)
 
 #. Press Enter to move on to the test selection screen.
 
@@ -1204,7 +1216,7 @@ If you need to run a mish-mash of different tests, you can do so via the
    on. Using these controls, de-select all the tests you do *not* want to
    run, leaving only the relevant tests selected.
 
-   .. figure:: images/test-selection-xenial.png
+   .. figure:: images/test-selection-focal.png
       :alt: The suite selection screen enables you to pick which
             tests to run
       :width: 100%
@@ -1264,8 +1276,8 @@ Appendix C - Testing Point Releases
 
 Ubuntu LTS releases are updated to a new *point release* version
 approximately three months after each intervening release -- that is,
-18.04.1 will be released around July of 2018 (three months after 18.04),
-18.04.2 will be released around January of 2019 (three months after 18.10),
+20.04.1 will be released around July of 2020 (three months after 20.04),
+20.04.2 will be released around January of 2021 (three months after 20.10),
 and so on. These updates use the kernels from the latest interim release,
 which can affect hardware compatibility; however, the new kernels are
 supported for a limited period of time compared to the GA kernel.
@@ -1273,10 +1285,10 @@ Therefore, certification can involve testing multiple Ubuntu releases or
 Linux kernels:
 
 -  The GA release -- That is, the version that was released in April of the
-   release year (2016 for 16.04, 2018 for 18.04). Ubuntu 16.04 shipped with
-   a 4.4.0-series kernel, and 18.04 shipped with a 4.15.0-series kernel.
+   release year (2018 for 18.04, 2020 for 20.04). Ubuntu 18.04 shipped with
+   a 4.15.0-series kernel, and 20.04 shipped with a 5.4.0-series kernel.
 
--  The current point release -- That is, version 16.04.4 or whatever is the
+-  The current point release -- That is, version 18.04.4 or whatever is the
    latest release in the series. Testing point-release versions starting
    with the .2 point release in addition to the original GA version serves
    as a check for regressions in the kernel, and may be required if the GA
@@ -1310,8 +1322,8 @@ Team.
 Appendix D - Network Performance Tuning
 =======================================
 
-Ubuntu's default network configuration works fine for most 1Gbps and 10Gbps
-network devices; however, most servers require a little tweaking of
+Ubuntu's default network configuration works fine for most 1 Gbps and 10
+Gbps network devices; however, most servers require a little tweaking of
 settings to perform adequately at higher speeds. The following procedure
 configures both the SUT and the ``iperf3`` Target for optimal performance:
 
@@ -1364,9 +1376,9 @@ configures both the SUT and the ``iperf3`` Target for optimal performance:
    changing the IP address to the ``iperf3`` Target system's high-speed
    interface and setting the ``-n`` option to the number of ``iperf3``
    instances you want to run. The ``network`` test in Checkbox defaults to
-   using one instance for every 10Gbps of network throughput being tested,
-   so you'll need at least ``-n 4`` to test a 40Gbps NIC and ``-n 10`` to
-   test a 100Gbps NIC. You may find you'll need another value, though, as
+   using one instance for every 10 Gbps of network throughput being tested,
+   so you'll need at least ``-n 4`` to test a 40 Gbps NIC and ``-n 10`` to
+   test a 100 Gbps NIC. You may find you'll need another value, though, as
    described shortly. If in doubt, run more ``iperf3`` instances than you
    think you'll need; the cost of running too many instances is very low.
    You can configure ``iperf3`` to start automatically by editing a startup
@@ -1385,14 +1397,14 @@ These steps are sufficient to produce passing test results on many
 high-speed networks; however, sometimes you may need to tweak the settings.
 The reason for using multiple ``iperf3`` instances is that a single
 ``iperf3`` thread tends to max out the CPU at some level of throughput --
-somewhere between 10Gbps and 20Gbps using the servers in our test lab. This
+somewhere between 10 Gbps and 20 Gbps using the servers in our test lab. This
 value may be different on other hardware, though. If either an ``iperf3``
 server or a SUT has less-powerful CPUs, more ``iperf3`` instances may be
 required; and fewer may be optimal if a CPU is more powerful. If you
 suspect your network tests are failing for this reason, you can adjust the
 ``-n`` value in your ``start-iperf3`` command and then run the ``network``
 script manually on the SUT, specifying the number of ``iperf3`` instances
-it launches via the ``--num-threads`` option, as in::
+it launches via the ``\-\-num-threads`` option, as in::
 
  sudo /usr/lib/plainbox-provider-checkbox/bin/network test -i ens1f1 \
   -t iperf --iperf3 --scan-timeout 3600 --fail-threshold 80 \
@@ -1400,7 +1412,7 @@ it launches via the ``--num-threads`` option, as in::
   --target 172.24.124.1
 
 This example sets the number of ``iperf3`` instances to 20. You must adjust
-the ``-i`` option for the SUT's interface and the ``--target`` value to
+the ``-i`` option for the SUT's interface and the ``\-\-target`` value to
 point to the ``iperf3`` Target. Of course, the ``iperf3`` Target must also
 be running at least the specified number of instances. If this procedure
 produces acceptable results, you will need to append the *exact* command
@@ -1435,9 +1447,9 @@ Fixing Deployment Problems
 --------------------------
 
 Sometimes a node fails to deploy. When this happens, check the installation
-output on the node's MAAS page. (With MAAS 2.3, click the Logs tab and
+output on the node's MAAS page. (Click the Logs tab and
 ensure that Installation Output is selected in the selector on the left of
-the screen.) Often, a clue to the nature of the problm
+the screen.) Often, a clue to the nature of the problem
 appears near the end of that output. If you don't spot anything obvious,
 copy that output into a file and send it to the Server Certification Team.
 
@@ -1587,7 +1599,7 @@ Many servers support *serial-over-LAN (SoL).* When configured in this way,
 the server mirrors its console output to a serial port device, which in
 turn is intercepted by the BMC and made accessible to you. Using SoL may be
 helpful when a server fails to enlist, commission, or deploy; or sometimes
-even if works correctly but you need to adjust its firmware settings
+even if it works correctly but you need to adjust its firmware settings
 remotely or obtain a record of early boot messages.
 
 The details of SoL configuration vary from one server to another. Broadly
@@ -1739,7 +1751,7 @@ Requirements for GPGPU testing
 - Internet connection
 
   - The SUT must be able to talk to the Internet in order to download a
-    significant number of packages from the nVidia repos.
+    significant number of packages from the nVidia repositories.
 
 
 Setting Up a GPGPU for Testing

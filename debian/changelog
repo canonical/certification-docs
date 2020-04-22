@@ -1,8 +1,13 @@
-certification-docs (0.3.5-1ppa1) UNRELEASED; urgency=medium
+certification-docs (0.3.6-0ppa1) focal; urgency=medium
 
+  [ Jeff Lane ]
   * Add 20.04 Test Case Guide
 
- -- Jeff Lane <jeff@ubuntu.com>  Mon, 20 Apr 2020 12:00:32 -0400
+  [ Rod Smith ]
+  * Updated STG for 20.04 release
+  * Updated MANIACS for 20.04 release
+
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 22 Apr 2020 11:10:13 -0400
 
 certification-docs (0.3.5-0ppa1) bionic; urgency=medium
 
