@@ -364,8 +364,8 @@ The more specific procedure for using MAAS in certification testing is:
       $ dpkg -s maas | grep Version
 
    If the wrong version is installed, fixing the problem (presumably an
-   out-of-date mirror repository or a problem with the ``maas/stable`` PPA)
-   and upgrading may work. If you upgrade from an earlier version of MAAS,
+   out-of-date mirror repository or a problem with the ``maas/stable``
+   PPA), upgrading may work. If you upgrade from an earlier version of MAAS,
    be sure to select the option to upgrade all the configuration files when
    the package manager asks about this.
 

@@ -561,9 +561,9 @@ install Ubuntu on the SUT as follows:
        option is appropriate. If the sysetm is not deployable or fails
        certification using the GA kernel, you will then need to re-deploy
        the SUT choosing the correct HWE kernel option (if available). Note
-       that an HWE kernel option becomes available only after the first
-       point release for an LTS version, such as 18.04.1 or 20.04.1 (due
-       out in July of 2020).
+       that an HWE kernel option becomes available only starting with the
+       second point release for an LTS version, such as 18.04.2 or 20.04.2
+       (due out in February of 2021).
 
      - Do not choose any of the **edge** or
        **lowlatency** kernel options for official Certification testing.
