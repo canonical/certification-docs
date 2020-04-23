@@ -45,7 +45,7 @@ large.
 This document begins with information on the required hardware and then
 moves on to a general description of Ubuntu installation, details on how to
 install and configure MAAS, and how to test your MAAS installation.
-Appendixes cover more esoteric or specialized topics, including how to add
+Appendixes cover more esoteric topics, including how to add
 support for i386 (32-bit) images and how to set up advanced network
 configurations.
 
@@ -53,8 +53,8 @@ Figure 1 illustrates the overall configuration that this document will help
 you create. This document describes configuration of the MAAS server device
 in the figure. It presupposes the existence of a local LAN that the MAAS
 server can use for external connections, as well as the availability of at
-least one SUT for testing at the end of the process. (Note that the
-Internet connection is required for initial setup, but a
+least one system under test (SUT) for testing at the end of the process.
+(Note that the Internet connection is required for initial setup, but a
 properly-configured MAAS server, with local APT repository mirrors, does
 not need this connection to bring up SUTs.) Once configured, you will be
 able to move the MAAS server from one site to another, repopulating the
@@ -68,11 +68,11 @@ MAAS LAN at each site.
    Figure 1: Network structure in which the MAAS server will reside
 
 **WARNING:** The configuration described in this document leaves several
-server programs running on the MAAS computer, including a proxy server,
-a web server (that can control MAAS), and an SSH server. Thus, it is unwise
-to expose the MAAS computer directly to the Internet. You should either
-secure it with strict local firewall rules or place it behind a strong
-firewall running on a router between it and the Internet.
+server programs running on the MAAS computer, including a proxy server, a
+web server, an SSH server, and of course the MAAS server software itself.
+Thus, it is unwise to expose the MAAS computer directly to the Internet.
+You should either secure it with strict local firewall rules or place it
+behind a strong firewall running on a router between it and the Internet.
 
 Hardware Required
 =================
@@ -149,10 +149,16 @@ Once you've assembled the basic hardware for your MAAS server system, you can
 begin preparing it. The initial steps involve installing Ubuntu and setting
 up its most basic network settings:
 
-1. Install Ubuntu 18.04 (Bionic Beaver) to the MAAS server system.
+1. Install Ubuntu 18.04 (Bionic Beaver) to the MAAS server system. (Note
+   that Ubuntu 20.04 changes the way MAAS is installed, so these directions
+   do not apply to Ubuntu 20.04. Procedures to use Ubuntu 20.04 will be
+   released in mid-2020.)
 
-   -  The version of Ubuntu Server 18.04 described here can be
-      obtained from https://www.ubuntu.com/download/server.
+   -  The version of Ubuntu Server 18.04 described here can be obtained
+      from
+      http://releases.ubuntu.com/18.04/ubuntu-18.04.4-live-server-amd64.iso.
+      This is an 18.04.4 image, but other images in the 18.04 series will
+      also work.
 
    -  Ubuntu may need access to several network sites in order to function
       properly. These include repositories at ``archive.ubuntu.com`` (or a
@@ -162,7 +168,7 @@ up its most basic network settings:
       implements strict outgoing firewall rules, you may need to open
       access to these sites on ports 80 and/or 443.
 
-   -  This guide assumes the use of Ubuntu Server 18.04 and MAAS 2.4.
+   -  This guide assumes the use of Ubuntu Server 18.04 and MAAS 2.6.
       Although other versions of Ubuntu and MAAS may work, some details
       will differ. Some notable variants include:
 
@@ -175,9 +181,8 @@ up its most basic network settings:
         this document.
 
       - **When you boot the installation medium, you should select the
-        "Install Ubuntu" option, not either of the "Install MAAS bare-metal
-        cloud" options.** The procedure in this document involves
-        installing MAAS later.
+        "Install Ubuntu Server" option, not any other option.** The
+        procedure in this document involves installing MAAS later.
 
    -  On the *Network connections* screen, configure your network ports:
 
@@ -245,7 +250,7 @@ up its most basic network settings:
            :alt: The network can be configured during installation.
            :width: 100%
 
-           Figure 1: The network can be configured during installation.
+           Figure 2: The network can be configured during installation.
 
       - Configure the disk storage and other options as you see fit.
 
@@ -264,9 +269,10 @@ up its most basic network settings:
    network port is not properly configured, edit the configuration file in
    ``/etc/netplan/``. This file may be called ``50-cloud-init.yaml``,
    ``01-netcfg.yaml``, or something else; the name depends on the
-   installation method. A typical configuration should look like this,
-   although likely with different network device names (``eth0`` and
-   ``eth1`` here) and possibly different IP addresses::
+   installation method. A typical configuration should look something like
+   this, although likely with different network device names (``eth0`` and
+   ``eth1`` here), possibly different IP addresses, and perhaps with more
+   or fewer options::
 
     network:
       version: 2
@@ -332,14 +338,14 @@ Configuring MAAS is described in generic terms at
 `http://maas.ubuntu.com/docs/install.html <http://maas.ubuntu.com/docs/install.html>`_.
 The more specific procedure for using MAAS in certification testing is:
 
-.. #. Install the MAAS stable PPA
-..    (`https://launchpad.net/~maas/+archive/ubuntu/stable <https://launchpad.net/~maas/+archive/ubuntu/stable>`_)::
-.. 
-..       $ sudo apt-add-repository ppa:maas/stable
-.. 
-..    Currently (early November, 2017), Ubuntu 16.04 installs MAAS 2.0 by default.
-..    This PPA holds the most recent release version of MAAS 2, which is recommended for
-..    certification testing.
+#. Install the MAAS stable PPA
+   (`https://launchpad.net/~maas/+archive/ubuntu/stable <https://launchpad.net/~maas/+archive/ubuntu/stable>`_)::
+
+      $ sudo apt-add-repository ppa:maas/stable
+
+   Currently (late April, 2020), Ubuntu 18.04 installs MAAS 2.4 by default.
+   This PPA holds the most recent release version of MAAS 2.6, which is
+   recommended for certification testing.
 
 #. Several scripts and configuration files are available in the
    ``maas-cert-server`` package in the hardware certification PPA. You can
@@ -352,15 +358,16 @@ The more specific procedure for using MAAS in certification testing is:
    dependency on MAAS, so installing ``maas-cert-server`` will also install
    MAAS, as well as all of MAAS's dependencies.
 
-#. Verify that you've installed MAAS 2.4.0 or later, rather than some
+#. Verify that you've installed MAAS 2.6.0 or later, rather than some
    earlier version::
 
       $ dpkg -s maas | grep Version
 
    If the wrong version is installed, fixing the problem (presumably an
-   out-of-date mirror repository) and upgrading may work. If you upgrade from an
-   earlier version of MAAS, be sure to select the option to upgrade all the
-   configuration files when the package manager asks about this.
+   out-of-date mirror repository or a problem with the ``maas/stable``
+   PPA), upgrading may work. If you upgrade from an earlier version of MAAS,
+   be sure to select the option to upgrade all the configuration files when
+   the package manager asks about this.
 
 #. Edit the ``/etc/maas-cert-server/config`` file to be sure that the
    variables it contains are correct. Specifically:
@@ -378,15 +385,15 @@ The more specific procedure for using MAAS in certification testing is:
      (``=``) in the assignments!
 
 #. Optionally create an ``/etc/maas-cert-server/iperf.conf`` file to
-   identify your ``iperf`` server(s). This file should consist of a single
+   identify your ``iperf3`` server(s). This file should consist of a single
    line that contains a comma-delimited list of IP addresses, each
-   identifying a different ``iperf`` (or ``iperf3``) server. If this file
+   identifying a different ``iperf3`` server. If this file
    is absent, SUTs will configure themselves to use their network gateways
-   (normally the MAAS server) as the ``iperf`` target. If
+   (normally the MAAS server) as the ``iperf3`` target. If
    ``/etc/maas-cert-server/iperf.conf`` is present, though, MAAS will tell
    SUTs to use the specified system(s) instead. You might use this feature
-   if your ``iperf`` server is not the SUTs' network gateway or if you have
-   multiple ``iperf`` servers. The SUTs will attempt to use each ``iperf``
+   if your ``iperf3`` server is not the SUTs' network gateway or if you have
+   multiple ``iperf3`` servers. The SUTs will attempt to use each ``iperf3``
    target in series until the network test passes or until the list is
    exhausted. This setting can be overridden on SUTs by editing the
    ``/etc/xdg/canonical-certification.conf`` file on the SUT. See
@@ -510,7 +517,6 @@ mirror::
 
     * Do you want to mirror xenial (Y/n)? y
     * Do you want to mirror bionic (Y/n)? y
-    * Do you want to mirror disco (Y/n)? n
     * Do you want to mirror eoan (Y/n)? n
     * Do you want to mirror focal (Y/n)? y
 
@@ -555,7 +561,7 @@ launching ``maniacs-setup`` with the ``\-\-download-virtualization-image``
     * an image on your MAAS server can be convenient, but downloading it can
     * take a while (each image is about 250MiB). This process will import cloud
     * images for whatever releases and architectures you specify. If you select
-    * 'Y', logs will be stored at $MCS_DATA/cloudimg-*-dl-*.log;
+    * 'Y', logs will be stored at /home/ubuntu/.maas-cert-server/cloudimg-*-dl-*.log;
     * monitor them if you suspect download problems.
     *
     * To defer this task, respond 'N' to the following question.
@@ -569,7 +575,6 @@ Ubuntu versions and architectures to download::
     * Cloud Mirror does not exist. Creating.
     * Do you want to get images for xenial release (Y/n)? y
     * Do you want to get images for bionic release (y/N)? y
-    * Do you want to get images for disco release (y/N)? n
     * Do you want to get images for eoan release (y/N)? n
     * Do you want to get images for focal release (y/N)? y
     *
@@ -611,7 +616,6 @@ complete, so the script gives you the option of deferring this process::
     * MAAS requires boot resource images to be useful, and they will now be
     * imported in the background. This can take a LONG time, but will not
     * significantly slow down subsequent configuration steps.
-    * Beginning import of boot resources
 
 If the download of boot resources fails and you want to initiate it
 manually later, you can use the MAAS web UI or launch ``maniacs-setup``
@@ -658,7 +662,7 @@ adjusts some other details of which you should be aware:
 - Any keys in your ``~/.ssh/authorized_keys`` file on the MAAS server
   computer are also added to the MAAS setup. Again, this simplifies login.
 
-- The MAAS computer's SSH server configuration is relaxed so that
+- The MAAS computer's SSH client configuration is relaxed so that
   changed host keys do not block outgoing connections. This change is
   *insecure*, but is a practical necessity because your internal network's
   nodes will be redeployed regularly. You should keep this setting in mind
@@ -669,8 +673,7 @@ adjusts some other details of which you should be aware:
   compared to a generic MAAS installation.
 
 - The default storage layout setting is changed from
-  "LVM" to "flat." Some certification tests assume a flat layout, which is
-  the default (and only) option in MAAS 1.8 and earlier.
+  "LVM" to "flat." Some certification tests assume a flat layout.
 
 Checking the MAAS Configuration
 -------------------------------
@@ -714,11 +717,27 @@ to modify a few settings. To do so, follow these steps:
       When you're done adding SSH keys, click Go to Dashboard at the bottom
       of the page.
 
-#. On the Network Discovery page, you may want to disable the Device
-   Discovery feature; you can do this with the slider near the top right of
-   the page. In theory, this feature should passively detect devices and
-   should cause no problems. In practice, it may trigger security alerts on
-   the external network.
+#. Once you're fully logged in, click Settings in the top line, followed by
+   Network Services in the resulting sub-menu. You can review several
+   network settings here. A couple that often cause problems are:
+
+   - *Enable DNSSEC validation of upstream zones* -- Some private DNS
+     servers are misconfigured and will cause problems if this setting is
+     left at the default value of Automatic. Changing this setting to No
+     may be required in such cases. (Alternatively, configuring the
+     upstream DNS server to support DNSSEC should fix the problem.)
+
+   - *Network Discovery* -- In theory, this feature should passively detect
+     devices and should cause no problems. In practice, it sometimes
+     triggers security alerts on the external network.
+
+   After making a change, be sure to click Save *within that subsection.*
+
+#. You can review other settings in the MAAS Settings page. This page is
+   broken into several subsections, each of which has a tab near the top of
+   the page -- Users, General, User Scripts, and so on. If you change any
+   settings, be sure to click the associated "Save" button within that
+   section.
 
 #. Click the Subnets link near the top of the web page so you can review
    the DHCP options:
@@ -734,8 +753,8 @@ to modify a few settings. To do so, follow these steps:
        as additional "fabrics."
 
    #.  On the page for your internal network, scroll down about halfway to
-       view the Utilisation and Reserved sections. At this point, about
-       half the addresses will be classified as "used" because
+       view the Utilisation and Reserved Ranges sections. At this point,
+       about half the addresses will be classified as "used" because
        ``maniacs-setup`` set them aside as reserved or as managed by DHCP.
        The "available" addresses are those that do not belong to either of
        these categories; MAAS assigns them to nodes that are deployed using
@@ -755,16 +774,10 @@ to modify a few settings. To do so, follow these steps:
        - If you want to completely delete the range, click the trash can
          icon instead of the edit icon.
 
-   #.  You can optionally reserve additional ranges for machines not
-       managed by MAAS (using the Reserve Range button) or for DHCP
-       addresses (using the Reserve Dynamic Range button).
-
-#. Click Settings near the top of the page to load the MAAS Settings page,
-   where you review several miscellaneous MAAS details. This page is broken
-   into several subsections, each of which has a tab near the top of the
-   page -- Users, General, User Scripts, and so on. If you change any
-   settings, be sure to click the associated "Save" button within that
-   section.
+   #.  You can optionally reserve additional ranges by using the Reserve
+       Range button, which provides two sub-options: for machines not
+       managed by MAAS (using the Reserve Range sub-option) or for DHCP
+       addresses (using the Reserve Dynamic Range sub-option).
 
 Testing the MAAS Server
 =======================
@@ -791,12 +804,15 @@ To test it, follow these steps:
      field of "New." If it doesn't appear, try refreshing the page. Also,
      be sure you check the *Machines* tab, not the *Devices* tab.
 
-#. Click on the node's hostname to view the node's summary page.
+   - Beginning with MAAS 2.6, MAAS will attempt to commission the node
+     immediately after enlisting it. If this succeeds, you can skip ahead
+     to the final step of this procedure to test deployment. If
+     commissioning fails (as it may if the node uses a power control system
+     other than IPMI, for example), you should continue with the next few
+     steps to more fully configure the node and, if necessary, troubleshoot
+     the problem.
 
-#. If desired, click the node's hostname near the upper-left corner of the
-   page. This will enable you to change the hostname to something
-   descriptive, such as the computer's model number. Click "Save" when
-   you've made your changes.
+#. Click on the node's hostname to view the node's summary page.
 
 #. You may need to make a few changes in the Configuration area:
 
@@ -851,10 +867,15 @@ To test it, follow these steps:
 If any of these steps fail, you may have run into a MAAS bug; your test
 computer may have a buggy PXE, IPMI, or other subsystem; or you may have
 misconfigured something in the MAAS setup. You may want to review the
-preceding sections to verify that you configured everything correctly.
-To help in debugging problems, the node status page includes sections
-entitled Commissioning, Logs, and Events with various pieces of diagnostic
-information related to commissioning and deployment.
+preceding sections to verify that you configured everything correctly. To
+help in debugging problems, the node status page includes sections entitled
+Commissioning, Hardware Tests, Logs, and Events with various pieces of
+diagnostic information related to commissioning and deployment.
+
+At any time after enlisting a node, you can click the node's hostname near
+the upper-left corner of its summary page. This will enable you to change
+the hostname to something descriptive, such as the computer's model number.
+Click "Save" when you've made your changes.
 
 .. raw:: pdf
 
