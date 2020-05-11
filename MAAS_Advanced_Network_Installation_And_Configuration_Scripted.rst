@@ -45,8 +45,8 @@ large.
 This document begins with information on the required hardware and then
 moves on to a general description of Ubuntu installation, details on how to
 install and configure MAAS, and how to test your MAAS installation.
-Appendixes cover more esoteric topics, including how to add
-support for i386 (32-bit) images and how to set up advanced network
+Appendixes cover more esoteric topics, including how to add support for CPU
+architectures other than x86-64 and how to set up advanced network
 configurations.
 
 Figure 1 illustrates the overall configuration that this document will help
@@ -881,25 +881,41 @@ Click "Save" when you've made your changes.
 
    PageBreak
 
-Appendix A: Adding i386 Support
-===============================
+Appendix A: Adding Non-AMD64 Support
+====================================
 
 By default, the ``maniacs-setup`` script supports only AMD64 (64-bit,
 x86-64) nodes. (If you created a local mirror, it includes i386/x86
-binaries because they're needed by some 64-bit packages.) If you expect to
-run certification tests on i386 (32-bit, x86) computers, though, you must
-add support for such systems in MAAS:
+binaries because they're needed by some 64-bit packages.) Beginning with
+Ubuntu 20.04, direct installs in 32-bit mode to i386 computers are no
+longer supported, but some i386 libraries remain available to support older
+32-bit binaries running on AMD64 installations. If you expect to
+run 18.04 certification tests on i386 (32-bit, x86) computers, or to run
+18.04 or 20.04 certification on other architectures, such as ppc64el or
+ARM64, you must add support for such systems in MAAS:
 
 #. In the MAAS web UI, click the Images tab.
 
-#. Select "i386" in the "Architecture" column.
+#. Select the desired CPU types in the "Architecture" column.
 
-#. Click "Apply changes." The standard MAAS i386 images will download. This
-   process can take several minutes, and perhaps over an hour on a slow
-   Internet connection.
+#. Click "Apply changes." The standard MAAS images for the new CPU
+   architectures will download. This process can take several minutes, and
+   perhaps over an hour on a slow Internet connection.
 
-That's it. You can add support for ppc64el, ARM64, or other architectures
-in a similar way. Please consult the Server Certification Team if you need
+#. For architectures other than i386 or AMD64, you must also add support
+   for extra repositories:
+
+   #. Click the Settings tab at the top of the MAAS web UI.
+
+   #. Click Package Repositories in the resulting sub-menu.
+
+   #. Check the Enabled box for the Ubuntu Extra Architectures repository.
+
+   #. For *all* the enabled repositories, click the edit icon in the
+      Actions column, ensure that all the necessary architectures are
+      checked, and then click Save Repository to save the changes.
+
+That's it. Please consult the Server Certification Team if you need
 to certify systems using these CPUs.
 
 .. raw:: pdf
