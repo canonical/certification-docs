@@ -1,3 +1,9 @@
+certification-docs (0.3.7-0ppa1) focal; urgency=medium
+
+  * Updated MANIACS to note removal of i386 support from Ubuntu 20.04
+
+ -- Rod Smith <rod.smith@canonical.com>  Mon, 11 May 2020 11:00:33 -0400
+
 certification-docs (0.3.6-0ppa1) focal; urgency=medium
 
   [ Jeff Lane ]
