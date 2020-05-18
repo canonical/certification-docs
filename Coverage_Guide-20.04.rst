@@ -61,7 +61,7 @@ the next major suite revision.  For example:
 In previous versions of Ubuntu up to 16.04 LTS, we did not test GPGPUs.  Thus
 GPGPUs were Untested items.  As of 18.04 LTS, GPGPU testing was introduced as a
 tech preview test, which is non-blocking.  As of 20.04 LTS, AI/ML focused systems
-MUST pass GPGPU testing (GPGPUs are a blocker here) but standard servers that
+**must** pass GPGPU testing (GPGPUs are a blocker here) but standard servers that
 happen to also have GPGPU options are not gated if GPGPUs are not tested.
 
 The use of Canonical's `Metal as a Service`_ tool is a required part of server
@@ -85,15 +85,16 @@ portal for partners:
 20.04 LTS Coverage Changes
 ==========================
 
-As introduced in the 18.04 LTS cycel, Ubuntu 20.04 LTS continues the policy of
+As introduced in the 18.04 LTS cycle, Ubuntu 20.04 LTS continues the policy of
 Comprehensive Server Certification. This means that all Vendor Approved Options
 for sale with a given model Server must be tested at some point.
 
 Once a Vendor Approved Option has been tested in one Server Model, it does not
 need to be retested for another Server Model.  This increases the scope of
 testing but minimizes the amount of extra test work necessary.  Thus, if Model A
-and Model B both feature Networkcard 1, Networkcard 1 must only be tested once in
-either Model A or Model B, and will be considered tested for both.
+and Model B both feature Networkcard 1, Networkcard 1 is only required to be
+tested once in either Model A or Model B, and will be considered tested for
+both.
 
 Additional changes to Server Certification Test Coverage are highlighted
 below.
@@ -106,23 +107,17 @@ Blocking
   * All supported processor architectures are tested to ensure proper
     functionality.
 
-    * By default, 64-bit Ubuntu is used. 32-bit Ubuntu is used only on
-      processors that are 32-bit. 32-bit Ubuntu is *not* tested on 64-bit
-      processors.
-
   * A general stress test is performed to verify that the system can handle
     a sustained high load for a period of time. This utilizes the test tool
-    "stress-ng" available in the Universe repositories.
+    "stress-ng" available in the Universe repositories. Currently, the
+    following architectures are supported
 
-  * Currently, the following processor architectures are supported and must pass
-    Certification testing
-
-    * Both Intel and AMD CPUs (AMD64 only)
+    * Both Intel and AMD CPUs (64-bit only)
 
     * IBM and OpenPOWER Power 8 and Power 9 (ppc64el)
 
     * ARM64 (ARM64 based Server Models must use a SoC that has been `SoC
-      Certified`_.
+      Certified`_.)
       
     * IBM s390x
 
@@ -147,7 +142,7 @@ Blocking
 
     .. [1] fsdax, raw, and sector modes only, devdax is not currently tested.
 
-* Internal storage (RAID AND Non-RAID) [2]_:
+* Internal storage (RAID **and** Non-RAID) [2]_:
 
   .. [2] Only RAID hardware solutions.
 
@@ -227,9 +222,9 @@ Blocking
 
 * GPGPU Devices
 
-  * Systems that are AI/ML focused MUST pass the GPGPU tests in addition to the
-    standard test plan for certification. These are systems that ship with
-    multiple GPGPUs and are marketed for AI/ML workloads.
+  * Systems that are AI/ML focused, such as those that ship with multiple
+    GPGPUs and marketed for AI/ML workloads, **must** pass the GPGPU tests
+    in addition to the standard test plan for certification.
 
 Non-Blocking
 ------------
@@ -284,14 +279,12 @@ Q & A
 =====
 
 What do you mean by MAAS Compatibility?
-  As of 14.04 LTS, any system that is listed as Certified has been tested
-  with Ubuntu's deployment tools. This means the system can be deployed
-  using Metal as a Service (MAAS) and workloads can be installed to it.  This
-  is determined by using MAAS to provision and deploy the OS onto the target
-  systems to be tested. Additionally, there should be as little human
-  intervention as necessary to perform this task, such as the user manually
-  needing to power the machine on and off between during the provision
-  process.
+  In order to be listed as certified, a system is required to have been
+  deployed using Ubuntu's Metal as a Service (MAAS) tool. This is determined by
+  using MAAS to enlist, commission, and deploy the OS and certification tools
+  onto the target systems to be tested. Additionally, there should be as little
+  human intervention as necessary to perform this task, such as the user
+  manually needing to power the machine on during the initial enlistment phase.
 
 Does changing the speed of processors require a new certificate?
   No. Only changing the CPU family would require retesting and issuing a
@@ -304,7 +297,7 @@ What about non-x86 processors?
 Complete Test Plan
 ==================
 
-The Hardware Certification Testing Coverage aims to test as thoroughly as
+The Hardware Certification Testing Coverage aims to test as thorough as
 possible and ensure that systems and their components are compatible and
 function well with Ubuntu and Ubuntu Tools; however, it is not possible for
 this scope of testing to catch issues that are unique to a system or
