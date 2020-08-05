@@ -1170,8 +1170,8 @@ provided with the Server Test Suite:
 
 - The ``test-nvdimm`` command will run the memory and storage focused tests and
   some NVDIMM health checks. This launcher is intended for testing NVDIMMs
-  configured in mixed mode (See `Configuring DCPMM Devices for Testing`_ for
-  more information).
+  configured in mixed mode. (See `Configuring DCPMM Devices for Testing`_ for
+  more information.)
 
 - The ``test-storage`` command runs tests of storage devices.
 
