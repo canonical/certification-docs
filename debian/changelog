@@ -1,3 +1,9 @@
+certification-docs (0.3.9-0ppa1) focal; urgency=medium
+
+  * Add info on test-nvdimm launcher to STG
+
+ -- Jeff Lane <jeff@ubuntu.com>  Tue, 04 Aug 2020 11:20:30 -0400
+
 certification-docs (0.3.8-0ppa1) focal; urgency=medium
 
   * Add 20.04 Coverage Guide

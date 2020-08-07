@@ -47,10 +47,11 @@ CSM
   Compatbility Support Module -- A feature of many UEFI implementations
   that enables the machine to boot using older BIOS-mode boot loaders.
 
-DCPMM
+DCPMM or NVDIMM
   Intel Optane Datacenter Persistent Memory Module -- A specialized RAM device
   introduced with Cascade Lake that can be configured to provide a block device
-  that sits on the Memory Bus.
+  that sits on the Memory Bus. Generically these are called NVDIMM or
+  Non-Volatile Dual In-line Memory Module.
 
 DHCP
   Dynamic Host Control Protocol -- A method for providing IP
@@ -1167,12 +1168,22 @@ provided with the Server Test Suite:
   check disabled. This is helpful in situations where a network device reports
   an incorrect maximum speed.
 
+- The ``test-nvdimm`` command will run the memory and storage focused tests and
+  some NVDIMM health checks. This launcher is intended for testing NVDIMMs
+  configured in mixed mode. (See `Configuring DCPMM Devices for Testing`_ for
+  more information.)
+
 - The ``test-storage`` command runs tests of storage devices.
 
 - The ``test-usb`` command runs tests of USB ports.
 
 - The ``test-virtualization`` command runs virtualization (KVM and
   LXD) tests.
+
+If you're testing NVDIMMs alone, you should note that ``test-nvdimm`` will run
+both memory and storage stress tests and thus will take a while to run.  If
+your NVDIMMs are configured only in memory or storage mode you can save some
+time by using the ``test-memory`` or ``test-storage`` launchers respectively.
 
 If you're testing Ubuntu 18.04, change the version number in commands that
 include it. Consult your Partner Engineer if you need help
