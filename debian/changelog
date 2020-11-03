@@ -1,3 +1,9 @@
+certification-docs (0.3.10-0ppa1) focal; urgency=medium
+
+  * Update MAAS PPA in MANIACS to point to maas/2.6 
+
+ -- Jeff Lane <jeff@ubuntu.com>  Tue, 03 Nov 2020 15:29:37 -0500
+
 certification-docs (0.3.9-0ppa1) focal; urgency=medium
 
   * Add info on test-nvdimm launcher to STG
