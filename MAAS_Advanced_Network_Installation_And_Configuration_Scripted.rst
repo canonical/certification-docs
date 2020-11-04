@@ -341,7 +341,7 @@ The more specific procedure for using MAAS in certification testing is:
 #. Install the MAAS stable PPA
    (`https://launchpad.net/~maas/+archive/ubuntu/stable <https://launchpad.net/~maas/+archive/ubuntu/stable>`_)::
 
-      $ sudo apt-add-repository ppa:maas/stable
+      $ sudo apt-add-repository ppa:maas/2.6
 
    Currently (late April, 2020), Ubuntu 18.04 installs MAAS 2.4 by default.
    This PPA holds the most recent release version of MAAS 2.6, which is
