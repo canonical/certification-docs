@@ -84,11 +84,12 @@ hardware:
 
    -  Ensure that the MAAS server has two network interfaces.
       Ethernet works best for both connections, but a WiFi link for the
-      external link can work in a pinch.
+      external connection can work in a pinch.
 
-   -  You can install on a virtual machine in a more general-purpose
-      computer, but you'll have to pay careful attention to the network and
-      disk settings.
+   -  You can install on a virtual machine or container  in a more
+      general-purpose computer, but you'll have to pay careful attention to
+      the network and disk settings. `Appendix D: Installing MAAS in a LXD
+      Container`_ describes how to set up MAAS in a LXD container.
 
 *  System Under Test (SUT) that provides one of the power control types
    MAAS supports:
@@ -103,13 +104,13 @@ hardware:
    - IBM Hardware Management Console (HMC)
    - IPMI
    - Intel AMT
+   - LXD (virtual systems)
    - Microsoft OCS - Chassis Manager
    - OpenBMC Power Driver
    - OpenStack Nova
    - Rack Scale Design
    - Redfish
    - SeaMicro 15000
-   - Sentry Switch CDU
    - VMWare
    - Virsh (virtual systems)
 
@@ -124,7 +125,7 @@ hardware:
 
    -  Be sure cables and switches are capable of handling the fastest
       network speeds being tested; for instance, if a SUT has a 100 Gbps
-      NIC, you'll need 100 Gbps cables and switches, not 40 Gbps devices.
+      NIC, you'll need 100 Gbps cables and switches, not 40 Gbps hardware.
 
    -  Please see the Self-Test Guide for further information on network
       requirements for certification testing.
@@ -149,15 +150,12 @@ Once you've assembled the basic hardware for your MAAS server system, you can
 begin preparing it. The initial steps involve installing Ubuntu and setting
 up its most basic network settings:
 
-1. Install Ubuntu 18.04 (Bionic Beaver) to the MAAS server system. (Note
-   that Ubuntu 20.04 changes the way MAAS is installed, so these directions
-   do not apply to Ubuntu 20.04. Procedures to use Ubuntu 20.04 will be
-   released in mid-2020.)
+1. Install Ubuntu 20.04 (Focal Fossa) to the MAAS server system.
 
-   -  The version of Ubuntu Server 18.04 described here can be obtained
+   -  The version of Ubuntu Server 20.04 described here can be obtained
       from
-      http://releases.ubuntu.com/18.04/ubuntu-18.04.4-live-server-amd64.iso.
-      This is an 18.04.4 image, but other images in the 18.04 series will
+      http://releases.ubuntu.com/20.04/ubuntu-20.04.1-live-server-amd64.iso.
+      This is a 20.04.1 image, but other images in the 20.04 series will
       also work.
 
    -  Ubuntu may need access to several network sites in order to function
@@ -168,21 +166,21 @@ up its most basic network settings:
       implements strict outgoing firewall rules, you may need to open
       access to these sites on ports 80 and/or 443.
 
-   -  This guide assumes the use of Ubuntu Server 18.04 and MAAS 2.6.
+   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 2.9.
       Although other versions of Ubuntu and MAAS may work, some details
       will differ. Some notable variants include:
-
-      - If your MAAS server requires use of LVM or other exotic disk
-        configurations, you may need to install using the older
-        Debian-based installation medium, which you can obtain at
-        http://cdimage.ubuntu.com/releases/18.04/release/, rather than by
-        using the "live server" installation medium that's described here;
-        however, some installation details differ from what's described in
-        this document.
 
       - **When you boot the installation medium, you should select the
         "Install Ubuntu Server" option, not any other option.** The
         procedure in this document involves installing MAAS later.
+
+      - Beginning with Ubuntu 20.04, MAAS is installed via a snap by
+        default, rather than the Debian packages used in earlier versions
+        of Ubuntu. Use of an older version of Ubuntu, or of MAAS installed
+        via a Debian package, is no longer recommended; however, if you
+        must do so, `Appendix E: MAAS Packages and Sources`_, describes how
+        to install MAAS via Debian packages on Ubuntu 20.04. Please consult
+        the Server Certification team before doing so.
 
    -  On the *Network connections* screen, configure your network ports:
 
@@ -265,9 +263,9 @@ up its most basic network settings:
 #. When the installation is complete, boot the MAAS computer and log
    in.
 
-#. Type ``ifconfig`` to verify your network configuration. If either
+#. Type ``ip address`` to verify your network configuration. If either
    network port is not properly configured, edit the configuration file in
-   ``/etc/netplan/``. This file may be called ``50-cloud-init.yaml``,
+   ``/etc/netplan/``. This file may be called ``00-installer-config.yaml``,
    ``01-netcfg.yaml``, or something else; the name depends on the
    installation method. A typical configuration should look something like
    this, although likely with different network device names (``eth0`` and
@@ -282,15 +280,10 @@ up its most basic network settings:
             macaddress: 24:8a:07:a3:18:fc
           addresses:
           - 172.24.124.1/22
-          nameservers:
-            search: [ ]
-            addresses: [ ]
-          optional: true
+          nameservers: {}
           mtu: 9000
         eth1:
-          addresses: [ ]
           dhcp4: true
-          optional: true
 
    If your network includes any high-speed network devices (above 10 Gbps),
    you may need to add ``mtu: 9000`` to that device's configuration, and
@@ -314,9 +307,9 @@ up its most basic network settings:
    remotely. If in doubt, don't install X11 and a desktop environment. You
    can always install it later if you discover it's necessary. In most
    cases, you can install X11 and the desktop environment with a single
-   command, such as the following to install Ubuntu 18.04's GNOME::
+   command, such as the following to install Ubuntu 20.04's GNOME::
 
-    sudo apt install ubuntu-gnome-desktop
+    $ sudo apt install vanilla-gnome-desktop
 
 #. Reboot the computer. This enables you to begin using your updated kernel
    (if it was updated) and ensures that your network settings will survive a
@@ -338,15 +331,6 @@ Configuring MAAS is described in generic terms at
 `http://maas.ubuntu.com/docs/install.html <http://maas.ubuntu.com/docs/install.html>`_.
 The more specific procedure for using MAAS in certification testing is:
 
-#. Install the MAAS stable PPA
-   (`https://launchpad.net/~maas/+archive/ubuntu/stable <https://launchpad.net/~maas/+archive/ubuntu/stable>`_)::
-
-      $ sudo apt-add-repository ppa:maas/2.6
-
-   Currently (late April, 2020), Ubuntu 18.04 installs MAAS 2.4 by default.
-   This PPA holds the most recent release version of MAAS 2.6, which is
-   recommended for certification testing.
-
 #. Several scripts and configuration files are available in the
    ``maas-cert-server`` package in the hardware certification PPA. You can
    install the scripts and configuration files as follows::
@@ -356,18 +340,25 @@ The more specific procedure for using MAAS in certification testing is:
 
    The ``maas-cert-server`` package includes a
    dependency on MAAS, so installing ``maas-cert-server`` will also install
-   MAAS, as well as all of MAAS's dependencies.
+   MAAS, as well as all of MAAS's dependencies. Note that the installation
+   process will warn you that MAAS must be set up after installation. **Do
+   not** set it up with the specified command; that will be handled later.
 
-#. Verify that you've installed MAAS 2.6.0 or later, rather than some
-   earlier version::
+#. Verify that MAAS is installed::
+
+      $ snap info maas | grep tracking
+
+   The output should specify the installed MAAS version, which should be at
+   least 2.7. If this command presents no output, you might try looking for
+   a Debian package instead::
 
       $ dpkg -s maas | grep Version
 
-   If the wrong version is installed, fixing the problem (presumably an
-   out-of-date mirror repository or a problem with the ``maas/stable``
-   PPA), upgrading may work. If you upgrade from an earlier version of MAAS,
-   be sure to select the option to upgrade all the configuration files when
-   the package manager asks about this.
+   If MAAS is installed via a Debian package but not a snap, double-check
+   that you're using Ubuntu 20.04 and not an earlier version. If both a
+   snap and an old-looking Debian package (such as version 1:0.7) are
+   installed, that's fine; the Debian package is simply a hook to install
+   the snap.
 
 #. Edit the ``/etc/maas-cert-server/config`` file to be sure that the
    variables it contains are correct. Specifically:
@@ -439,8 +430,25 @@ the script's output.
 Note that at all prompts for a "Y/N" response, the default value is
 capitalized; if you press Enter, that default will be used.
 
-The next question acquires a password for the MAAS administrative account,
-which will have the same name as your default login name::
+The next question acquires a password for a PostgresQL database (with the
+name `maas`) upon which MAAS relies::
+
+    ***************************************************************************
+    * We must set up a PostgresQL account (called 'maas') with a password that
+    * you supply.
+    *
+    * Please enter a password for this account:
+    * Please re-enter the password for verification:
+
+MAAS records this password and uses it itself, so ideally you won't need
+it; but you may need it if you must perform manual database maintenance, so
+it's best to remember the password.
+
+The script will now ask for a password for the MAAS administrative account,
+which will have the same name as your default login name. Note that this
+account is distinct from the PostgresQL account created earlier.
+
+::
 
     ***************************************************************************
     * A MAAS administrative account with a name of ubuntu is being
@@ -517,8 +525,9 @@ mirror::
 
     * Do you want to mirror xenial (Y/n)? y
     * Do you want to mirror bionic (Y/n)? y
-    * Do you want to mirror eoan (Y/n)? n
     * Do you want to mirror focal (Y/n)? y
+    * Do you want to mirror groovy (Y/n)? n
+    * Do you want to mirror hirsute (Y/n)? n
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -573,10 +582,11 @@ If you respond ``Y`` to this question, the script proceeds to ask you what
 Ubuntu versions and architectures to download::
 
     * Cloud Mirror does not exist. Creating.
-    * Do you want to get images for xenial release (Y/n)? y
-    * Do you want to get images for bionic release (y/N)? y
-    * Do you want to get images for eoan release (y/N)? n
-    * Do you want to get images for focal release (y/N)? y
+    * Do you want to get images for xenial release (y/N)? n
+    * Do you want to get images for bionic release (y/N)? n
+    * Do you want to get images for focal release (Y/n)? y
+    * Do you want to get images for groovy release (y/N)? n
+    * Do you want to get images for hirsute release (y/N)? n
     *
     * Do you want to get images for amd64 architecture (Y/n)? y
     * Do you want to get images for i386 architecture (y/N)? n
@@ -584,9 +594,9 @@ Ubuntu versions and architectures to download::
     * Do you want to get images for armhf architecture (y/N)? n
     * Do you want to get images for ppc64el architecture (y/N)? n
     * Do you want to get images for s390x architecture (y/N)? n
-    * Downloading cloud images. This may take some time.
+    * Downloading cloud images.  This may take some time.
     *
-    * Downloading image for xenial on amd64 in the background....
+    * Downloading image for focal on amd64 in the background....
 
 These downloads proceed in the background, with logs stored in
 ``~/.maas-cert-server``, so you can check there if you suspect problems. To
@@ -607,10 +617,11 @@ the default or enter a new value::
     *
     * Type your repository's URL, or press the Enter key:
 
-At this point, the script gives you the option of telling MAAS to begin
-importing its boot resources -- images it uses to enlist, commission, and
-deploy nodes. This process can take several minutes to over an hour to
-complete, so the script gives you the option of deferring this process::
+At this point, the script tells MAAS to begin importing its boot resources
+-- images it uses to enlist, commission, and deploy nodes. This process can
+take several minutes to over an hour to complete, but it will happen in the
+background, so it doesn't ask for permission, but it does tell you what
+it's doing::
 
     ***************************************************************************
     * MAAS requires boot resource images to be useful, and they will now be
@@ -623,11 +634,11 @@ with the ``\-\-import-boot-resources`` (or ``-i``) option.
 
 Sometimes this process hangs. Typically, the boot images end up available
 in MAAS, but the script doesn't move on. If this happens, you can kill the
-script and, if desired, re-launch it to finish the installation.
+script and re-launch it to finish the installation.
 
-After the download of boot resources is begun, the script configures personal package
-archives (PPAs), in which the latest certification software is stored.
-You'll want to configure PPAs for whatever architectures you intend to test::
+The script configures personal package archives (PPAs), in which the latest
+certification software is stored. You'll want to configure PPAs for
+whatever architectures you intend to test::
 
     ***************************************************************************
     * Now we will set up the PPAs necessary for installing the certification
@@ -702,40 +713,39 @@ to modify a few settings. To do so, follow these steps:
 #. Log in to the web UI using your regular username and the password you
    gave to the setup script.
 
-#. Once you log in, MAAS presents an overview screen.
+#. Once you log in, MAAS presents a screen in which you can import
+   additional SSH keys. You can import keys from github or Launchpad, or
+   upload them individually. Once you've imported all the keys you need,
+   scroll down and select Go To Dashboard.
+
+#. MAAS now displays an overview screen on which you can adjust some
+   high-level parameters.
 
    #. Review these settings for sanity. Some show options that were
       set earlier in this process. Most others should be self-explanatory.
       The standard MAAS images are among the items shown. Be sure the Ubuntu
-      versions and architectures you need are checked, and click Save Selection
-      to import anything you need.
+      versions and architectures you need are checked, and click Update
+      Selection to import anything you need.
 
    #. When you're done, click Continue at the bottom of the page.
 
-   #. The next page shows SSH keys. You can add more keys, taken from
-      Github, Launchpad, or copied-and-pasted from your local computer.
-      When you're done adding SSH keys, click Go to Dashboard at the bottom
-      of the page.
-
 #. Once you're fully logged in, click Settings in the top line, followed by
-   Network Services in the resulting sub-menu. You can review several
-   network settings here. A couple that often cause problems are:
+   Network -> DNS in the resulting sub-menu. Review your DNS settings here.
+   The default for Enable DNSSEC Validation of Upstream Zones is Automatic,
+   which must sometimes be adjusted. Some private DNS servers are
+   misconfigured and will cause problems. Changing this setting to No may
+   be required in such cases. (Alternatively, configuring the upstream DNS
+   server to support DNSSEC should fix the problem.) If you change this
+   option, be sure to click Save.
 
-   - *Enable DNSSEC validation of upstream zones* -- Some private DNS
-     servers are misconfigured and will cause problems if this setting is
-     left at the default value of Automatic. Changing this setting to No
-     may be required in such cases. (Alternatively, configuring the
-     upstream DNS server to support DNSSEC should fix the problem.)
-
-   - *Network Discovery* -- In theory, this feature should passively detect
-     devices and should cause no problems. In practice, it sometimes
-     triggers security alerts on the external network.
-
-   After making a change, be sure to click Save *within that subsection.*
+#. Select Network -> Network Discovery. In theory, this feature should
+   passively detect devices and should cause no problems. In practice, it
+   sometimes triggers security alerts on the external network. If you run
+   into this problem, change this setting and click Save.
 
 #. You can review other settings in the MAAS Settings page. This page is
-   broken into several subsections, each of which has a tab near the top of
-   the page -- Users, General, User Scripts, and so on. If you change any
+   broken into several subsections, navigated via the list on the left of
+   the page -- Configuration, Users, Images, and so on. If you change any
    settings, be sure to click the associated "Save" button within that
    section.
 
@@ -772,7 +782,10 @@ to modify a few settings. To do so, follow these steps:
          start and end addresses, and then click Save to save your changes.
 
        - If you want to completely delete the range, click the trash can
-         icon instead of the edit icon.
+         icon instead of the edit icon. To function properly, MAAS must
+         have at least a small reserved range (for the MAAS server itself,
+         at a minimum) and a dynamic range (to support enlisting,
+         commissioning, and deploying nodes).
 
    #.  You can optionally reserve additional ranges by using the Reserve
        Range button, which provides two sub-options: for machines not
@@ -783,7 +796,9 @@ Testing the MAAS Server
 =======================
 
 At this point, your MAAS server should be set up and configured correctly.
-To test it, follow these steps:
+(You may need to wait for images to complete importing, though; go to the
+Images page of the web UI to check the status of this process.) To test
+MAAS, follow these steps:
 
 #. Prepare a computer by configuring it to boot via PXE. This computer
    need not be a computer you plan to certify; anything that can
@@ -800,11 +815,12 @@ To test it, follow these steps:
      some very basic information to the MAAS server.
    
    - Once the node powers itself off you should see it listed in the MAAS
-     machines list (\http://172.24.124.1:5240/MAAS/#/machines/) with a Status
+     machines list (\http://172.24.124.1:5240/MAAS/r/machines) with a Status
      field of "New." If it doesn't appear, try refreshing the page. Also,
-     be sure you check the *Machines* tab, not the *Devices* tab.
+     be sure you check the Hardware -> *Machines* tab, not any other
+     sub-tab of Hardware.
 
-   - Beginning with MAAS 2.6, MAAS will attempt to commission the node
+   - Beginning with MAAS 2.6, MAAS may attempt to commission the node
      immediately after enlisting it. If this succeeds, you can skip ahead
      to the final step of this procedure to test deployment. If
      commissioning fails (as it may if the node uses a power control system
@@ -869,7 +885,7 @@ computer may have a buggy PXE, IPMI, or other subsystem; or you may have
 misconfigured something in the MAAS setup. You may want to review the
 preceding sections to verify that you configured everything correctly. To
 help in debugging problems, the node status page includes sections entitled
-Commissioning, Hardware Tests, Logs, and Events with various pieces of
+Commissioning, Tests, Logs, and Events with various pieces of
 diagnostic information related to commissioning and deployment.
 
 At any time after enlisting a node, you can click the node's hostname near
@@ -907,11 +923,14 @@ ARM64, you must add support for such systems in MAAS:
 
    #. Click the Settings tab at the top of the MAAS web UI.
 
-   #. Click Package Repositories in the resulting sub-menu.
+   #. Click Package Repos in the navigation pane to the left of the page.
 
-   #. Check the Enabled box for the Ubuntu Extra Architectures repository.
+   #. If the Ubuntu Extra Architectures repository is not enabled, click
+      its edit icon, ensure that Enable Repository is checked, and click
+      Save Repository.
 
-   #. For *all* the enabled repositories, click the edit icon in the
+   #. For *all* the enabled repositories (including Ubuntu Extra
+      Architectures), click the edit icon in the
       Actions column, ensure that all the necessary architectures are
       checked, and then click Save Repository to save the changes.
 
@@ -927,9 +946,9 @@ Appendix B: Network Testing Options
 
 A key part of certification is testing your SUT's network cards. This
 document is written with the assumption of a fairly basic configuration;
-however, some labs may have more advanced needs. Differences also exist
-between network configuration
-on Ubuntu 18.04 and earlier LTS releases. Important variables include:
+however, some labs may have more advanced needs. Ubuntu also changed how it
+configures its network devices beginning with version 17.10. Important
+variables include:
 
 * **Multiple simultaneous network tests** -- A single server takes about 60
   minutes per network port to run its network tests -- long enough that
@@ -1149,17 +1168,16 @@ Specifically, MAAS splits the internal network into three parts:
   addresses would either come out of this space or be on another network
   block entirely.
 
-- A DHCP space, which MAAS manages so that it can temporarily address
-  servers when enlisting and commissioning them.
-  Depending on your needs, your BMCs and even deployed nodes may be
-  assigned via DHCP, too.
+- A dynamic (DHCP) space, which MAAS manages so that it can temporarily
+  address servers when enlisting and commissioning them. Depending on your
+  needs, your BMCs and even deployed nodes may be assigned via DHCP, too.
 
 - An automatic space, which is a range of addresses that MAAS assigns to
   nodes. MAAS configures these nodes to use static addresses, not DHCP; but
   although the static addresses will survive reboots, they are likely to
   change between deployments.
 
-In the MAAS subnet configuration page, the reserved and DHCP spaces are
+In the MAAS subnet configuration page, the reserved and dynamic spaces are
 explicitly defined. Any address that does not fall into either of those
 spaces is part of the automatic space.
 
@@ -1175,7 +1193,7 @@ addresses shown in the table will be adjusted appropriately.
 *Purpose*               */22 network*                  */23 network*                   */24 network*
 ======================  =============================  ==============================  ===============================
 Reserved                172.24.124.1 - 172.24.124.255  172.24.124.1 - 172.24.124.50    172.24.124.1 - 172.24.124.9
-Assigned via DHCP       172.24.125.0 - 172.24.125.255  172.24.124.51 - 172.24.124.255  172.24.124.10 - 172.24.124.127
+Dynamic                 172.24.125.0 - 172.24.125.255  172.24.124.51 - 172.24.124.255  172.24.124.10 - 172.24.124.127
 Assigned Automatically  172.24.126.0 - 172.24.127.254  172.24.125.0 - 172.24.125.254   172.24.124.128 - 172.24.124.254
 ======================  =============================  ==============================  ===============================
 
@@ -1209,7 +1227,7 @@ If you want to run MAAS in this way, follow these steps:
    maas-lxc-host``.
 
 #. If you're using a remote SSH session, type ``screen``. The setup process
-   will interrupt network connectivity, so you'll have to reconnect
+   may interrupt network connectivity, so you'll have to reconnect
    mid-process. Better, use a physical console or remote KVM, which will
    not be affected by this interruption.
 
@@ -1220,17 +1238,20 @@ If you want to run MAAS in this way, follow these steps:
    #. If you're running remotely, the script checks to see if ``screen`` is
       in use. If so, you'll be asked to confirm that you want to continue.
 
+   #. At least once, and perhaps multiple times, you'll be asked to enter
+      your password. Do so whenever prompted.
+
    #. The script tries to identify the internal and external network
-      devices on the host, and asks you to verify each identification. It
-      then tweaks the configuration to create network bridges for the
-      future container. Once this is done, the script gives you the option
-      to manually edit the NetPlan configuration file, in case you want to
-      make your own tweaks. Note that the script tries to configure the
-      external network interface (``br1``) using DHCP. This is likely to
-      result in the external network interface's IP address changing
-      compared to its original configuration unless you manually edit it to
-      use a static IP address; but specifying a static IP address may be
-      unreliable.
+      devices on the host, and asks you to verify each one. It then creates
+      network bridges for the future container. Once this is done, the
+      script gives you the option to manually edit the NetPlan
+      configuration file, in case you want to make your own tweaks. Note
+      that the script tries to configure the external network interface
+      (``br1``) using DHCP. This is likely to result in the external
+      network interface's IP address changing compared to its original
+      configuration unless you manually edit it to use a static IP address;
+      but this may not be appropriate. You should make changes suitable for
+      your own network.
 
    #. After configuring the network, your remote network access is likely
       to go down, if you're running remotely. You should be able to
@@ -1258,22 +1279,16 @@ If you want to run MAAS in this way, follow these steps:
       installed on both the host and the container, but using the host as a
       NAT router provides a more direct route to the outside world than
       would be the case if you used the LXD container for this purpose.
-      Typing ``sudo systemctl enable certification-nat`` on the host will
-      configure it to enable NAT on the next reboot, and typing ``sudo
-      service certification-nat start`` will start NAT immediately. Note
-      that if you use the host as the NAT router, you must edit the subnet
-      definition in MAAS (from the "Subnets" link near the top of the MAAS
-      web UI) so that its gateway is the IP address of the host.
+      this topic is covered in more detail shortly.
 
 #. If the ``lxc-setup`` script fails at some point, you can try fixing
-   whatever problem is reported and re-running the script; however, some
-   steps relating to LXC setup may fail when re-run. You can copy the
-   ``/usr/sbin/lxc-setup`` script and comment out the offending lines,
-   which are likely to be the ``sudo lxd init``, ``lxc profile copy``, and
-   ``edit_lxd_profile`` lines in the ``setup_lxd()`` function.
+   whatever problem is reported and re-running the script; however, this
+   use case is not yet well-tested and so may fail. You may need to copy
+   ``/usr/sbin/lxc-setup`` to your home directory and edit it to work
+   around the problems.
 
 The result of this configuration is that the computer will have at least
-four IP addresses: Internal and external for the host computer itself and
+four IP addresses: internal and external for the host computer itself and
 for the LXD container. The latter will run MAAS and an SSH server, but the
 latter may not be usable until you import your SSH public keys into the LXD
 container's ``ubuntu`` account. You can do this from the host by typing::
@@ -1304,6 +1319,28 @@ large files outside of the container may be desirable. You can also install
 Apache on the host and deliver these files from that location, if you
 prefer.
 
+The ``maniacs-setup`` script configures the MAAS server computer (that is,
+the LXD container, when MAAS is installed this way) as the router for the
+internal network. If you want to use the host instead, you must take some
+extra steps:
+
+1. On the host computer, type ``sudo systemctl enable certification-nat``
+   to configure it to enable NAT on the next reboot
+
+#. Type ``sudo service certification-nat start`` on the host to start NAT
+   immediately.
+
+#. In the MAAS web UI, select Subnets from the options at the top of the
+   page, and then select the internal subnet from the list.
+
+#. Click the Edit button to the right of the Subnet Summary section.
+
+#. Change Gateway IP to match the host computer's IP address, rather
+   than the LXD container's IP address. (You can make other changes here,
+   too, if necessary for your network.)
+
+#. Click Save Summary to save your changes.
+
 The ``iperf3`` server is installed on both the host and the LXD container
 at the end of this process, but it's not configured to launch automatically
 from either location. In theory, network tests can use either location as a
@@ -1316,9 +1353,10 @@ will be limited by the capabilities of the host; you can't run full-speed
 tests against both the host and the LXD container and expect to get twice
 the host's native network speed!
 
-A fresh installation of MAAS in a LXC/LXD container will consume about 4.7
-GiB of disk space in the ``/var/lib/lxd/storage-pools/default/containers/``
-directory. This space is likely to grow over time, especially if you add
+A fresh installation of MAAS in a LXC/LXD container will consume about 6
+GiB of disk space in the ``/var/snap/lxd/common`` directory (or
+``/var/lib/lxd/storage-pools/default/containers/``, if using an Ubuntu
+18.04 host). This space is likely to grow over time, especially if you add
 support for multiple Ubuntu versions and CPU architectures to your MAAS
 configuration. (Each new version requires ``cloud-init`` files that consume
 some space.)
@@ -1354,13 +1392,44 @@ tools. For more information, see the official Linux containers
 documentation at https://linuxcontainers.org. You can also type ``lxc``
 with no options to see a summary of sub-commands, or type ``lxc`` with a
 subcommand to see a summary of how to use it, if the subcommand requires
-additional subcommands.
+additional options.
 
 .. raw:: pdf
 
    PageBreak
 
-Appendix E: Glossary
+Appendix E: MAAS Packages and Sources
+=====================================
+
+In Ubuntu 18.04 and earlier, MAAS was typically installed via Debian
+packages. Beginning with Ubuntu 20.04, MAAS is installed via snaps, which
+are a new type of package management system. If you use ``maniacs-setup``
+to install MAAS, the script will use whichever type of packaging system is
+the default for your Ubuntu version; however, it is possible to install
+using Debian packages on an Ubuntu 20.04 system. In most cases, there's no
+need to do this; however, Debian packages can be easier to debug and fix in
+some situations. To use Debian packages, type the following command
+*before* running ``maniacs-setup``::
+
+  $ sudo apt-add-repository ppa:maas/2.9
+
+This command will add the MAAS version 2.9 PPA to the computer's list of
+APT sources, thus overriding the snap package. (You can use another MAAS
+version, if necessary; see https://launchpad.net/~maas for a list of
+official MAAS PPAs. Consult the Server Certification team before using
+anything but a snap or MAAS 2.9 Debian package.)
+
+If you want to install MAAS in a LXC/LXD container using Debian packages,
+you should run the ``lxc-setup`` script, but answer ``N`` to the question
+about setting up MAAS in the container. You should then type ``lxc exec
+lxc-maas bash`` to access the container, run the ``apt-add-repository``
+command specified earlier, and run ``maniacs-setup`` manually.
+
+.. raw:: pdf
+
+   PageBreak
+
+Appendix F: Glossary
 ====================
 
 The following definitions apply to terms used in this document.
