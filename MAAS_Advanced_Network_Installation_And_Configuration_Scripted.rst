@@ -523,7 +523,7 @@ If you respond ``n`` to this question, the script asks you to specify
 another archive site. The script then asks you which Ubuntu releases to
 mirror::
 
-    * Do you want to mirror xenial (Y/n)? y
+    * Do you want to mirror xenial (Y/n)? n
     * Do you want to mirror bionic (Y/n)? y
     * Do you want to mirror focal (Y/n)? y
     * Do you want to mirror groovy (Y/n)? n
