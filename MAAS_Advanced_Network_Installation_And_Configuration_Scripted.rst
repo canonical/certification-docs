@@ -166,7 +166,7 @@ up its most basic network settings:
       implements strict outgoing firewall rules, you may need to open
       access to these sites on ports 80 and/or 443.
 
-   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 2.9.
+   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 2.8 or 2.9.
       Although other versions of Ubuntu and MAAS may work, some details
       will differ. Some notable variants include:
 
