@@ -361,9 +361,6 @@ up the SUT and test environment:
    -  If the SUT's firmware supports PXE-booting in UEFI mode, it must be
       configured to boot in UEFI mode, rather than in BIOS/CSM/legacy mode.
 
-   -  On x86-64 systems, if the UEFI supports it, the SUT must be
-      configured to boot with Secure Boot active.
-
 -  The SUT Firmware should have verifiable identifiers in DMI Types 1, 2 and/or
    3 that match the information entered in the hardware entry on C3.
    
@@ -411,7 +408,7 @@ attention to the following:
      server. This server may be a standard part of the testing network or
      something you bring with you for testing purposes alone. A laptop or a
      small portable computer such as an Intel NUC is sufficient. MAAS
-     version 2.4 or later is required for certification work.
+     version 2.8 or later is required for certification work.
 
   -  When testing multiple SUTs simultaneously, you will need multiple
      ``iperf3`` Targets, one for each SUT. If your ``iperf3`` Target has a
@@ -462,7 +459,7 @@ that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced Network Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 2.6.
+This document describes use of MAAS 2.9.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:
@@ -479,11 +476,10 @@ install Ubuntu on the SUT as follows:
       MAAS server's node list. (You may need to refresh your browser to see
       the new entry.)
 
-   -  MAAS 2.6 will automatically attempt to commission the node
+   -  MAAS 2.6 and later may attempt to commission the node
       immediately after enlisting it, thus skipping the next two steps. If
-      this fails or if you want to change the node's name, you can perform
-      the next two steps manually after the commissioning attempt. The next
-      two steps are also required if you're using an older version of MAAS.
+      this does not happen or if you want to change the node's name, you can perform
+      the next two steps manually after the commissioning attempt.
 
 #. Check and verify the following items in the MAAS server's node details
    page:
@@ -550,7 +546,7 @@ install Ubuntu on the SUT as follows:
 #. Select the Ubuntu release you want to deploy:
 
    - Choose the Ubuntu version you wish to deploy from the list of available
-     Ubuntu releases. The options will appear similar to **Ubuntu 20.04 LTS
+     Ubuntu releases. The options will appear similar to **20.04 LTS
      "Focal Fossa"** in the middle drop-down box.
 
    - Choose the kernel you wish to deploy. The available kernels are in the
@@ -759,6 +755,10 @@ You can initiate a testing session in a server as follows:
 #. Launch ``iperf3`` on the Target server(s) you plan to use by typing::
 
     $ iperf3 -s
+
+   In the case of high-speed (typically, over 10 Gbps) networks, network
+   configuration and launching the ``iperf3`` server are more complex. See
+   `Appendix D - Network Performance Tuning`_ for details.
 
 #. Connect to the SUT via SSH or log in at the console. A standard MAAS
    installation creates a user called ``ubuntu``, as noted earlier. You can
@@ -1287,8 +1287,8 @@ Appendix C - Testing Point Releases
 
 Ubuntu LTS releases are updated to a new *point release* version
 approximately three months after each intervening release -- that is,
-20.04.1 will be released around July of 2020 (three months after 20.04),
-20.04.2 will be released around January of 2021 (three months after 20.10),
+20.04.1 was released in early August of 2020 (about three months after 20.04),
+20.04.2 will be released in early February of 2021 (three months after 20.10),
 and so on. These updates use the kernels from the latest interim release,
 which can affect hardware compatibility; however, the new kernels are
 supported for a limited period of time compared to the GA kernel.
@@ -1299,7 +1299,8 @@ Linux kernels:
    release year (2018 for 18.04, 2020 for 20.04). Ubuntu 18.04 shipped with
    a 4.15.0-series kernel, and 20.04 shipped with a 5.4.0-series kernel.
 
--  The current point release -- That is, version 18.04.4 or whatever is the
+-  The current point release -- That is, version 18.04.5, 20.04.2, or
+   whatever is the
    latest release in the series. Testing point-release versions starting
    with the .2 point release in addition to the original GA version serves
    as a check for regressions in the kernel, and may be required if the GA

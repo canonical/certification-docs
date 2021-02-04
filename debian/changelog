@@ -1,3 +1,10 @@
+certification-docs (0.4.0-0ppa1) focal; urgency=medium
+
+  * Update documentation (especially MANIACS) for MAAS in snaps on
+    Ubuntu 20.04.
+
+ -- Rod Smith <rod.smith@canonical.com>  Mon, 01 Feb 2021 13:41:07 -0500
+
 certification-docs (0.3.10-0ppa1) focal; urgency=medium
 
   * Update MAAS PPA in MANIACS to point to maas/2.6 
