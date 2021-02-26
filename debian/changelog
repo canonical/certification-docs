@@ -1,3 +1,10 @@
+certification-docs (0.4.1-0ppa1) focal; urgency=medium
+
+  * Updated MANIACS with information on how to expand a LXD container's
+    disk image.
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 26 Feb 2021 16:16:40 -0500
+
 certification-docs (0.4.0-0ppa1) focal; urgency=medium
 
   * Update documentation (especially MANIACS) for MAAS in snaps on

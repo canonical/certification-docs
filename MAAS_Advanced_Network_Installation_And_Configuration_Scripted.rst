@@ -1216,6 +1216,9 @@ of minor deviations from the specified procedure.
 
 If you want to run MAAS in this way, follow these steps:
 
+#. Ensure that the host has sufficient disk space. The container consumes
+   128 GiB of disk space, in ``/var/snap/lxd/common/lxd/disks/``.
+
 #. Install Ubuntu Server on the server you want to host the LXD container
    and configure the server's network as described earlier, in `Installing
    and Configuring Ubuntu`_.
@@ -1386,6 +1389,47 @@ but are not limited to:
 * ``lxc snapshot`` -- Creates a snapshot of a specified container.
 
 * ``lxc restore`` -- Restores a snapshot of a specified container.
+
+The ``lxc-setup`` script creates a container that's 128 GiB in size. This
+is normally adequate. (If you create a local APT mirror, that mirror can be
+much bigger than this, but it will normally be hosted in ``/srv``, which is
+a filesystem that's shared with the host, and so does not count against the
+container's size.) Versions of ``lxc-setup`` prior to ``maas-cert-server``
+0.6.2, however, created a container that's only 30 GiB in size. If the
+container fills up, symptoms can include a sluggish container, an
+unresponsive MAAS server, and a high CPU load on the host. You can type
+``df /`` inside the container to check its disk use. If you find the
+container is low on disk space, you may want to begin by reviewing your
+installed images in MAAS. Delete unused images, such as for old releases or
+architectures you don't test. If you're still low on disk space in the
+container, you can increase its size as follows:
+
+#. On the host, verify that ``/var/snap/lxd/common/lxd/disks/default.img``
+   exists. This file should hold the container's filesystem; but its
+   location could differ if you installed in some unusual way or if you're
+   using something other than 20.04 as the host OS.
+
+#. On the host, check to see how much disk space is available in the
+   filesystem that holds the container, as just identified. (This is
+   usually in your root filesystem, ``/``, so ``df -h /`` will give you the
+   information you need.)
+
+#. On the host, type the following commands::
+
+      sudo truncate -s +100G /var/snap/lxd/common/lxd/disks/default.img
+      sudo zpool set autoexpand=on default
+      sudo zpool online -e default /var/snap/lxd/common/lxd/disks/default.img
+      sudo zpool set autoexpand=off default
+
+   If necessary, change the path to the container's filesystem file; and if
+   desired or necessary, change ``+100G`` to a suitable value for a change
+   to the filesystem size. *Be sure that* ``100G`` *is preceded by a plus
+   sign (* ``+`` *)!*
+
+#. Log into the container.
+
+#. Verify that the available disk space has increased, such as by
+   typing ``df -h /``.
 
 This documentation can provide only a brief summary of LXC/LXD commands and
 tools. For more information, see the official Linux containers
