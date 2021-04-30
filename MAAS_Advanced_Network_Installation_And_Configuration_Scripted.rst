@@ -166,7 +166,7 @@ up its most basic network settings:
       implements strict outgoing firewall rules, you may need to open
       access to these sites on ports 80 and/or 443.
 
-   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 2.8 or 2.9.
+   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 2.9.
       Although other versions of Ubuntu and MAAS may work, some details
       will differ. Some notable variants include:
 
@@ -176,11 +176,9 @@ up its most basic network settings:
 
       - Beginning with Ubuntu 20.04, MAAS is installed via a snap by
         default, rather than the Debian packages used in earlier versions
-        of Ubuntu. Use of an older version of Ubuntu, or of MAAS installed
-        via a Debian package, is no longer recommended; however, if you
-        must do so, `Appendix E: MAAS Packages and Sources`_, describes how
-        to install MAAS via Debian packages on Ubuntu 20.04. Please consult
-        the Server Certification team before doing so.
+        of Ubuntu; however, this document describes installing MAAS via
+        Debian packages. Use of an older version of Ubuntu is no longer
+        supported, and use of snaps for MAAS is discouraged.
 
    -  On the *Network connections* screen, configure your network ports:
 
@@ -331,6 +329,10 @@ Configuring MAAS is described in generic terms at
 `http://maas.ubuntu.com/docs/install.html <http://maas.ubuntu.com/docs/install.html>`_.
 The more specific procedure for using MAAS in certification testing is:
 
+#. Enable the MAAS 2.9 PPA::
+
+      $ sudo apt-add-repository ppa:maas/2.9
+
 #. Several scripts and configuration files are available in the
    ``maas-cert-server`` package in the hardware certification PPA. You can
    install the scripts and configuration files as follows::
@@ -346,19 +348,24 @@ The more specific procedure for using MAAS in certification testing is:
 
 #. Verify that MAAS is installed::
 
-      $ snap info maas | grep tracking
+      $ apt-cache policy maas | grep Installed
 
-   The output should specify the installed MAAS version, which should be at
-   least 2.7. If this command presents no output, you might try looking for
-   a Debian package instead::
+   The output should specify the installed MAAS version, which should be
+   1:2.9. If this command reports that a very old-looking version, such as
+   1:0.7, is installed, then chances are something went wrong when adding
+   the MAAS PPA, and the snap version is installed. You can verify this by
+   checking for the snap package::
 
-      $ dpkg -s maas | grep Version
+      $ snap info maas | grep installed
 
-   If MAAS is installed via a Debian package but not a snap, double-check
-   that you're using Ubuntu 20.04 and not an earlier version. If both a
-   snap and an old-looking Debian package (such as version 1:0.7) are
-   installed, that's fine; the Debian package is simply a hook to install
-   the snap.
+   If MAAS is installed via a snap, then it is recommended to:
+
+     #. Uninstall the snap (``sudo snap remove maas``)
+
+     #. Fix the PPA configuration (``sudo apt-add-repository
+        ppa:maas/2.9``)
+
+     #. Re-install MAAS (``sudo apt install maas``).
 
 #. Edit the ``/etc/maas-cert-server/config`` file to be sure that the
    variables it contains are correct. Specifically:
@@ -376,7 +383,9 @@ The more specific procedure for using MAAS in certification testing is:
      (``=``) in the assignments!
 
 #. Optionally create an ``/etc/maas-cert-server/iperf.conf`` file to
-   identify your ``iperf3`` server(s). This file should consist of a single
+   identify your ``iperf3`` server(s). (If you must install MAAS via a
+   snap, this file should be ``/var/snap/maas/current/iperf.conf``.)
+   This file should consist of a single
    line that contains a comma-delimited list of IP addresses, each
    identifying a different ``iperf3`` server. If this file
    is absent, SUTs will configure themselves to use their network gateways
@@ -1442,38 +1451,7 @@ additional options.
 
    PageBreak
 
-Appendix E: MAAS Packages and Sources
-=====================================
-
-In Ubuntu 18.04 and earlier, MAAS was typically installed via Debian
-packages. Beginning with Ubuntu 20.04, MAAS is installed via snaps, which
-are a new type of package management system. If you use ``maniacs-setup``
-to install MAAS, the script will use whichever type of packaging system is
-the default for your Ubuntu version; however, it is possible to install
-using Debian packages on an Ubuntu 20.04 system. In most cases, there's no
-need to do this; however, Debian packages can be easier to debug and fix in
-some situations. To use Debian packages, type the following command
-*before* running ``maniacs-setup``::
-
-  $ sudo apt-add-repository ppa:maas/2.9
-
-This command will add the MAAS version 2.9 PPA to the computer's list of
-APT sources, thus overriding the snap package. (You can use another MAAS
-version, if necessary; see https://launchpad.net/~maas for a list of
-official MAAS PPAs. Consult the Server Certification team before using
-anything but a snap or MAAS 2.9 Debian package.)
-
-If you want to install MAAS in a LXC/LXD container using Debian packages,
-you should run the ``lxc-setup`` script, but answer ``N`` to the question
-about setting up MAAS in the container. You should then type ``lxc exec
-lxc-maas bash`` to access the container, run the ``apt-add-repository``
-command specified earlier, and run ``maniacs-setup`` manually.
-
-.. raw:: pdf
-
-   PageBreak
-
-Appendix F: Glossary
+Appendix E: Glossary
 ====================
 
 The following definitions apply to terms used in this document.
