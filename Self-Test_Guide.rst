@@ -1146,7 +1146,7 @@ relevant USB tests will fail. Another common source of problems is
 network tests, which can fail because of busy LANs, flaky switches, bad
 cables, and so on. When this happens, you must re-run the relevant
 test(s). Broadly speaking, there are two ways to re-run tests: via a
-limited test script and by install updated test scripts.
+limited test script and by installing updated test scripts.
 
 Running a Limited Test Script
 -----------------------------
