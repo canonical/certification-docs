@@ -1,3 +1,12 @@
+certification-docs (0.4.3-0ppa1) focal; urgency=medium
+
+  * Add information about the need to disable the "minimum password
+    change interval" on some servers to both MANIACS and the STG.
+  * Remove mention of certify-advanced from the STG, since some
+    users are using it inappropriately.
+
+ -- Rod Smith <rod.smith@canonical.com>  Mon, 17 May 2021 11:01:34 -0400
+
 certification-docs (0.4.2-0ppa1) focal; urgency=medium
 
   * Revert most snap information, since snaps have proven to be
