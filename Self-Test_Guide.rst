@@ -513,6 +513,15 @@ install Ubuntu on the SUT as follows:
       pass more information about itself to the MAAS server, and then power
       down again.
 
+   -  Some servers provide an option called "minimum password change
+      interval," or something similar, in their BMCs' web-based interfaces,
+      that prevents BMC passwords from being changed very frequently. MAAS
+      will attempt to change the password upon commissioning, though, and
+      if this is done immediately after enlisting the node, it will fail.
+      If the BMC configuration commissioning step fails, you may need to
+      set this minimum password change interval to 0 or otherwise disable
+      this feature, then try commissioning again.
+
 #. Check and, if necessary, adjust the following node details:
 
    - On the Interfaces tab, ensure that all the node's interfaces are
@@ -1137,8 +1146,7 @@ relevant USB tests will fail. Another common source of problems is
 network tests, which can fail because of busy LANs, flaky switches, bad
 cables, and so on. When this happens, you must re-run the relevant
 test(s). Broadly speaking, there are two ways to re-run tests: via a
-limited test script and by manually selecting a subset of tests. You may
-also need to install updated test scripts in some cases.
+limited test script and by install updated test scripts.
 
 Running a Limited Test Script
 -----------------------------
@@ -1194,52 +1202,6 @@ would for a complete test run. You can then request a certificate based on
 the main results (the one with the most passed tests) and refer to the
 secondary set of results in the certificate notes. This procedure ensures
 that all the necessary data will be present on C3.
-
-Manually Selecting a Subset of Tests
-------------------------------------
-
-If you need to run a mish-mash of different tests, you can do so via the
-``certify-advanced`` command:
-
-#. Run::
-
-    $ certify-advanced
-
-#. Press the Enter key. The system will display a Suite Selection
-   screen:
-
-   .. figure:: images/suite-selection-focal.png
-      :alt: The Select Test Plan screen enables you to pick which
-            tests to run
-      :width: 100%
-
-#. Select the *20.04 Server Certification Full* item by using the arrow
-   keys and then pressing Spacebar. (In some cases, another selection may
-   be appropriate. For instance, if you need to re-run a single network
-   test, you might select *20.04 Network Only Test Plan*.)
-
-#. Press Enter to move on to the test selection screen.
-
-#. After a few seconds, a test selection screen will appear, as shown
-   below. Using this screen is fairly straightforward -- you can use Enter
-   to expand or collapse a category, the spacebar to select or deselect an
-   option or category, arrow keys to navigate through the options, and so
-   on. Using these controls, de-select all the tests you do *not* want to
-   run, leaving only the relevant tests selected.
-
-   .. figure:: images/test-selection-focal.png
-      :alt: The suite selection screen enables you to pick which
-            tests to run
-      :width: 100%
-
-#. Press the *T* key to start testing. The screen will begin displaying a
-   scrolling set of technical details about the tests as they are
-   performed.
-
-#. When the test run is complete, submit the test results in the same way
-   you would for a complete test run, and then request a certificate based
-   on the main test run, including a note referring to this secondary run
-   to complete the results.
 
 Installing and Running Updated Tests
 ------------------------------------

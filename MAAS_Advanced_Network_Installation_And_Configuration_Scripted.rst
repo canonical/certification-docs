@@ -866,6 +866,15 @@ MAAS, follow these steps:
 
    - Once it's done, the UI will show a Status of "Ready."
 
+   - Some servers provide an option called "minimum password change
+     interval," or something similar, in their BMCs' web-based interfaces,
+     that prevents BMC passwords from being changed very frequently. MAAS
+     will attempt to change the password upon commissioning, though, and if
+     this is done immediately after enlisting the node, it will fail. If
+     the BMC configuration commissioning step fails, you may need to set
+     this minimum password change interval to 0 or otherwise disable this
+     feature, then try commissioning again.
+
 #. Once the system powers off after commissioning, click "Take Action"
    followed by "Deploy." You must then click "Deploy machine" to confirm
    this action.
