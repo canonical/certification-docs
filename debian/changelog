@@ -1,3 +1,10 @@
+certification-docs (0.4.4-0ppa1) UNRELEASED; urgency=medium
+
+  * Added information on an in-MAAS workaround to the "minimum password
+    change interval" problem to MANIACS and STG.
+
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 19 May 2021 15:31:01 -0400
+
 certification-docs (0.4.3-0ppa1) focal; urgency=medium
 
   * Add information about the need to disable the "minimum password
