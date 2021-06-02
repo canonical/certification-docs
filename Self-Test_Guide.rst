@@ -520,7 +520,10 @@ install Ubuntu on the SUT as follows:
       if this is done immediately after enlisting the node, it will fail.
       If the BMC configuration commissioning step fails, you may need to
       set this minimum password change interval to 0 or otherwise disable
-      this feature, then try commissioning again.
+      this feature, then try commissioning again. Alternatively, checking
+      the "Skip configuring supported BMC controllers with a MAAS generated
+      username and password" option when commissioning the node may work
+      around this problem.
 
 #. Check and, if necessary, adjust the following node details:
 
