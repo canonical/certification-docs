@@ -1,4 +1,11 @@
-certification-docs (0.4.4-0ppa1) UNRELEASED; urgency=medium
+certification-docs (0.4.5-0ppa1) focal; urgency=medium
+
+  * Documented need to use precheck script to fix APT issues
+  * Documented some common virtualization test problems
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 02 Jul 2021 15:12:37 -0400
+
+certification-docs (0.4.4-0ppa1) focal; urgency=medium
 
   * Added information on an in-MAAS workaround to the "minimum password
     change interval" problem to MANIACS and STG.
