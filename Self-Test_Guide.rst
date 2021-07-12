@@ -145,7 +145,7 @@ The highlights of this process are:
 
 #. Check the SUT's configuration. (The ``canonical-certification-precheck``
    script, described in `Running the Certification
-   Tests`_, can help with this.)
+   Tests`_, can help with this, among other things.)
 
 #. Run the test suite on the SUT, as described in `Running the
    Certification Tests`_.
@@ -787,7 +787,10 @@ You can initiate a testing session in a server as follows:
 
 #. You should double-check that the server's configuration is correct by
    running the ``canonical-certification-precheck`` script, which tests
-   critical configuration details:
+   critical configuration details and fixes some common problems:
+
+   - The script completes APT configuration, which is sometimes incomplete
+     at system installation.
 
    - If the script detects that the
      ``/etc/xdg/canonical-certification.conf`` file is missing information,
@@ -1548,6 +1551,28 @@ tests. Specific suggestions for fixing these problems include:
 If you end up having to re-run the network tests, you can do so as
 described earlier, in `Appendix B - Re-Testing and Installing Updated
 Tests`_.
+
+Fixing Virtualization Test Problems
+-----------------------------------
+
+Virtualization tests can fail for a number of reasons. If these tests fail,
+you should first try these diagnostic or corrective actions:
+
+- Type ``sudo apt install -f`` on the SUT. This command repairs some
+  package installation problems, which can sometimes cause the KVM test to
+  fail.
+
+- Check your virtualization image sources, as described in `Running the
+  Certification Tests`_. Note that you may need to check the configuration
+  on the SUT (in ``/etc/xdg/canonical-certification.conf``) and on whatever
+  server you use to host your virtualization images.
+
+- If you're *not* hosting virtualization images locally, be aware that the
+  virtualization tests will try to download images from the Internet. In
+  this case, you must ensure that the SUT has Internet access.
+
+You can run the virtualization tests alone by typing
+``test-virtualization`` on the SUT.
 
 Handling Miscellaneous Issues During Testing
 --------------------------------------------
