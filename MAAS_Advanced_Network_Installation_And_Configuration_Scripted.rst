@@ -641,7 +641,7 @@ If the download of boot resources fails and you want to initiate it
 manually later, you can use the MAAS web UI or launch ``maniacs-setup``
 with the ``\-\-import-boot-resources`` (or ``-i``) option.
 
-Sometimes this process hangs. Typically, the boot images end up available
+Sometimes this process freezes. Typically, the boot images end up available
 in MAAS, but the script doesn't move on. If this happens, you can kill the
 script and re-launch it to finish the installation.
 
@@ -730,7 +730,7 @@ to modify a few settings. To do so, follow these steps:
 #. MAAS now displays an overview screen on which you can adjust some
    high-level parameters.
 
-   #. Review these settings for sanity. Some show options that were
+   #. Review these settings. Some show options that were
       set earlier in this process. Most others should be self-explanatory.
       The standard MAAS images are among the items shown. Be sure the Ubuntu
       versions and architectures you need are checked, and click Update

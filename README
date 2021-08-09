@@ -42,11 +42,11 @@ Guacamole libs:
  sudo apt-get install python3-guacamole
 
 To use the script, you will also need the source for checkbox (for the job
-files) and the whitelist you wish to use to build the guide from.
+files) and the allowlist you wish to use to build the guide from.
 
 Execute the script like this (ex. 16.04 Test Case Guide):
 
- $ mk-test-case-guide -w path/to/whitelist -j path/to/jobs dir --preamble
+ $ mk-test-case-guide -a path/to/allowlist -j path/to/jobs dir --preamble
  testcase-preample.rst --output Test_Case_Guide_16.04.rst
 
 To build the Test Case Guide alone, once you've created the RST file, simply:

@@ -289,10 +289,10 @@ miscellanea/check_prerelease
  versions of the kernel and the OS.
 
 miscellanea/cpus_are_not_samples
- Sanity check of CPU information; fails if CPU is an engineering sample
+ Quick check of CPU information; fails if CPU is an engineering sample
 
 miscellanea/dmitest_server
- Sanity check of DMI system identification data (for servers)
+ Quick check of DMI system identification data (for servers)
 
 miscellanea/efi_boot_mode
  Test to verify that the system booted in EFI mode with Secure Boot active.

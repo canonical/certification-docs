@@ -1,3 +1,9 @@
+certification-docs (0.4.6-0ppa1) hirsute; urgency=medium
+
+  * Update all documentation files for inclusive language
+
+ -- Rod Smith <rod.smith@canonical.com>  Mon, 09 Aug 2021 13:26:43 -0400
+
 certification-docs (0.4.5-0ppa1) focal; urgency=medium
 
   * Documented need to use precheck script to fix APT issues

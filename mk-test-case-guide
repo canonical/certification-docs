@@ -53,7 +53,7 @@ class make_guide(Command):
         """
         tpfile = '/usr/share/plainbox-provider-certification-server/units/server-full-18.04.pxu'
         jdir = '/usr/share/plainbox-provider-checkbox/units'
-        parser.add_argument('--whitelist', '-w', help='the whitelist file',
+        parser.add_argument('--allowlist', '-a', help='the allowlist file',
                             default=tpfile)
         parser.add_argument('--jobs', '-j', help='the jobs directory',
                             default=jdir)
@@ -63,17 +63,17 @@ class make_guide(Command):
         parser.add_argument('--output', '-o', help='the output .rst file',
                             default='testcase.rst')
 
-    def find_tests(whitelist_file):
+    def find_tests(allowlist_file):
         """
-        Build a list of tests from the whitelist file.
+        Build a list of tests from the allowlist file.
 
-        :param whitelist_file:
+        :param allowlist_file:
             Filename of file containing test names.
         :returns:
             List of dictionaries; each dictionary has 'category' and 'test'
             entries.
 
-        This function reads and ignores lines from whitelist_file until a
+        This function reads and ignores lines from allowlist_file until a
         line with nothing but "include:" is encountered. Thereafter, the
         function discards lines that begin with "#", discards lines that
         contain "*", records any line that starts with "__" as a category name
@@ -85,7 +85,7 @@ class make_guide(Command):
         category = 'uncategorized'
         test_list = []
         try:
-            with open(whitelist_file) as f:
+            with open(allowlist_file) as f:
                 for line in f:
                     if 'certification-status' not in line:
                         line = ''.join(line.split())
@@ -103,7 +103,7 @@ class make_guide(Command):
                         test_list.append(dict([('category', category),
                                                ('test', testname)]))
         except FileNotFoundError:
-            print('Could not open whitelist file ({})!'.format(whitelist_file))
+            print('Could not open allowlist file ({})!'.format(allowlist_file))
             print('Aborting!')
             exit(1)
         return test_list
@@ -275,12 +275,12 @@ class make_guide(Command):
             successful exit status (return code zero).
         """
         print('')
-        print('Whitelist file: {}'.format(ctx.args.whitelist))
+        print('allowlist file: {}'.format(ctx.args.allowlist))
         print('Jobs directory: {}'.format(ctx.args.jobs))
         print('Preamble file: {}'.format(ctx.args.preamble))
         print('Output file: {}'.format(ctx.args.output))
         print('')
-        test_list = make_guide.find_tests(ctx.args.whitelist)
+        test_list = make_guide.find_tests(ctx.args.allowlist)
         make_guide.add_descriptions(test_list, ctx.args.jobs)
         make_guide.create_rst_file(test_list, ctx.args.preamble,
                                    ctx.args.output)
