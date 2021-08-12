@@ -48,7 +48,7 @@ DHCP
   Dynamic Host Control Protocol -- A method for providing IP
   addresses to the SUT and Targets.
 
-Greylist test
+Non-Blocking test
   A test that must be performed but will not affect the
   granting of a certified status.
 
@@ -105,7 +105,7 @@ Test case
   include things such as "stress test of system memory" and "test the CPU
   for clock jitter."
 
-Whitelist test
+Blocking test
   A test that *must* pass for the SUT to be granted a certified status.
 
 Understanding the Certification Process
@@ -779,7 +779,7 @@ You can initiate a testing session in a server as follows:
    below. You should ordinarily leave all the tests selected. (Tests that
    are irrelevant for a given computer, such as tests of the optical drive
    on computers that lack this hardware, are automatically ignored.) If a
-   test is hanging or otherwise causing problems, please contact the
+   test is freezing or otherwise causing problems, please contact the
    Canonical Server Certification Team for advice on how to proceed. Using
    this screen is fairly straightforward -- you can use Enter to expand
    or collapse a category, the spacebar to select or deselect an option
@@ -841,7 +841,7 @@ green color, with the word "PASSED." Note, however, that *a failed test
 does not necessarily denote a failed certification*. Reasons a test might
 fail but still enable a certification to pass include the following:
 
--  A test may be a greylist test, as described in the `Ubuntu Server
+-  A test may be a Non-Blocking test, as described in the `Ubuntu Server
    Hardware Certification Coverage` document, available from
    https://certification.canonical.com.
 
@@ -1032,7 +1032,7 @@ single test script, the preferred method is:
 
 #. Re-run ``canonical-certification-server``.
 
-#. Use one of the abbreviated testing whitelists (such as *Network Only*)
+#. Use one of the abbreviated testing procedures (such as *Network Only*)
    or adjust the set of tests to be run.
 
 #. Submit the resulting ``submission_<DATECODE>.xml`` file to the C3 site.
