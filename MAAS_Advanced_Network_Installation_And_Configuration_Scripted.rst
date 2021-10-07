@@ -82,7 +82,7 @@ the following requirements:
 
 *  Network
 
-   -  The MAAS server should be on it's own VLAN or physically segregated network.
+   -  The MAAS server should be on its own VLAN or physically segregated network.
       This is because MAAS will provide DHCP, DNS and PXE services.
 
    -  The network should have the capabilities to match the fastest network
@@ -94,7 +94,7 @@ the following requirements:
       Ethernet works best for both connections, but a WiFi link for the
       external connection can work in a pinch.
 
-   -  At a minmum, the external port should be able to access the internet
+   -  At a minmum, the external port should be able to access the Internet
       while the internal port must be on its own VLAN or physically segregated
       LAN to avoid conflicts with other network servers providing DHCP, DNS or
       PXE. Note, that external access should be protected as mentioned above in
