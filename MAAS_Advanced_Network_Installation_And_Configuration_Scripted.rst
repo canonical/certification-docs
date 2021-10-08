@@ -74,17 +74,31 @@ Thus, it is unwise to expose the MAAS computer directly to the Internet.
 You should either secure it with strict local firewall rules or place it
 behind a strong firewall running on a router between it and the Internet.
 
-Hardware Required
-=================
+Prerequisits
+============
 
-Before beginning, you should ensure that you have the following
-hardware:
+Before beginning, you should ensure that your hardware and network meet
+the following requirements:
+
+*  Network
+
+   -  The MAAS server should be on its own VLAN or physically segregated network.
+      This is because MAAS will provide DHCP, DNS and PXE services.
+
+   -  The network should have the capabilities to match the fastest network
+      device being tested. This will be covered in more detail later.
 
 *  MAAS server
 
    -  Ensure that the MAAS server has two network interfaces.
       Ethernet works best for both connections, but a WiFi link for the
       external connection can work in a pinch.
+
+   -  At a minmum, the external port should be able to access the Internet
+      while the internal port must be on its own VLAN or physically segregated
+      LAN to avoid conflicts with other network servers providing DHCP, DNS or
+      PXE. Note, that external access should be protected as mentioned above in
+      `Purpose`_ above.
 
    -  You can install on a virtual machine or container  in a more
       general-purpose computer, but you'll have to pay careful attention to

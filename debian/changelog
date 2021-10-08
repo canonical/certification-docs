@@ -1,3 +1,12 @@
+certification-docs (0.4.7-0ppa1) focal; urgency=medium
+
+  * Update STG to insist on enabling IPMI-over-LAN
+  * Update MANIACs to be more specific about Network prerequisits
+  * remove 16.04 stuff that is no longer necessary
+  * create .gitignore so it won't try to add pdf or html file
+
+ -- Jeff Lane <jeff@ubuntu.com>  Wed, 06 Oct 2021 15:06:00 -0400
+
 certification-docs (0.4.6-0ppa1) hirsute; urgency=medium
 
   * Update all documentation files for inclusive language

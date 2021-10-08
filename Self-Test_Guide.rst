@@ -353,6 +353,9 @@ up the SUT and test environment:
 -  BIOS/UEFI should be configured using factory default settings, with the
    following exceptions:
 
+   -  Many systems ship with **IPMI-over-LAN** disabled by default. This will need
+      to be enabled to ensure MAAS can remotely manage the SUT.
+
    -  If the hardware virtualization options in the BIOS/UEFI are not
       enabled, enable them, save the settings and allow the SUT to reboot.
 
