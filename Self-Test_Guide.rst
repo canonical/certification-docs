@@ -1577,6 +1577,36 @@ you should first try these diagnostic or corrective actions:
 You can run the virtualization tests alone by typing
 ``test-virtualization`` on the SUT.
 
+Handling Secure Boot MOKs
+-------------------------
+
+Although most Ubuntu components, such as GRUB, the Linux kernel, and
+standard Linux kernel modules, are cryptographically signed with
+Canonical's key, some third-party and specialized modules (notably
+including some used by the firmware test suite, or ``fwts``) are not so
+signed. To use such modules, they must be signed with a machine owner key
+(MOK), which is stored in the computer's NVRAM; and to store the MOK, UEFI
+Secure Boot policy requires manual boot-time approval. Thus, if the
+computer is deployed with Secure Boot active and certain packages are
+updated via ``apt``, the ``apt`` program will prompt for a password and,
+upon reboot, the computer's console will display a prompt to enter a
+password, and the MOK will be added only if the password matches the one
+you entered as part of the ``apt`` package update. The prompt at reboot has
+no timeout, so if you can't see the console, the reboot will fail.
+
+If console access is not available, it's best to configure computers with
+Secure Boot disabled; however, as a general rule, we encourage use of
+Secure Boot so as to ensure that this feature works. "Console access" can
+be via a remote KVM or even IPMI SoL. Enabling and disabling Secure Boot
+generally requires this access, too.
+
+Repeatedly deploying a server with Secure Boot active may result in the
+accumulation of multiple MOKs in the computer's NVRAM. In theory, these
+could grow to consume enough space in the NVRAM to cause problems. Typing
+``sudo mokutil --reset`` at an Ubuntu console will cause all the MOKs to be
+deleted; however, this will cause kernel modules signed with a MOK to fail
+to load. It's best to use this command just prior to releasing a node.
+
 Handling Miscellaneous Issues During Testing
 --------------------------------------------
 
