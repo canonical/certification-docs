@@ -1,3 +1,11 @@
+certification-docs (0.4.8-0ppa1) focal; urgency=medium
+
+  * Update STG to document potential problems with MOKs
+    installed as part of an apt update when Secure Boot
+    is active.
+
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 08 Dec 2021 15:25:18 -0500
+
 certification-docs (0.4.7-0ppa1) focal; urgency=medium
 
   * Update STG to insist on enabling IPMI-over-LAN
