@@ -1,9 +1,9 @@
 Source: certification-docs
 Section: doc
 Priority: optional
-Maintainer: Rod Smith <rod.smith@canonical.com>
+Maintainer: Rod Smith <rod.smith@ubuntu.com>
 Uploaders: Jeff Lane <jeff@canonical.com>
-Build-Depends: debhelper (>= 9.0.0), rst2pdf, ttf-ubuntu-font-family, python-pil
+Build-Depends: debhelper (>= 9.0.0), rst2pdf, ttf-ubuntu-font-family
 Standards-Version: 3.9.5
 Homepage: https://launchpad.net/certification-docs
 #Vcs-Bzr: lp:certification-docs
