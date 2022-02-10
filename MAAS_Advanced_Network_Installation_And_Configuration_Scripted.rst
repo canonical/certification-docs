@@ -56,9 +56,7 @@ server can use for external connections, as well as the availability of at
 least one system under test (SUT) for testing at the end of the process.
 (Note that the Internet connection is required for initial setup, but a
 properly-configured MAAS server, with local APT repository mirrors, does
-not need this connection to bring up SUTs.) Once configured, you will be
-able to move the MAAS server from one site to another, repopulating the
-MAAS LAN at each site.
+not need this connection to bring up SUTs.)
 
 .. figure:: images/maniac-network.png
    :alt: This document describes configuring a server that manages its own
@@ -74,8 +72,8 @@ Thus, it is unwise to expose the MAAS computer directly to the Internet.
 You should either secure it with strict local firewall rules or place it
 behind a strong firewall running on a router between it and the Internet.
 
-Prerequisits
-============
+Prerequisites
+=============
 
 Before beginning, you should ensure that your hardware and network meet
 the following requirements:
@@ -83,7 +81,7 @@ the following requirements:
 *  Network
 
    -  The MAAS server should be on its own VLAN or physically segregated network.
-    Â  This is because MAAS will provide DHCP, DNS and PXE services.
+      This is because MAAS will provide DHCP, DNS and PXE services.
 
    -  The network should have the capabilities to match the fastest network
       device being tested. This will be covered in more detail later.
@@ -91,13 +89,11 @@ the following requirements:
 *  MAAS server
 
    -  Ensure that the MAAS server has two network interfaces.
-      Ethernet works best for both connections, but a WiFi link for the
-      external connection can work in a pinch.
 
    -  At a minmum, the external port should be able to access the Internet
       while the internal port must be on its own VLAN or physically segregated
       LAN to avoid conflicts with other network servers providing DHCP, DNS or
-      PXE. Note, that external access should be protected as mentioned above in
+      PXE. Note that external access should be protected as mentioned above in
       `Purpose`_ above.
 
    -  You can install on a virtual machine or container  in a more
@@ -112,36 +108,36 @@ the following requirements:
    - Christmann RECS|Box Power Driver
    - Cisco UCS Manager 
    - Digital Loggers, Inc. PDU
+   - Eaton PDU
    - Facebook's Wedge
    - HP Moonshot - iLO Chassis Manager
    - HP Moonshot - iLO (IPMI)
-   - IBM Hardware Management Console (HMC)
+   - IBM Hardware Management Console (HMC) for PowerPC
+   - IBM Hardware Management Console (HMC) for Z
    - IPMI
    - Intel AMT
    - LXD (virtual systems)
    - Microsoft OCS - Chassis Manager
    - OpenBMC Power Driver
    - OpenStack Nova
-   - Rack Scale Design
+   - Proxmox
    - Redfish
    - SeaMicro 15000
    - VMWare
    - Virsh (virtual systems)
+   - Webhook
 
-*  Gigabit or faster switch (we recommend 8 ports minimum)
+*  Switches capable of handling the highest-speed network devices under
+   test.
 
-   -  Sufficient Ethernet cables
-
-      - For MAAS server: one cable for each port to be connected to a
-        switch (optionally including its BMC, if it is so equipped)
-
-      - For each SUT: one Ethernet cable for each NIC port including the BMC
+   -  Sufficient Ethernet cables to connect all network ports on the SUTs
+      and the MAAS server, including their BMCs.
 
    -  Be sure cables and switches are capable of handling the fastest
       network speeds being tested; for instance, if a SUT has a 100 Gbps
       NIC, you'll need 100 Gbps cables and switches, not 40 Gbps hardware.
 
-   -  Please see the Self-Test Guide for further information on network
+   -  Please see the Self-Testing Guide for further information on network
       requirements for certification testing.
 
 *  Monitor and keyboard for SUT (helpful, but not strictly required)
@@ -154,8 +150,8 @@ the following requirements:
 
 Note that these hardware requirements are geared toward a typical
 testing environment. You may need to expand this list in some cases. For
-instance, if you test multiple servers simultaneously, you may need
-additional Ethernet ports and cables.
+instance, if you test network devices of varying speeds, you may need
+multiple switches and cable types to handle them all.
 
 Installing and Configuring Ubuntu
 =================================
@@ -167,10 +163,10 @@ up its most basic network settings:
 1. Install Ubuntu 20.04 (Focal Fossa) to the MAAS server system.
 
    -  The version of Ubuntu Server 20.04 described here can be obtained
-      from
-      http://releases.ubuntu.com/20.04/ubuntu-20.04.1-live-server-amd64.iso.
-      This is a 20.04.1 image, but other images in the 20.04 series will
-      also work.
+      from http://releases.ubuntu.com/20.04/. Be sure to download the *live
+      server* version. Any version within the 20.04 series, such as 20.04.3
+      or 20.04.4, should work. Using the latest point-release available is
+      recommended.
 
    -  Ubuntu may need access to several network sites in order to function
       properly. These include repositories at ``archive.ubuntu.com`` (or a
@@ -180,9 +176,9 @@ up its most basic network settings:
       implements strict outgoing firewall rules, you may need to open
       access to these sites on ports 80 and/or 443.
 
-   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 2.9.
+   -  This guide assumes the use of Ubuntu Server 20.04 and MAAS 3.1.
       Although other versions of Ubuntu and MAAS may work, some details
-      will differ. Some notable variants include:
+      will differ. Some notable caveats include:
 
       - **When you boot the installation medium, you should select the
         "Install Ubuntu Server" option, not any other option.** The
@@ -214,12 +210,6 @@ up its most basic network settings:
           it up to use DHCP, which is appropriate. You can adjust it if
           necessary, though.
 
-        - If you intend to use WiFi for your external network, you may be
-          best served by installing NetworkManager, which NetPlan can use
-          to manage the WiFi link. See
-          https://djanotes.blogspot.com/2018/03/connecting-to-wifi-network-with-netplan.html
-          for an example.
-
       - Configure your *internal* network port:
 
         - If your MAAS server's network devices vary in speed or
@@ -247,8 +237,8 @@ up its most basic network settings:
 
       - If you can't easily differentiate the two ports during
         installation, you can configure one or both of them after
-        completing the Ubuntu installation. Note that Ubuntu 17.10 and
-        later use NetPlan for network configuration; see
+        completing the Ubuntu installation. Ubuntu
+        uses NetPlan for network configuration; see
         https://wiki.ubuntu.com/Netplan/Design and https://netplan.io for
         details.
 
@@ -343,9 +333,9 @@ Configuring MAAS is described in generic terms at
 `http://maas.ubuntu.com/docs/install.html <http://maas.ubuntu.com/docs/install.html>`_.
 The more specific procedure for using MAAS in certification testing is:
 
-#. Enable the MAAS 2.9 PPA::
+#. Enable the MAAS 3.1 PPA::
 
-      $ sudo apt-add-repository ppa:maas/2.9
+      $ sudo apt-add-repository ppa:maas/3.1
 
 #. Several scripts and configuration files are available in the
    ``maas-cert-server`` package in the hardware certification PPA. You can
@@ -365,7 +355,7 @@ The more specific procedure for using MAAS in certification testing is:
       $ apt-cache policy maas | grep Installed
 
    The output should specify the installed MAAS version, which should be
-   1:2.9. If this command reports that a very old-looking version, such as
+   1:3.1. If this command reports that a very old-looking version, such as
    1:0.7, is installed, then chances are something went wrong when adding
    the MAAS PPA, and the snap version is installed. You can verify this by
    checking for the snap package::
@@ -377,7 +367,7 @@ The more specific procedure for using MAAS in certification testing is:
      #. Uninstall the snap (``sudo snap remove maas``)
 
      #. Fix the PPA configuration (``sudo apt-add-repository
-        ppa:maas/2.9``)
+        ppa:maas/3.1``)
 
      #. Re-install MAAS (``sudo apt install maas``).
 
@@ -453,8 +443,8 @@ the script's output.
 Note that at all prompts for a "Y/N" response, the default value is
 capitalized; if you press Enter, that default will be used.
 
-The next question acquires a password for a PostgresQL database (with the
-name `maas`) upon which MAAS relies::
+If you've installed MAAS via snaps, the next question acquires a password
+for a PostgresQL database (with the name `maas`) upon which MAAS relies::
 
     ***************************************************************************
     * We must set up a PostgresQL account (called 'maas') with a password that
@@ -546,11 +536,10 @@ If you respond ``n`` to this question, the script asks you to specify
 another archive site. The script then asks you which Ubuntu releases to
 mirror::
 
-    * Do you want to mirror xenial (Y/n)? n
-    * Do you want to mirror bionic (Y/n)? y
+    * Do you want to mirror bionic (Y/n)? n
     * Do you want to mirror focal (Y/n)? y
-    * Do you want to mirror groovy (Y/n)? n
-    * Do you want to mirror hirsute (Y/n)? n
+    * Do you want to mirror impish (Y/n)? n
+    * Do you want to mirror jammy (Y/n)? y
 
 The list of releases changes as new versions become available and as old
 ones drop out of supported status.
@@ -605,11 +594,10 @@ If you respond ``Y`` to this question, the script proceeds to ask you what
 Ubuntu versions and architectures to download::
 
     * Cloud Mirror does not exist. Creating.
-    * Do you want to get images for xenial release (y/N)? n
     * Do you want to get images for bionic release (y/N)? n
     * Do you want to get images for focal release (Y/n)? y
-    * Do you want to get images for groovy release (y/N)? n
-    * Do you want to get images for hirsute release (y/N)? n
+    * Do you want to get images for impish release (y/N)? n
+    * Do you want to get images for jammy release (y/N)? n
     *
     * Do you want to get images for amd64 architecture (Y/n)? y
     * Do you want to get images for i386 architecture (y/N)? n
@@ -736,30 +724,54 @@ to modify a few settings. To do so, follow these steps:
 #. Log in to the web UI using your regular username and the password you
    gave to the setup script.
 
-#. Once you log in, MAAS presents a screen in which you can import
-   additional SSH keys. You can import keys from github or Launchpad, or
+#. Once you log in, MAAS presents a screen in which you can set a few
+   options, as shown below. Review these settings, changing any as
+   necessary, and click Save and Continue at the bottom of the page. (If in
+   doubt, leave the settings as-is; you can change them later, if
+   necessary.)
+
+       .. image:: images/first-login.png
+          :width: 98%
+
+#. MAAS now shows a list of OS images, as shown below. This page will
+   probably show Ubuntu 20.04 for AMD64 already synced or importing. You
+   can select additional Ubuntu releases using the radio buttons, and for
+   each release, pick the architectures you want to import. You probably
+   don't need to do anything with this page right now, and you can come
+   back to it later; however, if you know you must test with an unusual
+   architecture or something other than Ubuntu 20.04, you may want to
+   import additional images immediately. Click Update Selection once you've
+   made your picks. When you're done making changes, scroll down and click
+   Continue.
+
+       .. image:: images/os-images.png
+          :width: 98%
+
+#. MAAS now displays an information page with a Finish Setup button. Click
+   it.
+
+#. You can now import additional SSH keys from github or Launchpad, or
    upload them individually. Once you've imported all the keys you need,
-   scroll down and select Go To Dashboard.
+   scroll down and select Go To Dashboard. The keys that the
+   `maniacs-setup` script imported should already be present, so you might
+   not need to do more here. Once you're done, click Finish Setup.
 
-#. MAAS now displays an overview screen on which you can adjust some
-   high-level parameters.
+#. MAAS now shows a page summarizing computers it has discovered on the
+   network. You can review this information, but you shouldn't need to do
+   anything on this page.
 
-   #. Review these settings. Some show options that were
-      set earlier in this process. Most others should be self-explanatory.
-      The standard MAAS images are among the items shown. Be sure the Ubuntu
-      versions and architectures you need are checked, and click Update
-      Selection to import anything you need.
-
-   #. When you're done, click Continue at the bottom of the page.
-
-#. Once you're fully logged in, click Settings in the top line, followed by
-   Network -> DNS in the resulting sub-menu. Review your DNS settings here.
+#. Click Settings in the top line, followed by Network -> DNS in the
+   resulting sub-menu. The resulting screen should
+   resemble the one shown below. Review your DNS settings here.
    The default for Enable DNSSEC Validation of Upstream Zones is Automatic,
    which must sometimes be adjusted. Some private DNS servers are
    misconfigured and will cause problems. Changing this setting to No may
    be required in such cases. (Alternatively, configuring the upstream DNS
    server to support DNSSEC should fix the problem.) If you change this
    option, be sure to click Save.
+
+       .. image:: images/dns-settings.png
+          :width: 98%
 
 #. Select Network -> Network Discovery. In theory, this feature should
    passively detect devices and should cause no problems. In practice, it
@@ -843,14 +855,6 @@ MAAS, follow these steps:
      be sure you check the Hardware -> *Machines* tab, not any other
      sub-tab of Hardware.
 
-   - Beginning with MAAS 2.6, MAAS may attempt to commission the node
-     immediately after enlisting it. If this succeeds, you can skip ahead
-     to the final step of this procedure to test deployment. If
-     commissioning fails (as it may if the node uses a power control system
-     other than IPMI, for example), you should continue with the next few
-     steps to more fully configure the node and, if necessary, troubleshoot
-     the problem.
-
 #. Click on the node's hostname to view the node's summary page.
 
 #. You may need to make a few changes in the Configuration area:
@@ -868,7 +872,7 @@ MAAS, follow these steps:
 
 #. Click "Take Action" near the top-right corner of the page, followed by
    "Commission" from the resulting drop-down menu. You must then click
-   "Commission machine."
+   "Start Commissioning for machine."
 
    - The node should power on again. This time you'll see it PXE-boot the
      commissioning image. Note that if your test system lacks a BMC or
@@ -893,8 +897,8 @@ MAAS, follow these steps:
      around this problem.
 
 #. Once the system powers off after commissioning, click "Take Action"
-   followed by "Deploy." You must then click "Deploy machine" to confirm
-   this action.
+   followed by "Deploy." You must then click "Start deployment for
+   machine" to confirm this action.
 
    - The node should power on again (or you will have to control it
      manually if it lacks a BMC). This time it will take longer to finish
@@ -916,7 +920,7 @@ MAAS, follow these steps:
      from your MAAS server itself, such as \http://172.24.124.1.
 
 If any of these steps fail, you may have run into a MAAS bug; your test
-computer may have a buggy PXE, IPMI, or other subsystem; or you may have
+computer may have a buggy or misconfigured PXE, IPMI, or other subsystem; or you may have
 misconfigured something in the MAAS setup. You may want to review the
 preceding sections to verify that you configured everything correctly. To
 help in debugging problems, the node status page includes sections entitled
@@ -940,16 +944,22 @@ x86-64) nodes. (If you created a local mirror, it includes i386/x86
 binaries because they're needed by some 64-bit packages.) Beginning with
 Ubuntu 20.04, direct installs in 32-bit mode to i386 computers are no
 longer supported, but some i386 libraries remain available to support older
-32-bit binaries running on AMD64 installations. If you expect to
-run 18.04 certification tests on i386 (32-bit, x86) computers, or to run
-18.04 or 20.04 certification on other architectures, such as ppc64el or
-ARM64, you must add support for such systems in MAAS:
+32-bit binaries running on AMD64 installations. If you expect to certify
+computers of other architectures, such as ppc64el or ARM64, you must add
+support for such systems in MAAS:
 
 #. In the MAAS web UI, click the Images tab.
 
+#. Select the Ubuntu release you want to certify in the "Ubuntu Releases"
+   column.
+
 #. Select the desired CPU types in the "Architecture" column.
 
-#. Click "Apply changes." The standard MAAS images for the new CPU
+#. Repeat the preceding two steps for each Ubuntu release you need to
+   certify. (You can select a different set of architectures for each
+   Ubuntu release.)
+
+#. Click "Update Selection." The standard MAAS images for the new CPU
    architectures will download. This process can take several minutes, and
    perhaps over an hour on a slow Internet connection.
 
@@ -981,9 +991,8 @@ Appendix B: Network Testing Options
 
 A key part of certification is testing your SUT's network cards. This
 document is written with the assumption of a fairly basic configuration;
-however, some labs may have more advanced needs. Ubuntu also changed how it
-configures its network devices beginning with version 17.10. Important
-variables include:
+however, some labs may have more advanced needs. Important variables
+include:
 
 * **Multiple simultaneous network tests** -- A single server takes about 60
   minutes per network port to run its network tests -- long enough that
@@ -1000,46 +1009,10 @@ variables include:
   you're testing systems with faster interfaces, you will need a separate
   computer to function as an ``iperf3`` server.
 
-* **Network configuration methods** -- Two network configuration tools
-  have been used in recent versions of Ubuntu Server:
-
-  * Versions through 17.04 used a system built around the
-    ``/etc/network/interfaces`` file and the ``ifup`` and ``ifdown``
-    commands.
-
-  * Versions starting with 17.10 use the new NetPlan system
-    (https://netplan.io).
-
-  Deploying a SUT via MAAS automatically configures its network ports --
-  or at least, those ports that are configured via the MAAS web UI. Thus,
-  you needn't be concerned with these differences on your SUTs. You may
-  need to learn the new NetPlan tools for advanced configuration of your
-  MAAS server, though.
-
-If your ``iperf3`` target system has a fast NIC and you want to test multiple
-slower SUTs, you can configure the fast NIC with multiple IP addresses. An
-``/etc/network/interfaces`` entry for Ubuntu 17.04 or earlier to do this
-might look like this::
-
-  # The 10Gbps network interface
-  auto eno2
-  iface eno2 inet static
-	address 172.24.124.2
-	netmask 255.255.252.0
-	broadcast 172.24.127.255
-  auto eno2:1
-  iface eno2:1 inet static
-	address 172.24.124.3
-	netmask 255.255.252.0
-	broadcast 172.24.127.255
-  auto eno2:2
-  iface eno2:2 inet static
-	address 172.24.124.4
-	netmask 255.255.252.0
-	broadcast 172.24.127.255
-
-An equivalent NetPlan entry, for Ubuntu 17.10 or later, is simpler; you can
-specify multiple IP addresses, rather than just one, in
+If your ``iperf3`` target system has a fast NIC and you want to test
+multiple slower SUTs, you can configure the fast NIC with multiple IP
+addresses. A NetPlan configuration (as used in Ubuntu 17.10 and later) to
+support multiple IP addresses can be enabled in
 ``/etc/netplan/50-cloud-init.yaml`` (or another file; the name varies
 depending on how the system was installed). For example::
 
@@ -1049,15 +1022,13 @@ depending on how the system was installed). For example::
       - 172.24.124.3/22
       - 172.24.124.4/22
 
-Note that you do not explicitly set separate names for each interface, as
-in the ``eno2:1`` of the ``/etc/network/interfaces`` example.
+Note that you do not explicitly set separate names for each interface.
 
-In either case, you must activate the changes after making them. In theory,
-you can do this without rebooting by using commands such as ``sudo ifup
-eno2:1`` or ``sudo netplan apply``; however, you may find it's necessary to
-reboot to reliably apply an advanced configuration like this one. With
-either network configuration system, you can verify the network settings
-with ``ip addr show eno2`` (changing the interface name as necessary)::
+You must activate the changes after making them. In theory, you can do this
+without rebooting by typing ``sudo netplan apply``; however, you may find
+it's necessary to reboot to reliably apply an advanced configuration like
+this one. You can verify the network settings with ``ip addr show eno2``
+(changing the interface name as necessary)::
 
   $ ip addr show eno2
   3: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state
@@ -1170,7 +1141,8 @@ you can change this detail by editing the MAAS settings:
    9000 for the interface(s) connected to the high-speed network.
 
 You can make this change even to lower-speed networks or to networks with
-mixed speeds; however, the change applies to *all* the computers on the
+mixed speeds; however, the change applies to *all* the computers that MAAS
+controls on the
 associated fabric. Because jumbo frames create problems in some cases (such
 as PXE-booting some older UEFI-based computers), you should be cautious
 about applying this change too broadly. That said, if it works for your
@@ -1369,7 +1341,8 @@ extra steps:
    immediately.
 
 #. In the MAAS web UI, select Subnets from the options at the top of the
-   page, and then select the internal subnet from the list.
+   page, and then select the internal subnet (under the "Subnet" column)
+   from the list.
 
 #. Click the Edit button to the right of the Subnet Summary section.
 
@@ -1402,7 +1375,7 @@ some space.)
 You can use numerous commands to manage your MAAS container. These include,
 but are not limited to:
 
-* ``lxc list`` -- Show a list of containers and some summary information
+* ``lxc list`` -- Shows a list of containers and some summary information
   about them, including their IP addresses and whether or not they're
   running.
 

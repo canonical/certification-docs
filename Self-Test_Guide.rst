@@ -61,9 +61,6 @@ IPMI
   Intelligent Platform Management Interface -- A BMC technology for
   remotely connecting to a computer to perform management functions.
 
-JBOD
-  Just a bunch of disks -- A non-RAID disk configuration.
-
 KVM
   Kernel Virtual Machine -- A system for running virtual machines on
   Ubuntu Server.
@@ -131,7 +128,7 @@ document. An overview is presented in the following flowchart:
 
 The highlights of this process are:
 
-#. Set up your MAAS server and, if necessary, connect it to the test LAN.
+#. Set up your MAAS server and connect it to the test LAN.
    This process is covered in the MANIACS document (available from
    https://certification.canonical.com).
 
@@ -145,7 +142,7 @@ The highlights of this process are:
 
 #. Check the SUT's configuration. (The ``canonical-certification-precheck``
    script, described in `Running the Certification
-   Tests`_, can help with this, among other things.)
+   Tests`_, is key to this check.)
 
 #. Run the test suite on the SUT, as described in `Running the
    Certification Tests`_.
@@ -176,13 +173,25 @@ the Account Information on C3, try logging out of C3, clearing any browser
 cache and cookies, and logging back into C3.*
 
 In order to upload test results to C3, you need to create a hardware entry
-for the system which you will be certifying. You can put off creating the
-C3 entry until after the test, although doing it before testing is usually
-preferable. If you don't plan to submit the results, you should not create
-a C3 entry for the machine. If the specific machine or configuration
-you're testing already
-has a C3 entry, you should *not* create a new one. To create an entry you
-can go directly to:
+for the system which you will be certifying; however, creating a new entry
+is not always necessary. You *should* create an entry if:
+
+* A C3 entry for that specific machine (model and configuration) does not
+  already exist; *and*
+
+* You plan to submit certification data for that machine.
+
+You should *not* create a new entry if:
+
+* C3 already hosts an entry for that specific machine; instead, use
+  the existing entry, even if it has existing submissions associated with
+  it (say, for an earlier version of Ubuntu); *or*
+
+* You don't plan to submit certification data for this computer.
+
+You can put off creating the C3 entry until after the test, although doing
+it before testing is usually preferable. To create an entry you can go
+directly to:
 
 https://certification.canonical.com/hardware/create-system
 
@@ -247,7 +256,7 @@ Preparing the Test Environment
 ==============================
 
 Before you test the hardware, you must perform some initial setup
-steps. These steps are preparing the hardware you'll bring, configuring
+steps. These steps are preparing ancillary hardware, configuring
 the SUT for testing, and configuring the test network.
 
 Ensuring Equipment is Ready
@@ -270,19 +279,27 @@ that you have:
    These SD cards are needed only on those (rare) servers that have
    external SD card slots.
 
--  A data CD with some files written to it. This is required to test the
-   system's optical drive read capabilities. Note that a movie DVD or an
+-  Data CDs that hold data (for servers with optical drives only). These
+   are required to test the
+   systems' optical drive read capabilities. Note that a movie DVD or an
    audio CD won't be useful in this case, as they are not in the right
    format for the test. If you need to test more than one computer then
    *bring one medium per system*.
 
--  A computer to function as a MAAS server and ``iperf3`` target on the test
-   LAN. This server will provision the SUT. The MAAS server can be a normal
-   part of the test LAN or can be brought in specifically for testing SUTs
-   on the test LAN. (Note, however, that the MAAS server for certification
+-  A computer to function as an ``iperf3`` Target on the test LAN. This
+   computer must have network ports that equal or exceed the speed of the
+   fastest network port on your SUTs.
+
+-  A computer to function as a MAAS server on the test LAN. This server
+   will provision the SUT. (Note that a MAAS server for certification
    testing should ideally be configured to automatically install the Server
    Test Suite on the SUT, which will not be the case for a "generic" MAAS
    server.)
+
+Frequently, the MAAS server and ``iperf3`` Target are one and the same
+computer; however, sometimes it is desirable to use two computers for these
+two purposes. The upcoming section, `Preparing the Network Test
+Environment`_, covers these servers in more detail.
 
 Configuring the SUT for Testing
 -------------------------------
@@ -376,11 +393,6 @@ up the SUT and test environment:
 
 -  Storage should be properly configured.
 
-   -  Some BIOS-only computers may have problems booting from disks over
-      2 TiB in size. If the SUT fails for this reason, it may pass with
-      smaller disks (or a smaller RAID array), but this issue should be
-      noted with the results submission.
-
    -  Disks must be configured for "flat" storage -- that is, filesystems
       in plain partitions, rather than using LVM or bcache configurations.
       Similarly, software RAID must *not* be used.
@@ -408,16 +420,15 @@ attention to the following:
    - The MAAS Advanced Network Installation and Configuration -- Scripted
      (MANIACS) document (available from
      https://certification.canonical.com) describes how to configure a MAAS
-     server. This server may be a standard part of the testing network or
-     something you bring with you for testing purposes alone. A laptop or a
-     small portable computer such as an Intel NUC is sufficient. MAAS
-     version 2.8 or later is required for certification work.
+     server. The MAAS server computer itself does not need to be very
+     powerful by modern standards. MAAS version 3.1 or later is required
+     for certification work.
 
   -  When testing multiple SUTs simultaneously, you will need multiple
      ``iperf3`` Targets, one for each SUT. If your ``iperf3`` Target has a
      sufficiently fast NIC or multiple NICs, you can assign the computer
      multiple IP addresses and treat each one as a distinct Target. This
-     topic is covered in more detail in Appendix D of the MANIACS document.
+     topic is covered in more detail in Appendix B of the MANIACS document.
      Alternatively, you can run network tests against a single ``iperf3``
      Target sequentially; however, this approach complicates submission of
      results. Note that poor network infrastructure may make multiple
@@ -427,8 +438,8 @@ attention to the following:
    extraneous network traffic can negatively impact the network tests.
 
 -  Network cabling, switches, and the ``iperf3`` server should be capable of
-   at least the SUT's best speed. For instance, if the SUT has 10 Gbps
-   Ethernet, the other network components should be capable of 10 Gbps or
+   at least the SUT's best speed. For instance, if the SUT has 100 Gbps
+   Ethernet, the other network components should be capable of 100 Gbps or
    faster speeds. If the local network used for testing is less capable
    than the best network interfaces on the SUT, the network test won't run,
    and those interfaces must be
@@ -462,14 +473,10 @@ that the SUT be installable via MAAS. Therefore, the following procedure
 assumes the presence of a properly-configured MAAS server. The MAAS
 Advanced Network Installation and Configuration -- Scripted (MANIACS) document
 describes how to set up a MAAS server for certification testing purposes.
-This document describes use of MAAS 2.9.
+This document describes use of MAAS 3.1.
 
 Once the SUT and MAAS server are both connected to the network, you can
 install Ubuntu on the SUT as follows:
-
-#. Unplug any USB flash drives or external hard disks from the SUT.
-   (MAAS will attempt to install to a USB flash drive if it's detected
-   before the hard disk. This problem is rare but undesirable.)
 
 #. Power on the SUT and allow it to PXE-boot.
 
@@ -498,21 +505,18 @@ install Ubuntu on the SUT as follows:
       Canonical Server Certification Team.
 
 #. Commission the node by clicking Take Action followed by Commission
-   and then Commission Machine.
+   and then Start Commissioning for Machine.
 
    -  On some systems, it is necessary to remove the smartctl-validate
-      option under Hardware Tests before clicking Commission Machine.
-
-   -  It's best to remove any USB flash drives from the machine before
-      commissioning. If a drive is left plugged in, MAAS may detect it
-      and delete its partitions when you deploy the node.
+      option under Testing Scripts before clicking Commission Machine.
 
    -  If the SUT has a BMC, the computer should power up, pass more
       information about itself to the MAAS server, and then power down
       again.
 
    -  If the SUT does not have a BMC, you should manually power on the SUT
-      after clicking the Commission Node button. The SUT should power up,
+      after clicking the Start Commissioning for Machine button. The SUT
+      should power up,
       pass more information about itself to the MAAS server, and then power
       down again.
 
@@ -530,26 +534,37 @@ install Ubuntu on the SUT as follows:
 
 #. Check and, if necessary, adjust the following node details:
 
-   - On the Interfaces tab, ensure that all the node's interfaces are
+   - On the Network tab, ensure that all the node's interfaces are
      active. (By default, MAAS activates only the first network interface
      on most computers.) If an interface is identified as *Unconfigured,*
-     click the three horizontal bars in the Actions column, select Edit
+     click the down arrow in the Actions column, select Edit
      Physical, and set IP Mode to Auto Assign, DHCP, or Static Assign.
      (The first two cause MAAS to assign an IP address to the node itself,
      either by maintaining its own list of static IP addresses or by using
      DHCP. The Static Assign option requires you to set the IP address
      yourself. These three options are described in more detail in the
      MANIACS document, available from https://certification.canonical.com.)
-     When you've made this change, click Save.
+     When you've made this change, click Save Interface.
 
    - On the Storage tab, look under Available Disks and Partitions for
      disks that have not been configured. If any are availble, click the
-     three horizontal bars in the Actions column and select the Add
-     Partition option. You can then set a Filesystem
+     down arrow in the Actions column and select Add
+     Partition. You can then set a Filesystem
      (specify ext4) and Mount Point (something under ``/mnt``
      works well, such as ``/mnt/sdb`` for the ``/dev/sdb`` disk). Click Add
      Partition when you've set these options. Repeat this step for any
      additional disks.
+
+     - If MAAS complains that there's insufficient free space on the
+       device, try manually reducing the partition's size by a small
+       amount. Usually rounding down to the nearest whole number works
+       around this problem.
+
+       ..
+          RST comment: Above is bug:
+          https://bugs.launchpad.net/maas/+bug/1938296. Fix committed
+          2/4/2022, but is not released, as of 2/8/2022. Delete above
+          bullet point, and this comment, once the fix is released.
 
 #. On the MAAS server, verify that the SUT's Status is listed as Ready
    in the node list or on the node's details page. You may need to
@@ -574,8 +589,7 @@ install Ubuntu on the SUT as follows:
        certification using the GA kernel, you will then need to re-deploy
        the SUT choosing the correct HWE kernel option (if available). Note
        that an HWE kernel option becomes available only starting with the
-       second point release for an LTS version, such as 18.04.2 or 20.04.2
-       (due out in February of 2021).
+       second point release for an LTS version, such as 18.04.2 or 20.04.2.
 
      - Do not choose any of the **edge** or
        **lowlatency** kernel options for official Certification testing.
@@ -610,9 +624,9 @@ Server Test Suite properly, you can do so manually, as described in
 Configuring DCPMM Devices for Testing
 -------------------------------------
 
-One of the biggest features released with the Cascade Lake platform is the
-release of the Intel Optane DCPMM devices. These are RAM devices that use
-the standard DIMM form factor and are populated alongside DDR4 DIMMs. These
+Starting with Cascade Lake, Intel servers have included support for Intel
+Optane DCPMM devices. These are RAM devices that use
+the standard DIMM form factor and are populated alongside standard DIMMs. These
 special devices can function in one of three different modes, described below.
 
 * **Memory Mode** is a configuration where the DCPMMs are dedicated
@@ -626,14 +640,11 @@ special devices can function in one of three different modes, described below.
   test cases:
 
   - fsdax -- Filesystem-DAX mode is the default mode of a namespace when
-    specifying ``ndctl create-namespace`` with no options. It creates a block
-    device (``/dev/pmemX[.Y]``) that supports the DAX capabilities of Linux
-    filesystems(XFS and ext4 to date). DAX removes the page cache from the I/O
-    path and allows ``mmap(2)`` to establish direct mappings to persistent memory
-    media. The DAX capability enables workloads / working-sets that would exceed
-    the capacity of the page cache to scale up to the capacity of persistent
-    memory. Workloads that fit in page cache or perform bulk data transfers may
-    not see benefit from DAX. When in doubt, pick this mode.
+    specifying ``ndctl create-namespace`` with no options. It creates a
+    block device (``/dev/pmemX[.Y]``) that supports the DAX capabilities of
+    Linux filesystems (XFS and ext4 to date). DAX enables workloads or
+    working-sets that would exceed the capacity of the page cache to scale
+    up to the capacity of persistent memory. When in doubt, pick this mode.
 
   - sector -- Use this mode to host legacy filesystems that do not checksum
     metadata or applications that are not prepared for torn sectors after a
@@ -647,11 +658,12 @@ special devices can function in one of three different modes, described below.
     again, does not support DAX operation.
 
   - devdax -- Device-DAX mode enables similar ``mmap(2)`` DAX mapping capabilities
-    as Filesystem-DAX. However, instead of a block-device that can support a
+    as Filesystem-DAX. However, instead of a block device that can support a
     DAX-enabled filesystem, this mode emits a single character device file
     (``/dev/daxX.Y``). Use this mode to assign persistent memory to a
-    virtual-machine, register persistent memory for RDMA, or when gigantic
-    mappings are needed. *As of this writing, devdax is not yet supported by tests in Checkbox*
+    virtual machine, register persistent memory for RDMA, or when gigantic
+    mappings are needed. *As of this writing, devdax is not yet supported by
+    tests in Checkbox*
 
 * **Mixed Mode** enables configuring a mix of both Memory and AppDirect
   spaces using either the system configuration tools (e.g. Setup/BIOS) or
@@ -664,7 +676,7 @@ special devices can function in one of three different modes, described below.
   AppDirect Mode.
 
 This guide provides one path to configuration using Mixed Mode to reduce
-the amount of retests necessary to complete certification. Some OEMs may only
+the amount of retests necessary to complete certification. Some OEMs may
 support operation of DCPMMs in Memory or AppDirect only. If that applies to
 your SUT, you will need to configure each mode separately and run retests to
 ensure both modes have been tested. 
@@ -730,20 +742,22 @@ access the SUT:
 
    - If MAAS doesn't detect an interface, or if it requires configuration
      MAAS can't handle, you can reconfigure the network in the deployed
-     installation:
-
-     - For Ubuntu 16.04 and earlier, edit ``/etc/network/interfaces`` and
-       activate the interfaces with ``sudo ifup``.
-
-     - For Ubuntu 18.04 and later, edit ``/etc/netplan/50-cloud-init.yaml``
-       and activate the changes with ``sudo netplan apply``. (NetPlan
-       configuration is described in more detail at
-       https://wiki.ubuntu.com/Netplan/Design.)
+     installation: Edit ``/etc/netplan/50-cloud-init.yaml`` and activate
+     the changes with ``sudo netplan apply``. (NetPlan configuration is
+     described in more detail at https://wiki.ubuntu.com/Netplan/Design.)
 
 -  All disk devices (HDDs, SSDs, NVMes, and DCPMMs) must be partitioned and
    mounted prior to testing. Each disk beyond the first one should ideally
    be configured with a single partition that spans the entire disk and
    that uses the ext4 filesystem.
+
+   - As with network interfaces, the easiest way to do this is via MAAS
+     before deployment.
+
+   - If necessary, you can manually partition the disk (using ``gdisk``,
+     ``fdisk``, ``parted``, or similar tools), create filesystems on them
+     (using ``mkfs`` or related tools), and mount them (with the ``mount``
+     command or ``/etc/fstab`` file).
 
 -  If the SUT has DCPMMs installed, you should configure them prior to running
    the test suite. **Note: This document assumes that the SUT will support
@@ -788,8 +802,7 @@ You can initiate a testing session in a server as follows:
    must remain inserted *throughout the test run*, because the media tests
    will be kicked off partway through the run.
 
-#. You should double-check that the server's configuration is correct by
-   running the ``canonical-certification-precheck`` script, which tests
+#. run the ``canonical-certification-precheck`` script, which tests
    critical configuration details and fixes some common problems:
 
    - The script completes APT configuration, which is sometimes incomplete
@@ -813,9 +826,10 @@ You can initiate a testing session in a server as follows:
      passed results, yellow for warnings, and red for problems that should
      be corrected. In the preceding output, the Installed RAM value was
      displayed in yellow because the system's RAM is a bit shy of 4 GiB;
-     the ``iperf`` line is in red because the script detected no ``iperf3``
-     server; and the ``USB_Disks`` line is red because no USB flash drive
-     was inserted in the SUT. If your terminal supports the feature, you
+     the ``USB_Disks`` line is red because no USB flash drive
+     was inserted in the SUT; and the ``UVT_KVM_Image_Check`` line is red
+     because the KVM image was not configured. If your terminal supports
+     the feature, you
      can scroll up to see details of any warnings or failures.
 
    - If the script identifies any problems, be sure to correct them.
@@ -849,15 +863,15 @@ You can initiate a testing session in a server as follows:
        to attend to them. USB flash drives need only be prepared with FAT
        filesystems and inserted into the SUT, as described earlier. Most
        disks have device filenames of ``/dev/sda``, ``/dev/sdb``, and so
-       on; but some exotic disk devices may appear under other device
+       on; but some disk devices may appear under other device
        names, such as ``/dev/nvme*``. If ``ls /dev/sd*`` shows a disk with
        no partitions, you should partition the disk (one big disk-spanning
        partition is best), create an ext4 filesystem on it, and mount it
        (subdirectories of ``/mnt`` work well). Repeat this process for each
        unmounted disk.
 
-     - If the ``KVM_Image_Check`` or ``LXD_Image_Check`` tests failed, or
-       if your Internet access is slow, you should download the relevant
+     - If the ``UVT_KVM_Image_Check`` or ``LXD_Image_Check`` tests failed
+       and if your Internet access is slow, you should download the relevant
        virtualization images on the SUT:
 
        #. On a computer with better Internet access, download KVM and LXD
@@ -881,6 +895,11 @@ You can initiate a testing session in a server as follows:
 
           Note that the KVM and LXD configurations are separated by
           several lines of comments in the configuration file.
+
+       A failure of the virtualization image precheck need not be a problem
+       if your outside network access is good; the test script will attempt
+       to obtain the virtualization image from public mirrors if it is
+       not present locally.
 
 #. If you're running the test via SSH, type ``screen`` on the SUT to ensure
    that you can reconnect to your session should your link to the SUT go
@@ -926,6 +945,11 @@ You can initiate a testing session in a server as follows:
      shot, a test intended for IBM Power-architecture (ppc64el) computers
      was not run because the SUT used an x86-64 CPU.
 
+     .. figure:: images/cert-failures.png
+        :alt: You can sometimes correct problems and re-run tests
+              before submitting results.
+        :width: 100%
+
    You can use this opportunity to
    re-run a test if you believe it failed for a transient reason, such as
    if your ``iperf3`` server crashed or was unavailable or if you forgot to
@@ -934,11 +958,6 @@ You can initiate a testing session in a server as follows:
    select it, and then press the **R** key to re-run the selected tests.
    If you don't want to re-run any tests, press **F** to finish.
 
-     .. figure:: images/cert-failures.png
-        :alt: You can sometimes correct problems and re-run tests
-              before submitting results.
-        :width: 100%
-
 #. When the test run is complete, you should see a summary of tests run, a
    note about where the ``submission*`` files have been stored, and a
    prompt to submit the results to C3. If you're connected to the Internet,
@@ -946,7 +965,10 @@ You can initiate a testing session in a server as follows:
    will need either a Secure ID value or to have already entered this value
    in the ``/etc/xdg/canonical-certification.conf`` file. (The
    ``canonical-certification-precheck`` script will edit this file
-   appropriately if you provided the SID when you ran that script.)
+   appropriately if you provided the SID when you ran that script.) The
+   script will also prompt you for a description of the test run. This
+   description is not shared publicly; it's intended to help both you and
+   the Server Certification Team identify the purpose of a test run.
 
 #. Copying the results files off of the SUT is advisable. This is most
    important if the automatic submission of results fails; however,
@@ -994,8 +1016,8 @@ certification program itself, you must do so manually, perhaps from
 another computer that runs Ubuntu. At this time, there is no
 mechanism for submitting results from an OS other than Ubuntu.
 
-To add the Hardware Certification PPA, install the ``checkbox-ng`` package,
-and submit the results, follow these instructions:
+To submit results, you must first add the Hardware Certification PPA and
+install the ``checkbox-ng`` package. Follow these instructions:
 
 #. Add the Hardware Certification PPA::
 
@@ -1194,6 +1216,8 @@ provided with the Server Test Suite:
 
 - The ``test-usb`` command runs tests of USB ports.
 
+- The ``test-stress`` command runs CPU, RAM and storage stress tests.
+
 - The ``test-virtualization`` command runs virtualization (KVM and
   LXD) tests.
 
@@ -1258,8 +1282,8 @@ Appendix C - Testing Point Releases
 
 Ubuntu LTS releases are updated to a new *point release* version
 approximately three months after each intervening release -- that is,
-20.04.1 was released in early August of 2020 (about three months after 20.04),
-20.04.2 will be released in early February of 2021 (three months after 20.10),
+20.04.1 was released in August of 2020 (about three months after 20.04),
+20.04.2 was released in February of 2021 (three months after 20.10),
 and so on. These updates use the kernels from the latest interim release,
 which can affect hardware compatibility; however, the new kernels are
 supported for a limited period of time compared to the GA kernel.
@@ -1270,7 +1294,7 @@ Linux kernels:
    release year (2018 for 18.04, 2020 for 20.04). Ubuntu 18.04 shipped with
    a 4.15.0-series kernel, and 20.04 shipped with a 5.4.0-series kernel.
 
--  The current point release -- That is, version 18.04.5, 20.04.2, or
+-  The current point release -- That is, version 18.04.5, 20.04.3, or
    whatever is the
    latest release in the series. Testing point-release versions starting
    with the .2 point release in addition to the original GA version serves
@@ -1326,9 +1350,7 @@ configures both the SUT and the ``iperf3`` Target for optimal performance:
      the configuration file in ``/etc/netplan`` (such as
      ``/etc/netplan/01-netcfg.yaml``, although the exact name may differ).
      Locate the section for the high-speed network interface and add the
-     line ``mtu: 9000``. (Some versions of Ubuntu have a bug, #1724895,
-     which requires explicitly coding the interface's MAC address to set the
-     MTU, too.) The result might look something like this,
+     line ``mtu: 9000``. The result might look something like this,
      although several options may be different depending on your network
      configuration::
 
@@ -1431,8 +1453,7 @@ Fixing Deployment Problems
 
 Sometimes a node fails to deploy. When this happens, check the installation
 output on the node's MAAS page. (Click the Logs tab and
-ensure that Installation Output is selected in the selector on the left of
-the screen.) Often, a clue to the nature of the problem
+then click Installation Output.) Often, a clue to the nature of the problem
 appears near the end of that output. If you don't spot anything obvious,
 copy that output into a file and send it to the Server Certification Team.
 
@@ -1440,14 +1461,14 @@ One common cause of deployment problems is IP address assignment issues.
 Depending on your MAAS configuration and local network needs, your network
 might work better with DHCP, Auto Assign, or Static Assign as the method of
 IP address assignment. To change this setting, you must first release the
-node. You can then click the Interfaces tab on the node's summary page in
+node. You can then click the Network tab on the node's summary page in
 MAAS and reconfigure the network options by using the Actions field, as
 described earlier, in `Installing Ubuntu on the System`_.
 
 If, when you try to deploy a GA kernel, MAAS complains that the kernel is
 too old, try this:
 
-#. Click the *Configuration* tab in MAAS.
+#. Click the node's *Configuration* tab in MAAS.
 
 #. Click *Edit* under *Machine Configuration.*
 

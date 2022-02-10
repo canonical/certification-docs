@@ -1,3 +1,13 @@
+certification-docs (0.5.0-0ppa1) focal; urgency=medium
+
+  * Update MANIACS and STG for MAAS version 3.1
+  * Do pre-Jammy MANIACS and STG updates
+  * General cleanup of MANIACS and STG
+  * Remove most references to pre-18.04 versions of Ubuntu, including
+    old network configuration methods
+
+ -- Rod Smith <rod.smith@canonical.com>  Wed, 09 Feb 2022 17:21:05 -0500
+
 certification-docs (0.4.9-0ppa1) focal; urgency=medium
 
   * Fixed package build problems; no changes to documentation files
