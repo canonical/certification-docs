@@ -589,8 +589,7 @@ install Ubuntu on the SUT as follows:
        certification using the GA kernel, you will then need to re-deploy
        the SUT choosing the correct HWE kernel option (if available). Note
        that an HWE kernel option becomes available only starting with the
-       second point release for an LTS version, such as 18.04.6 or 20.04.4
-       (due out in February of 2022).
+       second point release for an LTS version, such as 18.04.2 or 20.04.2.
 
      - Do not choose any of the **edge** or
        **lowlatency** kernel options for official Certification testing.
@@ -625,9 +624,9 @@ Server Test Suite properly, you can do so manually, as described in
 Configuring DCPMM Devices for Testing
 -------------------------------------
 
-One of the biggest features released with the Cascade Lake platform is the
-the Intel Optane DCPMM devices. These are RAM devices that use
-the standard DIMM form factor and are populated alongside DDR4 DIMMs. These
+Starting with Cascade Lake, Intel servers have included support for Intel
+Optane DCPMM devices. These are RAM devices that use
+the standard DIMM form factor and are populated alongside standard DIMMs. These
 special devices can function in one of three different modes, described below.
 
 * **Memory Mode** is a configuration where the DCPMMs are dedicated
@@ -677,7 +676,7 @@ special devices can function in one of three different modes, described below.
   AppDirect Mode.
 
 This guide provides one path to configuration using Mixed Mode to reduce
-the amount of retests necessary to complete certification. Some OEMs may
+the amount of retests necessary to complete certification. Some OEMs may
 support operation of DCPMMs in Memory or AppDirect only. If that applies to
 your SUT, you will need to configure each mode separately and run retests to
 ensure both modes have been tested. 
@@ -899,7 +898,7 @@ You can initiate a testing session in a server as follows:
 
        A failure of the virtualization image precheck need not be a problem
        if your outside network access is good; the test script will attempt
-       to obtain the virtualization image from a Canonical server if it is
+       to obtain the virtualization image from public mirrors if it is
        not present locally.
 
 #. If you're running the test via SSH, type ``screen`` on the SUT to ensure

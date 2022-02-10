@@ -130,8 +130,8 @@ the following requirements:
 *  Switches capable of handling the highest-speed network devices under
    test.
 
-   -  Sufficient Ethernet cables for all SUTs and the MAAS server,
-      including their BMCs.
+   -  Sufficient Ethernet cables to connect all network ports on the SUTs
+      and the MAAS server, including their BMCs.
 
    -  Be sure cables and switches are capable of handling the fastest
       network speeds being tested; for instance, if a SUT has a 100 Gbps
