@@ -15,7 +15,7 @@ pdf:	$(PDF_NAMES)
 	$(RST2PDF) --smart-quotes 1 -s styles/cert-doc.style $< -o $@
 
 %.html: %.rst
-	$(RST2HTML) --smart-quotes=yes $< $@
+	$(RST2HTML) --smart-quotes=yes --stylesheet=css/plain.css $< $@
 
 maniacs: MAAS_Advanced_Network_Installation_And_Configuration_Scripted.pdf
 

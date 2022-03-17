@@ -5,8 +5,6 @@
  (The MANIACS Document)
 -----------------------
 
-.. include:: <isonum.txt>
-
 .. header:: |ubuntu_logo|
 
 .. |ubuntu_logo| image:: images/logo-ubuntu_su-white_orange-hex.png
