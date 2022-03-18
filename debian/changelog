@@ -1,3 +1,10 @@
+certification-docs (0.5.2-0ppa1) focal; urgency=medium
+
+  * Fix build problem on jammy; no changes to documentation files
+    themselves.
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 18 Mar 2022 14:08:33 -0400
+
 certification-docs (0.5.1-0ppa1) focal; urgency=medium
 
   * Customized CSS file for better-looking HTML output.

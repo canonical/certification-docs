@@ -3,7 +3,7 @@ Section: doc
 Priority: optional
 Maintainer: Rod Smith <rod.smith@ubuntu.com>
 Uploaders: Jeff Lane <jeff@canonical.com>
-Build-Depends: debhelper (>= 9.0.0), rst2pdf, ttf-ubuntu-font-family
+Build-Depends: debhelper (>= 9.0.0), rst2pdf, fonts-ubuntu
 Standards-Version: 3.9.5
 Homepage: https://launchpad.net/certification-docs
 #Vcs-Bzr: lp:certification-docs
