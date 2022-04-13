@@ -156,7 +156,7 @@ proper VPN-type access and admin control over the MAAS server, SUT, and any
 additional machines (such as iperf targets) is provided by the Partner. This
 service is not common and requires the OEM to perform a good bit of lab setup
 prior to our accessing the network and performing tests. This also requires
-fast, reliable internet access into the Partner Lab which not ever lab can
+fast, reliable internet access into the Partner Lab which not every lab can
 support.
 
 Certificate Issuance and Publication
@@ -245,7 +245,7 @@ General Policies
 
 Comprehensive Server Certification
 ----------------------------------
-In order to insure the best user experience possible when running Ubuntu on
+In order to ensure the best user experience possible when running Ubuntu on
 Partner Servers, Canonical requires that hardware partners sufficiently test
 the list of Vendor Approved Options that are applicable to a given Server Model.
 
@@ -277,7 +277,7 @@ remove HDD/SDD/NVMe devices from the boot menu, the Network Boot device should
 always be in the first position to ensure the machine ALWAYS boots from
 Network.
 
-MAAS will instruct the server, during the network boot, to boot from onoboard
+MAAS will instruct the server, during the network boot, to boot from onboard
 storage if necessary.
 
 
@@ -298,7 +298,7 @@ DCPMMs (NVDIMM devices)
 Systems that support Intel's Optane DataCenter Persistent Memory Modules must
 include those DCPMM devices.  For convenience, DPCMMs can be configired in mixed
 mode where supported in a mix of at least 30% RAM and 70% Storage. (That
-percentage will vary based on the amount of DCPMMs installed).
+percentage will vary based on the amount of DCPMM storage installed).
 
 Where Mixed Mode is not supported, then testers will need to test the DCPMM
 devices in both Memory Mode and App Direct (Storage) Mode, which requires
@@ -358,7 +358,7 @@ devices.  Please refer to `Appendix G - Setting Up and Testing a GPGPU`_ of the
 Self-Testing Guide for more information
 
 .. _Appendix G - Setting Up and Testing a GPGPU:
-    https://http://certification-static.canonical.com/docs/Ubuntu_Server_Hardware_Certification_Self-Testing_Guide.pdf
+    http://certification-static.canonical.com/docs/Ubuntu_Server_Hardware_Certification_Self-Testing_Guide.pdf
 
 Anything Else
 '''''''''''''
@@ -439,8 +439,8 @@ comprise the 20.04 LTS and LTS Point Release family.
 
 If a system is certified using 20.04 LTS and the HWE kernel, then the certification
 is valid from that HWE kernel version onward. Thus if the system was certified
-using 20.04 LTS and the 5.10 HWE kernel, the system is considered certified for
-the 20.04.3 LTS HWE Kernel version 5.10, the 18.04.4 LTS HWE Kernel version
+using 20.04.3 LTS and the 5.10 HWE kernel, the system is considered certified for
+the 20.04.3 LTS HWE Kernel version 5.10, the 20.04.4 LTS HWE Kernel version
 5.13, and the 20.04.5 LTS HWE Kernel version 5.15.
 
 Any exceptions to this policy will be decided on a case by case basis before
@@ -588,15 +588,15 @@ hypervisor.
 
 Virtual Machine Requirements
 ''''''''''''''''''''''''''''
-Guests or VMs created for the purpose of ceertifying Ubuntu as Guest on a
+Guests or VMs created for the purpose of certifying Ubuntu as Guest on a
 non-Ubuntu host OS should have a minimum of 4 GiB RAM and at least 100 GiB of
 disk space to ensure the tests run successfully.
 
 Guests should also have at least one virtual NIC that can successfully ping the
 MAAS server and iperf target.
 
-Certifications of this type will use the “virtual-machine-full” testplan, which
-is a subset of the full server suite defined by the “server-full” testplan.
+Certifications of this type will use the “virtual-machine-full” test plan, which
+is a subset of the full server suite defined by the “server-full” test plan.
 
 KVM testing is generally not required for certification of Ubuntu as Guest
 scenarios as nested virtualization (e.g. running KVM inside a VM is considered
@@ -684,8 +684,8 @@ Public Web Site
 All published Certificates are accessible via our public certification website
 found at
 
-        http://ubuntu.com/certified/server
-        http://ubuntu.com/certified/soc
+* http://ubuntu.com/certified/server
+* http://ubuntu.com/certified/soc
 
 Public certificates will include Make/Model, release and pertinent hardware
 information including certification/supported status of any Vendor Approved
@@ -696,11 +696,11 @@ system data or other details that are not meant to be publicly accessible.
 
 Private Web Site
 ----------------
-The private certification portal can be found at
+The private certification portal can be found at: 
 
-        https://certification.canonical.com
+* https://certification.canonical.com
 
-this site is often referred to as C3.
+This site is often referred to as C3.
 
 Access to C3 is available only to Canonical employees and designated employees
 of partners participating in the Programme.
@@ -726,7 +726,7 @@ All documentation can be accessed by several methods:
   suggested package for `canonical-certification-server`
 
 * MAAS servers installed following our MANIACS guide provide the docs via html
-  locally (http://maas.server.ip/doc)
+  locally (e.g. "\http://maas.server.ip/doc")
 
 Certification Process
 =====================
@@ -759,7 +759,7 @@ Depending on the activity, the following should apply as far as time estimates:
   releases and systems, the actual time to fix and SRU a bug fix can vary
   from a few days to several weeks.  Additionally, hardware enablement
   may require hardware to be present in our lab and may take several weeks to
-  develop and then push into the kernel, MAAS, or wherver is appropriate.
+  develop and then push into the kernel, MAAS, or wherever is appropriate.
 
 Test Lab
 --------
@@ -800,11 +800,11 @@ Firmware should be available somewhere online and not a secret build that is
 only available internally to the Partner or Canonical.  The only exception here
 is for initial release firmware that comes on a newly released system.
 
-You do not need to recertify on updated versions of Firmware. We will list the
+You do not need to recertify on updated versions of firmware. We will list the
 firmware in use at the time of certification and will support users from that
 firmware level onwards.
 
-That is not to say we wont recommend a firmware update where appropriate, but
+That is not to say we won't recommend a firmware update where appropriate, but
 rather sets a baseline firmware level with the expectation that the Partner
 will continue to ensure that updates to firmware do not cause issues with
 running Ubuntu on already certified hardware.
@@ -878,7 +878,7 @@ Thus if a system supports JBOD and onboard RAID plus an optional PCIe add-in
 RAID card (that controls onboard disks), the storage tests should be run
 against all three configurations.
 
-The Server Test Suite provides a ``storage-only`` testplan for this purpose.
+The Server Test Suite provides a ``storage-only`` test plan for this purpose.
 
 Storage Management Software
 '''''''''''''''''''''''''''
@@ -928,7 +928,7 @@ Bugs from vendors that recognize Ubuntu as a Tier 1 OS will recieve priority
 over other bugs.  This does not imply any specific SLA or time frame, but we
 will work with engineering teams within Canonical to escalate bugs from Tier 1
 vendors with the understanding that those engineering teams will have the right
-to decline to or delay fixing a bug depending on business needs at the time.
+to decline or delay fixing a bug depending on business needs at the time.
 
 Test Suite Bugs
 '''''''''''''''
@@ -1072,7 +1072,7 @@ existing certificate request that provides a link to the new retest results.
 
 Do *not* request further certificates each time retest results are submitted to C3.
 
-When performing retests, you MUST run the full requested testplan.  We provide
+When performing retests, you MUST run the full requested test plan.  We provide
 targeted test plans and launchers to assist with this.  For example, if you are
 asked to re-run a storage test, you should run the ``test-storage`` command
 which runs a small storage only subset of tests.

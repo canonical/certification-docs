@@ -387,6 +387,10 @@ up the SUT and test environment:
       an Ubuntu menu option and that is OK, but testing expects the Network
       Boot device is the first item in the boot menu.
 
+      - On systems where it is impossible to remove non-network boot options,
+        please ensure that the Network Booting option is the first (default)
+        boot option so that the machine ALWAYS boots from network first.
+
 -  The SUT Firmware should have verifiable identifiers in DMI Types 1, 2 and/or
    3 that match the information entered in the hardware entry on C3.
    
