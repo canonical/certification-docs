@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 RST2PDF=rst2pdf
 RST2HTML=rst2html
-DOC_NAMES=Test_Case_Guide-20.04 Test_Case_Guide-18.04 Programme_Guide Coverage_Guide-20.04 Coverage_Guide-18.04 Self-Test_Guide MAAS_Advanced_Network_Installation_And_Configuration_Scripted Policy_Guide
+DOC_NAMES=Test_Case_Guide-20.04 Test_Case_Guide-18.04 Programme_Guide Coverage_Guide Self-Test_Guide MAAS_Advanced_Network_Installation_And_Configuration_Scripted Policy_Guide
 HTML_NAMES=$(DOC_NAMES:=.html)
 PDF_NAMES=$(DOC_NAMES:=.pdf)
 
@@ -21,7 +21,7 @@ maniacs: MAAS_Advanced_Network_Installation_And_Configuration_Scripted.pdf
 
 stg: Self-Test_Guide.pdf Self-Test_Guide.pdf
 
-coverage: Coverage_Guide-18.04.pdf Coverage_Guide-20.04.pdf
+coverage: Coverage_Guide.pdf
 
 policy: Policy_Guide.pdf
 
@@ -33,7 +33,7 @@ maniacsh: MAAS_Advanced_Network_Installation_And_Configuration_Scripted.html
 
 stgh: Self-Test_Guide.html Self-Test_Guide.html
 
-coverageh: Coverage_Guide-18.04.html Coverage_Guide-20.04.html
+coverageh: Coverage_Guide.html
 
 policyh: Policy_Guide.html
 
