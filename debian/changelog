@@ -1,5 +1,18 @@
 certification-docs (0.5.2-0ppa1) focal; urgency=medium
 
+  * Policy Guide
+    * Updated for 22.04
+    * Update LTS_Certification_Schedule image used in Policy Guide
+  * Programme Guide
+    * Updated for 22.04
+    * Update release_cadence.png used in Programme Guide
+  * STG
+    * Added language to clarify PXE boot configuration of SUT
+
+ -- Jeff Lane <jeff@ubuntu.com>  Mon, 11 Apr 2022 23:46:04 -0400
+
+certification-docs (0.5.2-0ppa1) focal; urgency=medium
+
   * Fix build problem on jammy; no changes to documentation files
     themselves.
 

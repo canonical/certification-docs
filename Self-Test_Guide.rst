@@ -376,10 +376,20 @@ up the SUT and test environment:
    -  If the hardware virtualization options in the BIOS/UEFI are not
       enabled, enable them, save the settings and allow the SUT to reboot.
 
-   -  The SUT must be configured to PXE-boot by default.
+   -  The SUT must be configured so that at least ONE network device is set to
+      PXE-boot by default.
 
    -  If the SUT's firmware supports PXE-booting in UEFI mode, it must be
       configured to boot in UEFI mode, rather than in BIOS/CSM/legacy mode.
+
+   -  All non-network devices have been removed from the Boot Options so that
+      Network Booting (PXE) is the only option. The Ubuntu installer will add
+      an Ubuntu menu option and that is OK, but testing expects the Network
+      Boot device is the first item in the boot menu.
+
+      - On systems where it is impossible to remove non-network boot options,
+        please ensure that the Network Booting option is the first (default)
+        boot option so that the machine ALWAYS boots from network first.
 
 -  The SUT Firmware should have verifiable identifiers in DMI Types 1, 2 and/or
    3 that match the information entered in the hardware entry on C3.
