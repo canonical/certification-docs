@@ -1,4 +1,4 @@
-certification-docs (0.5.2-0ppa1) focal; urgency=medium
+certification-docs (0.5.3-0ppa1) focal; urgency=medium
 
   * Policy Guide
     * Updated for 22.04
@@ -8,6 +8,13 @@ certification-docs (0.5.2-0ppa1) focal; urgency=medium
     * Update release_cadence.png used in Programme Guide
   * STG
     * Added language to clarify PXE boot configuration of SUT
+  * Coverage Guide
+    * Removed versioned Coverage Guide source
+    * Updates for 22.04 to new single Coverage Guide doc
+    * Updated Makefile to de-version the Coverage Guide
+  * Changelog
+    * Update changelog and fix version conflict introduced by my my last
+      commits.
 
  -- Jeff Lane <jeff@ubuntu.com>  Mon, 11 Apr 2022 23:46:04 -0400
 
