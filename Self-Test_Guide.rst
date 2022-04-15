@@ -61,13 +61,18 @@ IPMI
   Intelligent Platform Management Interface -- A BMC technology for
   remotely connecting to a computer to perform management functions.
 
-KVM
+KVM (Meaning 1)
   Kernel Virtual Machine -- A system for running virtual machines on
   Ubuntu Server.
 
 .. raw:: pdf
 
    PageBreak
+
+KVM (Meaning 2)
+  Keyboard/Video/Mouse -- A device for sharing a keyboard, mouse, and
+  monitor between multiple computers, sometimes over a network; or a
+  BMC feature to enable remote access to a computer's console.
 
 LAN
   Local Area Network -- The network to which your SUT and Targets are
@@ -145,7 +150,7 @@ The highlights of this process are:
    Tests`_, is key to this check.)
 
 #. Run the test suite on the SUT, as described in `Running the
-   Certification Tests`_.
+   Certification Tests`_ and `Performing ISO Install Tests`_.
 
 #. Submit the test results to C3. This may be done semi-automatically
    when running the tests, or can be done manually, as described in
@@ -215,8 +220,9 @@ When creating an entry, you must enter assorted pieces of information:
    * **Make** -- The manufacturer of the system, e.g. Dell, HPE, as you
      would like it to appear on the public web site.
 
-   * **Model** -- The name of the system itself, e.g PowerEdge R7425 or
-     ProLiant DL380, as you would like it to appear on the public web site.
+   * **Model** -- The name of the system itself, e.g PowerEdge R750 or
+     ProLiant DL380 Gen10, as you would like it to appear on the public web
+     site.
 
    * **Codename** -- This is for your internal reference and identifies
      the internal code name associated with the SUT. This data is
@@ -270,21 +276,14 @@ that you have:
    Note that a USB stick with multiple partitions may cause problems, so if
    necessary you should repartitition your device to have a single
    partition. Modern computers typically provide both USB 2 and USB 3
-   ports, which are tested separately. Thus, you're likely to need two USB
-   sticks per computer, at least one of which must be a USB 3 device. If
+   ports, but we require testing of only the fastest USB device -- normally
+   the USB 3 port. If
    you need to test more than one computer then *bring enough USB sticks to
    test all the systems*.
 
 -  Writable SD cards configured with the same rules as the USB sticks.
    These SD cards are needed only on those (rare) servers that have
    external SD card slots.
-
--  Data CDs that hold data (for servers with optical drives only). These
-   are required to test the
-   systems' optical drive read capabilities. Note that a movie DVD or an
-   audio CD won't be useful in this case, as they are not in the right
-   format for the test. If you need to test more than one computer then
-   *bring one medium per system*.
 
 -  A computer to function as an ``iperf3`` Target on the test LAN. This
    computer must have network ports that equal or exceed the speed of the
@@ -586,20 +585,20 @@ install Ubuntu on the SUT as follows:
 #. Select the Ubuntu release you want to deploy:
 
    - Choose the Ubuntu version you wish to deploy from the list of available
-     Ubuntu releases. The options will appear similar to **20.04 LTS
-     "Focal Fossa"** in the middle drop-down box.
+     Ubuntu releases. The options will appear similar to **22.04 LTS
+     "Jammy Jellyfish"** in the middle drop-down box.
 
    - Choose the kernel you wish to deploy. The available kernels are in the
      dropdown box below the Ubuntu version. For recent versions of Ubuntu,
-     they will be named similar to **focal (ga-20.04)**.
+     they will be named similar to **jammy (ga-22.04)**.
 
      - When deploying the SUT for testing, you should always start out with
-       the original GA kernel.  For 20.04 LTS, the **focal (ga-20.04)**
+       the original GA kernel. For 22.04 LTS, the **jammy (ga-22.04)**
        option is appropriate. If the sysetm is not deployable or fails
        certification using the GA kernel, you will then need to re-deploy
        the SUT choosing the correct HWE kernel option (if available). Note
        that an HWE kernel option becomes available only starting with the
-       second point release for an LTS version, such as 18.04.2 or 20.04.2.
+       second point release for an LTS version, such as 20.04.2 or 22.04.2.
 
      - Do not choose any of the **edge** or
        **lowlatency** kernel options for official Certification testing.
@@ -679,9 +678,8 @@ special devices can function in one of three different modes, described below.
   spaces using either the system configuration tools (e.g. Setup/BIOS) or
   userspace tools after installation, which requires a reboot afterwards. 
   If using userspace tools, you will need to use ``ipmctl`` for the initial
-  configuration.  ``ipmctl`` is available in 18.04 LTS via the Hardware
-  Certification PPA that provides the Server Test Suite, and is available
-  via the Universe repo in 20.04 LTS. Using ``ipmctl`` you should allocate
+  configuration.  ``ipmctl`` is available via the Universe repo in 20.04
+  LTS and later. Using ``ipmctl`` you should allocate
   at least 25% of the DCPMM space to Memory Mode and the remainder as
   AppDirect Mode.
 
@@ -734,8 +732,8 @@ access the SUT:
    applied.
 
 -  You should verify your SUT's kernel version by typing ``uname -r``.
-   Ubuntu 18.04 GA ships with a 4.15.0-series kernel and Ubuntu 20.04 GA
-   ships with a 5.4.0-series kernel. Note that, although updated kernels
+   Ubuntu 20.04 GA ships with a 5.4.0-series kernel and Ubuntu 22.04 ships
+   with a 5.15-series kernel. Note that, although updated kernels
    ship with most
    point-release versions, if you use the standard MAAS images,
    ``lsb_release -a`` will show that you have the latest point-release
@@ -920,7 +918,7 @@ You can initiate a testing session in a server as follows:
 
 #. Run the certification tests by typing an appropriate command, such as::
 
-    $ certify-20.04
+    $ certify-22.04
 
    In some cases, though, another command may be necessary:
 
@@ -939,7 +937,7 @@ You can initiate a testing session in a server as follows:
 
 #. If at any time during the execution you are *sure* the computer has
    crashed (or it reboots spontaneously) then after the system comes back
-   up you should run the ``certify-20.04`` command again
+   up you should run the ``certify-22.04`` command again
    and respond `y` when asked if you want to resume the previous session.
 
 #. If any tests fail or do not run, a screen will appear that summarizes
@@ -1018,6 +1016,139 @@ fail but still enable a certification to pass include the following:
 Consult your account manager if you have questions about specific test
 results.
 
+Performing ISO Install Tests
+============================
+
+Beginning with Ubuntu 22.04, tests must be performed to ensure that the SUT
+can be installed manually with physical installation media (optical discs
+or USB flash drives). (For pusposes of this test, a BMC's virtual media
+support counts as "physical media.") These tests may be run before or after
+the bulk of the certification tests, as just described. Results are
+submitted in a similar way and those results must be referenced in the main
+submission, as described shortly. To perform these tests:
+
+#. Download an Ubuntu installation image from
+   https://cdimage.ubuntu.com/releases/22.04/release/. Be sure to retrieve
+   the server install image (``ubuntu-22.04-live-server-amd64.iso`` or a
+   variant for your SUT's architecture).
+
+#. Write the image to a bootable medium. There are several ways to do this,
+   including:
+
+   * You can use any optical disc burner program to write the image to a
+     DVD+R or similar medium if the SUT has an optical drive. (Note that
+     a CD-R is not large enough to hold the image; you must use a DVD-sized
+     medium.)
+
+   * You can use the Linux ``dd`` command to write the image to a USB flash
+     drive, as in ``sudo dd if=ubuntu-22.04-live-server-amd64.iso
+     of=/dev/sdd status=progress``, changing ``/dev/sdd`` to whatever
+     device file accesses your USB flash drive. (**WARNING: Specifying the
+     wrong device file can wipe out a hard disk!**) Be sure the target disk
+     is large enough to hold the image; it's about 1.4 GiB.
+
+   * For information on creating a bootable USB drive from Windows or using
+     GUI Linux tools, see the `Burning ISO HOWTO`_.
+
+   * To use the SUT's BMC to map the ``.iso`` file to a virtual medium,
+     consult the SUT's documentation.
+
+   .. _Burning ISO HOWTO:
+       https://help.ubuntu.com/community/BurningIsoHowto
+
+#. Prepare the SUT. For the most part, the SUT must be configured as
+   described earlier, in `Configuring the SUT for Testing`_; however, for
+   this test, it must boot from the removable medium. This can be done on a
+   one-time basis by using the computer's one-time boot option, as
+   described shortly.
+
+#. Insert the Ubuntu Live Server medium in the SUT or link the ``.iso``
+   image file as a virtual medium using the computer's BMC.
+
+#. Acquire console access. This can be a physical keyboard and monitor
+   connected directly to the computer or a remote KVM provided by the
+   computer's BMC or a remote KVM device.
+
+#. Power on (or reboot) the server.
+
+#. At the appropriate point in the boot process, enter the computer's boot
+   options menu. This is typically done by hitting F10, F12, Esc, or some
+   other key at a critical point. The key to press is usually prompted when
+   it becomes relevant. Consult the server's documentation for details. You
+   can then select the boot medium for booting. The boot medium is usually
+   (but not always) identified by brand name; for instance, an ADATA USB
+   flash drive will be identified by that brand name. In some cases, two
+   options appear for the boot medium, one of which includes the string
+   "UEFI" and one of which doesn't. Select the "UEFI" option if it's
+   present.
+
+#. Install Ubuntu Live Sever. The `Install Ubuntu Server`_ Tutorial
+   describes how to do this in detail. For the most part, you can install
+   as described in that Tutorial and using whatever options are appropriate
+   for your network; however, some items to which you may need to pay
+   special attention include:
+
+   .. _Install Ubuntu Server:
+       https://ubuntu.com/tutorials/install-ubuntu-server
+
+   * At least one active network device is desirable for machine
+     access and to transfer results from the SUT to C3; however, the
+     ISO-install test does not explicitly test network connections.
+     Therefore, you may opt to configure just one network device if that's
+     convenient.
+
+   * Certification testing normally requires a "flat" (non-LVM) storage
+     configuration; however, the ISO-install test does not test storage, so
+     this requirement is waived for this test. The Live Server installation
+     defaults to an LVM configuration. You can leave this as-is or change
+     it, as you see fit.
+
+   * You can use any username and password you desire. Be sure to remember
+     both so that you can log in.
+
+   * Installing the OpenSSH server is desirable if you want to access the
+     server remotely; however, this capability is not required if you have
+     physical access to the server, or access via a BMC's remote KVM
+     functionality. If you do install the OpenSSH server, you will have the
+     option to install remote access credentials from Launchpad or GitHub.
+     Doing so will simplify access.
+
+   * When asked whether to install any of the "featured server snaps,"
+     leave them all de-selected; none are required.
+
+#. When the installation is complete, reboot into the installed system and
+   log in. You can log in at the console, remotely via a KVM, or remotely
+   via SSH.
+
+#. Install the Server Test Suite by typing the following commands::
+
+    $ sudo add-apt-repository ppa:checkbox-dev/ppa
+    $ sudo apt install canonical-certification-server
+
+#. Type ``test-iso-install``. This command runs the ISO-install test.
+
+   * You will be prompted for your password early in the test run.
+     Enter it to proceed.
+
+   * The test should take about 2-5 minutes to run. At the end of the test
+     run, you will be asked whether to submit test results. Respond ``Y``
+     to do so. You will then be asked to enter a test description and the
+     computer's SID value, as with a full test run.
+
+   * If the SUT has no direct Internet access, you can instead extract
+     the test files and submit them from another computer, as described
+     in the next section, `Manually Uploading Test Results to the
+     Certification Site`_.
+
+#. If you've already created a certificate request based on the main test
+    run submission, you should locate that certificate request on C3 and
+    add a note that points to the URL of the results you've just uploaded
+    for the ISO-install test. If you have not yet submitted
+   the machine's main results, you will have to create a Note linking to
+   the ISO-install test after you submit those results. (See the upcoming
+   section, `Requesting a Certificate`_, for information on that process,
+   including attaching Notes to certificate requests.)
+
 Manually Uploading Test Results to the Certification Site
 =========================================================
 
@@ -1031,12 +1162,12 @@ install the ``checkbox-ng`` package. Follow these instructions:
 
 #. Add the Hardware Certification PPA::
 
-   $ sudo apt-add-repository ppa:hardware-certification/public
-   $ sudo apt-get update
+   $ sudo add-apt-repository ppa:hardware-certification/public
+   $ sudo apt update
 
 #. Install the package::
 
-   $ sudo apt-get install checkbox-ng
+   $ sudo apt install checkbox-ng
 
 #. Run the following command::
 
@@ -1150,10 +1281,10 @@ tools using ``apt-get``.
 
 Log in to the server and run the following commands::
 
-  $ sudo apt-add-repository ppa:hardware-certification/public
-  $ sudo apt-add-repository ppa:firmware-testing-team/ppa-fwts-stable
-  $ sudo apt-get update
-  $ sudo apt-get install canonical-certification-server
+  $ sudo add-apt-repository ppa:hardware-certification/public
+  $ sudo add-apt-repository ppa:firmware-testing-team/ppa-fwts-stable
+  $ sudo apt update
+  $ sudo apt install canonical-certification-server
 
 .. The ppa:hardware-certification/public should be stable. For
    the development PPA, instead use ppa:checkbox-dev/ppa.
@@ -1161,7 +1292,7 @@ Log in to the server and run the following commands::
 If you want to  run the test suite from an Ubuntu live medium, you must
 also enable the universe repository::
 
-  $ sudo apt-add-repository universe
+  $ sudo add-apt-repository universe
 
 Note that running the test suite from a live medium is not accepted for any
 certification attempt; this information is provided to help in unusual
@@ -1192,18 +1323,18 @@ limited test script and by installing updated test scripts.
 Running a Limited Test Script
 -----------------------------
 
-In addition to the ``certify-20.04`` test script, several others are
+In addition to the ``certify-22.04`` test script, several others are
 provided with the Server Test Suite:
 
 - If you're testing a System-on-Chip (SoC) rather than a production
-  server, you should run ``certify-soc-20.04``.
+  server, you should run ``certify-soc-22.04``.
 
 - If you're testing a virtual machine, you should run
-  ``certify-vm-20.04``.
+  ``certify-vm-22.04``.
 
 - The ``test-firmware`` command runs firmware tests.
 
-- The ``test-functional-20.04`` command runs functional tests.
+- The ``test-functional-22.04`` command runs functional tests.
 
 - The ``test-gpgpu`` command runs tests on nVidia GPGPUs. (See
   `Appendix G - Setting Up and Testing a GPGPU`_ for important information
@@ -1224,9 +1355,9 @@ provided with the Server Test Suite:
 
 - The ``test-storage`` command runs tests of storage devices.
 
-- The ``test-usb`` command runs tests of USB ports.
-
 - The ``test-stress`` command runs CPU, RAM and storage stress tests.
+
+- The ``test-usb`` command runs tests of USB ports.
 
 - The ``test-virtualization`` command runs virtualization (KVM and
   LXD) tests.
@@ -1236,7 +1367,7 @@ both memory and storage stress tests and thus will take a while to run.  If
 your NVDIMMs are configured only in memory or storage mode you can save some
 time by using the ``test-memory`` or ``test-storage`` launchers respectively.
 
-If you're testing Ubuntu 18.04, change the version number in commands that
+If you're testing Ubuntu 20.04, change the version number in commands that
 include it. Consult your Partner Engineer if you need help
 deciding which of these tests to run.
 
@@ -1294,17 +1425,18 @@ Ubuntu LTS releases are updated to a new *point release* version
 approximately three months after each intervening release -- that is,
 20.04.1 was released in August of 2020 (about three months after 20.04),
 20.04.2 was released in February of 2021 (three months after 20.10),
-and so on. These updates use the kernels from the latest interim release,
+and so on. A similar progression will occur with Ubuntu 22.04.
+These updates use the kernels from the latest interim release,
 which can affect hardware compatibility; however, the new kernels are
 supported for a limited period of time compared to the GA kernel.
 Therefore, certification can involve testing multiple Ubuntu releases or
 Linux kernels:
 
 -  The GA release -- That is, the version that was released in April of the
-   release year (2018 for 18.04, 2020 for 20.04). Ubuntu 18.04 shipped with
-   a 4.15.0-series kernel, and 20.04 shipped with a 5.4.0-series kernel.
+   release year (2020 for 20.04, 2022 for 22.04). Ubuntu 20.04 shipped with
+   a 5.4.0-series kernel, and 22.04 shipped with a 5.15.0-series kernel.
 
--  The current point release -- That is, version 18.04.5, 20.04.3, or
+-  The current point release -- That is, version 20.04.4, or
    whatever is the
    latest release in the series. Testing point-release versions starting
    with the .2 point release in addition to the original GA version serves
@@ -1496,7 +1628,7 @@ SUT must be able to reach the internet and more specifically reach
 ``launchpad.net``.  If either of those requirements are not met, you will receive a
 somewhat confusing message like this::
 
- ubuntu@ubuntu:~$ sudo apt-add-repository ppa:hardware-certification/public
+ ubuntu@ubuntu:~$ sudo add-apt-repository ppa:hardware-certification/public
  Cannot add PPA: 'ppa:hardware-certification/public'.
  Please check that the PPA name or format is correct.
 
@@ -1512,15 +1644,6 @@ the ``checkbox-cli`` program, as described earlier, in
 this on the SUT, but if network problems prevented a successful submission,
 you may need to bring the files out on a USB flash drive or other removable
 medium and submit them from a computer with better Internet connectivity.
-
-Addressing the Inconsistent Message when Submitting Results
------------------------------------------------------------
-
-If you receive a message that looks like the following when using
-``checkbox-cli`` to submit results, please be sure to save the
-``submission*.tar.xz`` file and contact your account manager::
-
-  2014-04-28 10:55:33,894 CRITICAL Error: Inconsistent message
 
 Resolving Network Problems
 --------------------------
@@ -1819,6 +1942,10 @@ Requirements for GPGPU testing
   - The SUT must be able to talk to the Internet in order to download a
     significant number of packages from the nVidia repositories.
 
+- Installation of the ``checkbox-provider-gpgpu`` package -- type ``sudo
+  apt install checkbox-provider-gpgpu`` after deploying the node. This
+  package is installed from the Certification PPA, which should be enabled
+  when you deployed the node or installed Checkbox manually.
 
 Setting Up a GPGPU for Testing
 ------------------------------

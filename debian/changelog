@@ -1,3 +1,10 @@
+certification-docs (0.5.4-0ppa1) focal; urgency=medium
+
+  * Updated STG for Ubuntu 22.04 (Jammy Jellyfish)
+  * Added information on ISO-boot test procedure to STG.
+
+ -- Rod Smith <rod.smith@canonical.com>  Fri, 15 Apr 2022 13:55:29 -0400
+
 certification-docs (0.5.3-0ppa1) focal; urgency=medium
 
   * Policy Guide
