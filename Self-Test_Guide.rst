@@ -1141,9 +1141,9 @@ submission, as described shortly. To perform these tests:
      Certification Site`_.
 
 #. If you've already created a certificate request based on the main test
-    run submission, you should locate that certificate request on C3 and
-    add a note that points to the URL of the results you've just uploaded
-    for the ISO-install test. If you have not yet submitted
+   run submission, you should locate that certificate request on C3 and
+   add a note that points to the URL of the results you've just uploaded
+   for the ISO-install test. If you have not yet submitted
    the machine's main results, you will have to create a Note linking to
    the ISO-install test after you submit those results. (See the upcoming
    section, `Requesting a Certificate`_, for information on that process,
