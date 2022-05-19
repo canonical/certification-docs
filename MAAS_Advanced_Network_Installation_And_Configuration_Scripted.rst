@@ -1142,7 +1142,9 @@ You can make this change even to lower-speed networks or to networks with
 mixed speeds; however, the change applies to *all* the computers that MAAS
 controls on the
 associated fabric. Because jumbo frames create problems in some cases (such
-as PXE-booting some older UEFI-based computers), you should be cautious
+as PXE-booting some older UEFI-based computers or complete failure of
+communication if intervening switches are not properly configured), you
+should be cautious
 about applying this change too broadly. That said, if it works for your
 servers, there's little reason to *not* set jumbo frames universally. Note
 that this change will not automatically adjust your iperf3 servers' MTUs,

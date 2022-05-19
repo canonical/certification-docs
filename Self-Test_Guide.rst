@@ -1507,7 +1507,9 @@ configures both the SUT and the ``iperf3`` Target for optimal performance:
    - Note that setting jumbo frames is not normally necessary on low-speed
      network interfaces, and in some cases jumbo frames can cause problems.
      Specifically, some EFI-based computers can't PXE-boot from a MAAS
-     server's interface that's configured to use jumbo frames. Thus, you
+     server's interface that's configured to use jumbo frames, and switches
+     that don't support jumbo frames can cause problems, too, as described
+     shortly. Thus, you
      should restrict this procedure to interfaces from which servers do
      *not* PXE-boot, if possible. If this is not possible and if you have
      problems PXE-booting computers, you may need to enable jumbo frames
@@ -1536,7 +1538,9 @@ configures both the SUT and the ``iperf3`` Target for optimal performance:
 
 #. You may need to enable jumbo frames on any switch(es) between the
    ``iperf3`` Target and the SUT. How to do this varies from one switch to
-   another, so you must consult the switch's documentation.
+   another, so you must consult the switch's documentation. If a switch
+   drops jumbo-frame traffic, the result can be a complete failure of
+   communication between two computers configured to use jumbo frames.
 
 #. Repeat steps 1 and 2 on the SUT.
 
