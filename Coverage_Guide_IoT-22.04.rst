@@ -1,6 +1,6 @@
-===========================================================================
-Internet of Things Certified Hardware Coverage for Ubuntu Core 22 and 22.04
-===========================================================================
+==============================================
+Internet of Things Certified Hardware Coverage
+==============================================
 
 .. include:: <isonum.txt>
 
@@ -29,9 +29,16 @@ Internet of Things Certified Hardware Coverage for Ubuntu Core 22 and 22.04
 Introduction
 ============
 
-This document lists the coverage for certification of Internet of Things devices
-with Ubuntu Core 22 or Ubuntu 22.04. The guide applies to devices submitted to 
-Canonical through one of the following programmes:
+This document lists the coverage for certification of Internet of Things (IoT)
+devices with Ubuntu images. IoT devices can be certified with the following
+image types:
+
+- Ubuntu Core 22
+- Ubuntu Server 22.04
+- Ubuntu Desktop 22.04
+
+The guide applies to devices submitted to Canonical through one of the
+following programmes:
 
 - IoT Devices Enablement Programme with Certification
 - IoT ODM Partner Programme
@@ -107,7 +114,7 @@ test specific features as:
 
 We will also include a general stress test performed for 120 minutes to verify 
 that the system can handle a sustained high load for a period of time. This 
-test uses the tool “stress” available in the Universe repositories.
+test uses the tool “stress-ng” available in the Universe repositories.
 
 For Intel CPU’s, the IPDT (Intel Processor Diagnostic Tool) test suite will be 
 run.  The diagnostic checks for brand identification, verifies the processor 
