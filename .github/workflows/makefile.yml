@@ -1,0 +1,27 @@
+name: Build HTML formatted documentation
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install apt prerequisites
+      run: apt-get install --no-install-recommends --assume-yes rst2pdf python3-pip python3-venv python3-sphinx build-essential
+      
+    - name: Set up and activate virtualenv
+      run: python3 -m venv /opt/venv && . /opt/venv/bin/activate
+
+    - name: Install pypi prerequisites
+      run: /opt/venv/bin/pip install -r requirements.txt
+    
+    - name: Build HTML formatteed documentation
+      run: make html
