@@ -4,7 +4,7 @@ SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = _build
-VENV = env/bin/activate
+VENV          = env/bin/activate
 PORT = 8001
 
 # Cert documentation options
@@ -31,7 +31,7 @@ all:	html pdf
 html:
 	. $(VENV); $(SPHINXBUILD) -b dirhtml . _build/html
 
-run:
+autobuild:
 	. $(VENV); sphinx-autobuild $(ALLSPHINXOPTS) --ignore ".git/*" --ignore "*.scss" . -b dirhtml -a _build/html --host 0.0.0.0 --port $(PORT)
 
 spelling:
