@@ -1,0 +1,6 @@
+[submodule "external/plainbox-provider-checkbox"]
+	path = external/plainbox-provider-checkbox
+	url = https://git.launchpad.net/plainbox-provider-checkbox
+[submodule "external/plainbox-provider-certification-server"]
+	path = external/plainbox-provider-certification-server
+	url = https://git.launchpad.net/plainbox-provider-certification-server

@@ -72,12 +72,36 @@ targets are:
 * ``maniacsh`` -- Builds the MANIACS document as an HTML file
 * ``pdf`` -- Builds all three documents as PDFs
 * ``html`` -- Builds all three documents as HTML files
+* ``autobuild`` -- Runs sphinx-autobuild to allow previewing and reloading content upon change
 * ``all`` (default) -- Builds all three documents as both PDFs and as
   HTML files
 * ``clean`` -- Removes all ``.pdf`` and ``.html`` files
 
-Note that the primary intended output format is PDF; HTML output is rough
-at this time (July, 2015).
+Building targets in Docker
+==========================
+
+As an alternative to installing the prerequisites on your system, you can alternatively use the `Dockerfile` included in the repository.
+
+1. Build the Docker image at the root of the repository: ``docker build . -t cert-docs``
+2. Run with ``docker run``. For example: ``docker run -v $(pwd):/docs cert-docs make VENV_ACTIVATE=/opt/venv/bin/activate html``
+
+
+sphinx-autobuild in Docker
+--------------------------
+
+To run `sphinx-autobuild` and to connect to the server from the development server, do the following:
+
+```
+docker run -it --expose 8001 -p8001:8001 -v $(pwd):/docs cert-docs make VENV=/opt/venv/bin/activate autobuild
+```
+
+Test case guide in Docker
+-------------------------
+
+```
+docker run -it -v $(pwd):/docs cert-docs ./mk-test-case-guide -a ./external/plainbox-provider-certification-server/units/server-full-20.04.pxu -j ./external/plainbox-provider-certification-server/units --preamble testcase-preample.rst --output Test_Case_Guide_20.04.rst
+```
+
 
 Styles and Formatting
 =====================

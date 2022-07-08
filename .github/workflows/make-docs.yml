@@ -1,0 +1,94 @@
+name: Build HTML and PDF formatted documentation
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Add hardware-certification/public ppa
+        run: |
+          sudo add-apt-repository ppa:hardware-certification/public
+          sudo apt-get update
+
+      - name: Install apt prerequisites
+        run: |
+          sudo apt-get install --no-install-recommends --assume-yes \
+          rst2pdf \
+          python3-pip \
+          python3-venv \
+          python3-sphinx \
+          build-essential \
+          plainbox-provider-resource-generic \
+          plainbox-provider-certification-client \
+          plainbox-provider-checkbox \
+          canonical-certification-client \
+          plainbox-provider-resource-generic \
+          plainbox-provider-certification-server \
+          plainbox-provider-checkbox \
+          canonical-certification-server \
+          canonical-certification-client \
+          checkbox-ng
+
+      - name: Set up and activate virtualenv
+        run: python3 -m venv venv && . venv/bin/activate
+
+      - name: Install pypi prerequisites
+        run: pip install -r requirements.txt
+
+      - name: Make 18.04 server test case guide
+        run: |
+          ./mk-test-case-guide \
+          -a ./external/plainbox-provider-certification-server/units/server-full-18.04.pxu \
+          -j ./external/plainbox-provider-checkbox/units \
+          --preamble ./testcase-preamble.rst \
+          --output ./Test_Case_Guide_18.04.rst
+
+      - name: Make 20.04 server test case guide
+        run: |
+          ./mk-test-case-guide \
+          -a ./external/plainbox-provider-certification-server/units/server-full-20.04.pxu \
+          -j ./external/plainbox-provider-checkbox/units \
+          --preamble ./testcase-preamble.rst \
+          --output ./Test_Case_Guide_20.04.rst
+
+      - name: Make 22.04 server test case guide
+        run: |
+          ./mk-test-case-guide \
+          -a ./external/plainbox-provider-certification-server/units/server-full-22.04.pxu \
+          -j ./external/plainbox-provider-checkbox/units \
+          --preamble ./testcase-preamble.rst \
+          --output ./Test_Case_Guide_22.04.rst
+
+      - name: Build server test case guide
+        run: make VENV=./venv clean && make VENV=./venv testcase
+
+      - name: Build HTML formatted documentation
+        run: make VENV=./venv clean && make VENV=./venv html
+
+      - name: Build PDF formatted documentation
+        run: make VENV=./venv clean && make VENV=./venv pdf
+
+      - name: Upload PDF formatted artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: PDFs
+          path: |
+            *.pdf
+          retention-days: 5
+
+      - name: Upload HTML formatted artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: HTML
+          path: _build/html
+          retention-days: 5
