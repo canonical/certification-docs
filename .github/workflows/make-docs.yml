@@ -70,10 +70,25 @@ jobs:
           --output ./Test_Case_Guide_22.04.rst
 
       - name: Build server test case guide
-        run: make VENV=./venv testcase
+        run: make VENV=./venv clean && make VENV=./venv testcase
 
       - name: Build HTML formatted documentation
-        run: make VENV=./venv html
+        run: make VENV=./venv clean && make VENV=./venv html
 
       - name: Build PDF formatted documentation
-        run: make VENV=./venv pdf
+        run: make VENV=./venv clean && make VENV=./venv pdf
+
+      - name: Upload PDF formatted artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: PDFs
+          path: |
+            *.pdf
+          retention-days: 5
+
+      - name: Upload HTML formatted artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: HTML
+          path: _build/html
+          retention-days: 5
