@@ -74,3 +74,6 @@ jobs:
 
       - name: Build HTML formatted documentation
         run: make VENV=./venv html
+
+      - name: Build PDF formatted documentation
+        run: make VENV=./venv pdf
