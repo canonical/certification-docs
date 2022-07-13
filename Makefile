@@ -23,6 +23,29 @@ stg: Self-Test_Guide.pdf Self-Test_Guide.pdf
 
 coverage: Coverage_Guide.pdf
 
+iot_stg_desktop:
+	rm -f .iot_stg_desktop_full.rst
+	cat	00_Self-Test_Guide_ODM.rst > .iot_stg_desktop_full.rst
+	cat 01a_Self-Test_Guide_ODM.rst >> .iot_stg_desktop_full.rst
+	cat 02a_Self-Test_Guide_ODM.rst >> .iot_stg_desktop_full.rst
+	cat 03_Self-Test_Guide_ODM.rst >> .iot_stg_desktop_full.rst
+	$(RST2PDF) --smart-quotes 1 -s styles/cert-doc.style .iot_stg_desktop_full.rst -o Self-Test_Guide_ODM_Desktop.pdf
+
+iot_stg_ubuntucore:
+	rm -f .iot_stg_ubuntucore_full.rst
+	cat	00_Self-Test_Guide_ODM.rst > .iot_stg_ubuntucore_full.rst
+	cat 01b_Self-Test_Guide_ODM.rst >> .iot_stg_ubuntucore_full.rst
+	cat 02b_Self-Test_Guide_ODM.rst >> .iot_stg_ubuntucore_full.rst
+	cat 03_Self-Test_Guide_ODM.rst >> .iot_stg_ubuntucore_full.rst
+	$(RST2PDF) --smart-quotes 1 -s styles/cert-doc.style .iot_stg_ubuntucore_full.rst -o Self-Test_Guide_ODM_UbuntuCore.pdf
+
+iot_stg_server:
+	rm -f .iot_stg_server_full.rst
+	cat	00_Self-Test_Guide_ODM.rst > .iot_stg_server_full.rst
+	cat 01c_Self-Test_Guide_ODM.rst >> .iot_stg_server_full.rst
+	cat 03_Self-Test_Guide_ODM.rst >> .iot_stg_server_full.rst
+	$(RST2PDF) --smart-quotes 1 -s styles/cert-doc.style .iot_stg_server_full.rst -o Self-Test_Guide_ODM_Server.pdf
+
 iot_coverage: Coverage_Guide_IoT-22.04.pdf
 
 policy: Policy_Guide.pdf
